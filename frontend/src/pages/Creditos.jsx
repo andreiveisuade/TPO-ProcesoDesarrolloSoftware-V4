@@ -1,4 +1,5 @@
 import { formatMoneda, formatFecha } from '../utils/formato';
+import { CARGOS } from '../utils/cargos';
 import Aviso from '../components/Aviso';
 import { getCredito } from '../api/creditos';
 import { useState } from 'react';
@@ -16,11 +17,16 @@ const estadoCuota = (c) => {
   return ESTADO_CUOTA.pendiente;
 };
 
-const FORM_VACIO = { dniCliente:'', deudaOriginal:'', fecha:'', tasaInteres:'', cantidadCuotas:'', tipoPlan:'INTERES_SIMPLE' };
+const FORM_VACIO = { dniCliente:'', deudaOriginal:'', fecha:'', tasaInteres:'', cantidadCuotas:'', tipoPlan:'INTERES_SIMPLE', cargos:[] };
 
 const descripcionPlan = (cr) => cr.tipoPlan === 'SISTEMA_FRANCES'
   ? `Sistema francés · ${cr.tasaInteres}% mensual`
   : `Interés simple · ${cr.tasaInteres}% total`;
+
+const descripcionCargos = (cr) => {
+  const etiquetas = Object.keys(CARGOS).filter(c => cr.cargos?.includes(c)).map(c => CARGOS[c].etiqueta);
+  return etiquetas.length ? etiquetas.join(', ') : 'Sin cargos';
+};
 
 // Creditos de un cliente y consulta de uno por numero: otorgamiento, plan de
 // cuotas con su estado y anulacion.
@@ -53,6 +59,11 @@ export default function Creditos() {
       setErrorBusqueda(err);
     }
   };
+
+  const alternarCargo = (cargo) => setForm({
+    ...form,
+    cargos: form.cargos.includes(cargo) ? form.cargos.filter(c => c !== cargo) : [...form.cargos, cargo],
+  });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -109,6 +120,7 @@ export default function Creditos() {
         <div><dt style={styles.dt}>Otorgado</dt><dd style={styles.dd}>{formatFecha(cr.fecha)}</dd></div>
         <div><dt style={styles.dt}>Total a devolver</dt><dd style={styles.dd}>{formatMoneda(cr.totalADevolver)}</dd></div>
         <div><dt style={styles.dt}>Cuota</dt><dd style={styles.dd}>{cr.cantidadCuotas} × {formatMoneda(cr.importeCuota)}</dd></div>
+        <div><dt style={styles.dt}>Cargos</dt><dd style={styles.dd}>{descripcionCargos(cr)}</dd></div>
         <div><dt style={styles.dt}>Saldo</dt><dd style={{ ...styles.dd, fontWeight: 'bold' }}>{formatMoneda(cr.saldo)}</dd></div>
       </dl>
 
@@ -186,6 +198,12 @@ export default function Creditos() {
             <option value="INTERES_SIMPLE">Interés simple (% total)</option>
             <option value="SISTEMA_FRANCES">Sistema francés (% mensual)</option>
           </select>
+          {Object.entries(CARGOS).map(([cargo, { etiqueta, detalle }]) => (
+            <label key={cargo} style={styles.casilla}>
+              <input type="checkbox" checked={form.cargos.includes(cargo)} onChange={() => alternarCargo(cargo)} />
+              {etiqueta} ({detalle})
+            </label>
+          ))}
           <button style={{...styles.btn, gridColumn:'span 2'}} disabled={loading}>
             {loading ? 'Guardando...' : 'Crear crédito'}
           </button>
@@ -212,6 +230,7 @@ const styles = {
   card:         { background:'var(--color-surface)', padding:'24px', borderRadius:'12px', boxShadow:'0 2px 10px var(--color-shadow)', marginBottom:'24px' },
   row:          { display:'flex', gap:'12px' },
   grid:         { display:'grid', gridTemplateColumns:'1fr 1fr', gap:'12px' },
+  casilla:      { display:'flex', alignItems:'center', gap:'8px' },
   input:        { padding:'10px', border:'1px solid var(--color-border-strong)', borderRadius:'6px', width:'100%', boxSizing:'border-box' },
   btn:          { padding:'10px 20px', backgroundColor:'var(--color-primary)', color:'var(--color-on-primary)', border:'none', borderRadius:'6px', cursor:'pointer', fontWeight:'bold' },
   btnAnular:    { background: 'var(--color-danger-solid)', color: 'var(--color-on-primary)', border: 'none', padding: '6px 12px', borderRadius: '4px', cursor: 'pointer', marginBottom: '10px', fontSize: '0.85em' },
