@@ -45,7 +45,7 @@ public class CreditoResponse {
             .fecha(credito.getFecha())
             .tasaInteres(credito.getTasaInteres())
             .tipoPlan(credito.getTipoPlan())
-            .cargos(credito.getCargos())
+            .cargos(Set.copyOf(credito.getCargos()))
             .totalADevolver(credito.totalADevolver())
             .importeCuota(credito.getImporteCuota())
             .cantidadCuotas(credito.getCantidadCuotas())
