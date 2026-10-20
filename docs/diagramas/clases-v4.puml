@@ -49,8 +49,10 @@ package "Controlador (controller)" as Controlador {
   class AdminController <<RestController>> {
     - adminService : AdminService
     + listarUsuarios() : List<UsuarioResponse>
+    + crearUsuario(AltaUsuarioRequest) : UsuarioResponse
     + actualizarPermisos(Long, PermisosRequest) : UsuarioResponse
     + actualizarRol(Long, RolRequest) : UsuarioResponse
+    + actualizarActivo(Long, ActivoRequest) : UsuarioResponse
   }
   class SupervisorController <<RestController>> {
     - adminService : AdminService
@@ -66,6 +68,7 @@ package "Controlador (controller)" as Controlador {
 package "Modelo: servicios (service)" as Servicios {
   interface AuthService <<Facade>> {
     + registrar(RegisterRequest) : AuthResponse
+    + registrarConRol(RegisterRequest, Rol) : UsuarioResponse
     + login(LoginRequest) : AuthResponse
     + actual(String) : AuthResponse
   }
@@ -89,8 +92,10 @@ package "Modelo: servicios (service)" as Servicios {
   }
   interface AdminService {
     + listarUsuarios() : List<UsuarioResponse>
+    + crearUsuario(AltaUsuarioRequest) : UsuarioResponse
     + actualizarPermisos(Long, PermisosRequest) : UsuarioResponse
     + actualizarRol(Long, RolRequest) : UsuarioResponse
+    + actualizarActivo(Long, ActivoRequest) : UsuarioResponse
   }
   interface DashboardService {
     + obtenerEstadisticasGenerales() : DashboardStatsResponse
@@ -116,6 +121,7 @@ package "Modelo: servicios (service)" as Servicios {
   }
   class AdminServiceImpl {
     - usuarioRepository : UsuarioRepository
+    - authService : AuthService
   }
   class DashboardServiceImpl {
     - clienteRepository : ClienteRepository
@@ -170,6 +176,7 @@ ClienteService <|.. ClienteServiceImpl
 CreditoService <|.. CreditoServiceImpl
 CobranzaService <|.. CobranzaServiceImpl
 AdminService <|.. AdminServiceImpl
+AdminServiceImpl --> "1" AuthService : alta por la Facade
 DashboardService <|.. DashboardServiceImpl
 
 Servicios ..down.> Repos : cada *ServiceImpl usa los\nrepositories de sus atributos
@@ -203,6 +210,7 @@ package "Facade: autenticación" {
   }
   interface AuthService <<Facade>> {
     + registrar(RegisterRequest) : AuthResponse
+    + registrarConRol(RegisterRequest, Rol) : UsuarioResponse
     + login(LoginRequest) : AuthResponse
     + actual(String) : AuthResponse
   }
@@ -212,9 +220,15 @@ package "Facade: autenticación" {
     - authenticationManager : AuthenticationManager
     - tokenService : TokenService
     + registrar(RegisterRequest) : AuthResponse
+    + registrarConRol(RegisterRequest, Rol) : UsuarioResponse
     + login(LoginRequest) : AuthResponse
     + actual(String) : AuthResponse
+    - crear(RegisterRequest, Rol) : Usuario
     - buscar(String) : Usuario
+  }
+  class AdminServiceImpl <<Client>> {
+    - authService : AuthService
+    + crearUsuario(AltaUsuarioRequest) : UsuarioResponse
   }
 }
 
@@ -272,21 +286,27 @@ package "Adapter 2: usuario para Spring Security" {
     + getAuthorities() : Collection<GrantedAuthority>
     + getPassword() : String
     + getUsername() : String
+    + isEnabled() : boolean
   }
   class UsuarioDetails <<Adapter>> {
     - usuario : IUsuario
     + getAuthorities() : Collection<GrantedAuthority>
     + getPassword() : String
     + getUsername() : String
+    + isEnabled() : boolean
   }
   interface IUsuario <<Adaptee>> {
     + getUsername() : String
     + getPassword() : String
     + getRol() : Rol
+    + isActivo() : boolean
+    + desactivar() : void
+    + reactivar() : void
   }
 }
 
 AuthController --> "1" AuthService : authService
+AdminServiceImpl --> "1" AuthService : authService
 AuthService <|.. AuthServiceImpl
 AuthServiceImpl --> "1" AuthenticationManager
 AuthServiceImpl --> "1" PasswordEncoder
@@ -307,8 +327,10 @@ UserDetails <|.. UsuarioDetails
 UsuarioDetails o--> "1" IUsuario : usuario
 
 note right of AuthServiceImpl
-  Facade: tres operaciones de negocio sobre
+  Facade: cuatro operaciones de negocio sobre
   Spring Security, BCrypt, el repositorio y JWT.
+  Dos clientes: AuthController (registro, login)
+  y AdminServiceImpl (alta con rol); un solo crear().
   Ningún controlador importa el subsistema.
   También es Client del Adapter 1.
 end note
@@ -324,6 +346,8 @@ note bottom of IUsuario
   del dominio. Los controllers reciben
   el IUsuario, no el Adapter:
   @AuthenticationPrincipal(expression = "usuario").
+  isEnabled() traduce isActivo() (baja lógica):
+  login 401 y JwtAuthFilter descarta el token.
 end note
 @enduml
 
@@ -357,9 +381,12 @@ package "model" {
       - id : Long
       - username : String
       - password : String
+      - activo : boolean
       + {static} nuevo(String, String, Rol, Permisos) : Usuario
       + otorgarPermisos(IPermisos) : void
       + asignarRol(Rol) : void
+      + desactivar() : void
+      + reactivar() : void
       + puedeAnularCredito() : boolean
       + puedeAnularCobranza() : boolean
     }
