@@ -20,7 +20,7 @@ h3{font-size:24px;font-weight:400;margin:0 0 10px}
 .portada .rule{width:64px;height:4px;background:var(--azul);margin:20px 0}
 .portada ul{list-style:none;padding:0;margin:20px 0 0}
 .portada li{padding:2px 0}
-.timeline{display:grid;grid-template-columns:repeat(4,1fr);gap:0;position:relative;margin:24px 0 16px}
+.timeline{display:grid;grid-template-columns:repeat(5,1fr);gap:0;position:relative;margin:24px 0 16px}
 .timeline::before{content:"";position:absolute;left:0;right:0;top:11px;height:3px;background:var(--azul)}
 .hito{position:relative;padding:32px 14px 0 0}
 .hito .punto{position:absolute;top:2px;left:0;width:20px;height:20px;border-radius:50%;background:var(--fondo);border:3px solid var(--azul)}

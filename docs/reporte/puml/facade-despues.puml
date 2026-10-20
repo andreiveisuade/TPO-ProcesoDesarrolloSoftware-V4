@@ -1,0 +1,35 @@
+@startuml
+skinparam shadowing false
+skinparam defaultFontName Calibri
+skinparam defaultFontSize 12
+skinparam ClassBackgroundColor #FFFFFF
+skinparam ClassBorderColor #1D2B4F
+skinparam ClassHeaderBackgroundColor #FFFFFF
+skinparam ArrowColor #2E75B6
+skinparam NoteBackgroundColor #FFF8E1
+skinparam NoteBorderColor #B38600
+hide empty members
+class AuthController <<Client>> {
+  +actual(UsuarioDetails)
+}
+interface AuthService <<Facade>> {
+  +registrar(request)
+  +login(request)
+  +actual(username)
+}
+class AuthServiceImpl <<Facade>>
+package "Subsistema: Spring Security + JWT (no conoce a la Facade)" {
+  interface "AuthenticationManager (Spring)" as AM
+  interface "PasswordEncoder (Spring)" as PE
+  interface TokenService <<Target>>
+  class JwtUtil <<Adapter>>
+  interface UsuarioRepository
+}
+AuthController --> AuthService
+AuthService <|.. AuthServiceImpl
+AuthServiceImpl --> AM
+AuthServiceImpl --> PE
+AuthServiceImpl --> TokenService
+AuthServiceImpl --> UsuarioRepository
+TokenService <|.. JwtUtil
+@enduml

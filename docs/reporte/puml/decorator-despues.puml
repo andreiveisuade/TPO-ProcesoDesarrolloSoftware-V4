@@ -1,0 +1,45 @@
+@startuml
+skinparam shadowing false
+skinparam defaultFontName Calibri
+skinparam defaultFontSize 12
+skinparam ClassBackgroundColor #FFFFFF
+skinparam ClassBorderColor #1D2B4F
+skinparam ClassHeaderBackgroundColor #FFFFFF
+skinparam ArrowColor #2E75B6
+skinparam NoteBackgroundColor #FFF8E1
+skinparam NoteBorderColor #B38600
+hide empty members
+class Credito <<Client>> {
+  -tipoPlan : TipoPlan
+  -cargos : Set<TipoCargo>
+  -calculo() : CalculoDeCuota
+}
+interface CalculoDeCuota <<Component>> {
+  +importeCuota(capital, tasa, cuotas)
+}
+class "InteresSimple\nSistemaFrances" as Planes <<ConcreteComponent>>
+abstract class CargoSobreCuota <<Decorator>> {
+  -envuelto : CalculoDeCuota
+  +importeCuota(capital, tasa, cuotas)
+  #cargo(capital, cuotas)
+}
+class SeguroDeVida <<ConcreteDecorator>> {
+  #cargo(capital, cuotas)
+}
+class GastoDeAdministracion <<ConcreteDecorator>> {
+  #cargo(capital, cuotas)
+}
+enum TipoCargo {
+  SEGURO_DE_VIDA
+  GASTO_DE_ADMINISTRACION
+  +aplicarSobre(calculo) : CalculoDeCuota
+}
+CalculoDeCuota <|.. Planes
+CalculoDeCuota <|.. CargoSobreCuota
+CargoSobreCuota o--> "1" CalculoDeCuota : envuelto
+CargoSobreCuota <|-- SeguroDeVida
+CargoSobreCuota <|-- GastoDeAdministracion
+TipoCargo ..> CargoSobreCuota : crea
+Credito --> "0..*" TipoCargo
+Credito ..> CalculoDeCuota : calculo()
+@enduml

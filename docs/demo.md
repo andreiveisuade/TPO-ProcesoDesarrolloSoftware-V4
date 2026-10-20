@@ -2,7 +2,7 @@
 
 `docs/demo.sh` abre nvim con una tab por archivo cambiado: v2 a la izquierda (solo lectura), main a la derecha, en modo diff. El título de cada tab es el ID del cambio y el archivo. Moverse con `gt` / `gT`, salir con `:qa`.
 
-`docs/demo.sh --headless` solo verifica que la sesión se arma sin errores. Los IDs son los de `docs/reporte/reporte-v3.html`.
+`docs/demo.sh --headless` solo verifica que la sesión se arma sin errores. Los IDs son los del reporte de V3 (`docs/reporte/reporte-v3.html` en el tag `v3`).
 
 ## Orden y qué decir
 

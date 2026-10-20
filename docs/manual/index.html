@@ -464,7 +464,7 @@ body.lightbox-locked { overflow: hidden; }
           <tr><td>Spring Boot Actuator</td><td>Endpoints de diagnóstico de la aplicación (como health). Está como dependencia en <code>pom.xml</code>.</td></tr>
           <tr><td>JUnit 5 + AssertJ</td><td>Framework de tests y librería de aserciones; vienen en <code>spring-boot-starter-test</code>. Los usan todos los tests.</td></tr>
           <tr><td>Mockito / <code>@WebMvcTest</code></td><td>Mockito crea objetos simulados; <code>@WebMvcTest</code> levanta solo la capa web de Spring. Juntos prueban los códigos HTTP sin base ni servicios reales (<code>controller/CodigosHttpTest.java</code>).</td></tr>
-          <tr><td>PlantUML y d2</td><td>Dos lenguajes que dibujan diagramas a partir de texto. PlantUML hace el diagrama de clases UML completo (<code>docs/diagramas/clases-v3.puml</code>) y el DER sale de <code>docs/diagramas/der-v3.py</code>; d2 hace las vistas simplificadas de Strategy, Adapter y el dominio (<code>docs/diagramas/d2/</code>).</td></tr>
+          <tr><td>PlantUML y d2</td><td>Dos lenguajes que dibujan diagramas a partir de texto. PlantUML hace el diagrama de clases UML completo (<code>docs/diagramas/clases-v4.puml</code>) y el DER sale de <code>docs/diagramas/der-v4.py</code>; d2 hace las vistas simplificadas de Strategy, Adapter y el dominio (<code>docs/diagramas/d2/</code>).</td></tr>
           <tr><td>Archify</td><td>Genera diagramas de arquitectura, secuencia y estados desde un JSON validado; con él están el panorama MVC, el flujo de anular un crédito y los estados del crédito (<code>docs/diagramas/archify/</code>).</td></tr>
           <tr><td>React 19</td><td>Librería para construir la interfaz con componentes; las pantallas están en <code>frontend/src/pages/</code>.</td></tr>
           <tr><td>React Router</td><td>Navegación entre pantallas del front sin recargar la página.</td></tr>
@@ -1113,12 +1113,12 @@ svg .s-security{color: var(--security-stroke);}
         </g>
       </svg></div><figcaption>Fuente: <code>docs/diagramas/archify/anular-credito.sequence.json</code></figcaption></figure>
       
-      <p>Diagrama de clases UML completo: <a href="../diagramas/clases-v3-mvc.svg">capas MVC</a>, <a href="../diagramas/clases-v3-seguridad.svg">seguridad y Adapter</a> y <a href="../diagramas/clases-v3-modelo.svg">modelo</a>.</p>
+      <p>Diagrama de clases UML completo: <a href="../diagramas/clases-v4-mvc.svg">capas MVC</a>, <a href="../diagramas/clases-v4-seguridad.svg">seguridad, Facade y Adapter</a> y <a href="../diagramas/clases-v4-modelo.svg">modelo</a>.</p>
     </section>
 
     <section class="doc-section" id="dominio">
       <h2>Modelo de dominio</h2>
-      <p>Diagramas: <a href="../reporte/reporte-v3.html#clases">reporte, "Diagramas de clases y DER"</a> (modelo de dominio, Strategy, Adapter y DER). Detalle UML: <a href="../diagramas/clases-v3-modelo.svg">clases-v3-modelo.svg</a>.</p>
+      <p>Diagramas: <a href="../reporte/reporte-v4.html#clases">reporte, "Diagramas de clases y DER"</a> (capas MVC, seguridad, modelo y DER). Detalle UML: <a href="../diagramas/clases-v4-modelo.svg">clases-v4-modelo.svg</a>.</p>
       <h3>Estados del crédito</h3>
       <p>El estado se calcula en <code>model/Credito.java</code> <code>estado</code>; solo se guarda <code>anulado</code>. El crédito es agregado de sus cuotas (M8).</p>
       <figure class="diagram"><div class="d2"><svg style="width:100%;height:auto" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 980 680" role="img" lang="es" aria-labelledby="archify-diagram-title archify-diagram-description" data-preset="classic" data-quality-profile="showcase"><style>svg{--bg:#ffffff;--grid:transparent;--panel:#ffffff;--panel-border:#D9E1EC;--text:#1D2B4F;--text-muted:#555f73;--text-dim:#8a94a6;--text-faint:#666;--mask:#ffffff;--lane-fill:#F6F9FD;--lane-stroke:#D9E1EC;--arrow:#7d8aa3;--arrow-emphasis:#2E75B6;
@@ -1419,11 +1419,12 @@ SELECT * FROM COBRANZAS WHERE ANULADA = FALSE;  -- cobranzas vigentes</code></pr
     <section class="doc-section" id="verificar">
       <h2>Cómo se verifica</h2>
       <ul>
-        <li><strong>Tests</strong>: <code>cd backend &amp;&amp; mvn test</code>: 43 tests, 0 fallas. JUnit 5 (el framework de tests de Java) con AssertJ (aserciones encadenadas legibles):
+        <li><strong>Tests</strong>: <code>cd backend &amp;&amp; mvn test</code>: 62 tests, 0 fallas. JUnit 5 (el framework de tests de Java) con AssertJ (aserciones encadenadas legibles):
           <ul>
-            <li>29 unitarios de dominio, sin Spring, en <code>backend/src/test/java/com/uade/tpejemplo/model/</code>: <code>CreditoTest</code> 9, <code>CuotaTest</code> 9, <code>plan/InteresSimpleTest</code> 4, <code>plan/SistemaFrancesTest</code> 4, <code>CobranzaTest</code> 3. La fecha de hoy entra por parámetro (<code>model/Cobranza.java</code> <code>anular(LocalDate)</code>, <code>model/Cuota.java</code> <code>estaVencida(LocalDate)</code>), así se prueba el rechazo de anular una cobranza de otro día y el vencimiento sin depender del reloj.</li>
+            <li>43 unitarios de dominio, sin Spring, en <code>backend/src/test/java/com/uade/tpejemplo/model/</code>: <code>CreditoTest</code> 10, <code>CuotaTest</code> 12, <code>CarteraTest</code> 4, <code>CobranzaTest</code> 3, <code>plan/InteresSimpleTest</code> 4, <code>plan/SistemaFrancesTest</code> 4, <code>plan/SeguroDeVidaTest</code> 2, <code>plan/GastoDeAdministracionTest</code> 2, <code>plan/CargosApiladosTest</code> 2. La fecha de hoy entra por parámetro (<code>model/Cobranza.java</code> <code>anular(LocalDate)</code>, <code>model/Cuota.java</code> <code>estaVencida(LocalDate)</code>), así se prueba el rechazo de anular una cobranza de otro día y el vencimiento sin depender del reloj.</li>
             <li>11 de códigos HTTP en <code>backend/src/test/java/com/uade/tpejemplo/controller/CodigosHttpTest.java</code>: <code>@WebMvcTest</code> levanta solo la capa web (controllers, <code>SecurityConfig</code>, el filtro JWT y el <code>GlobalExceptionHandler</code>) con los servicios simulados por <code>@MockitoBean</code>. Cubre 400 (DNI con letras, JSON roto, parámetro de tipo incorrecto, permisos sin campos), 401 (sin token y token inválido), 403 (rol incorrecto), 404, 405, 406 y 415.</li>
             <li>2 de concurrencia con <code>@SpringBootTest</code> en <code>backend/src/test/java/com/uade/tpejemplo/service/</code>: <code>CobranzaConcurrenteTest</code>, 20 hilos cobrando la misma cuota, espera una sola cobranza vigente (I-1; sin el bloqueo falla con 10); <code>AnulacionConcurrenteTest</code>, anular y cobrar en paralelo, nunca queda un crédito anulado con cobranza vigente.</li>
+            <li>5 de integración sobre H2 en <code>backend/src/test/java/com/uade/tpejemplo/service/</code>: <code>ReglaDeMoraTest</code> 2 (no se otorga a un cliente con cuotas vencidas) y <code>DeudaClienteTest</code> 3 (saldo y vencido del cliente).</li>
             <li><code>TpEjemploApplicationTests</code> (<code>contextLoads</code>): 1, levanta la aplicación entera.</li>
           </ul>
         </li>
@@ -1467,7 +1468,8 @@ SELECT * FROM COBRANZAS WHERE ANULADA = FALSE;  -- cobranzas vigentes</code></pr
         <li><strong>V0</strong> (<code>main@2a90af8</code>): proyecto inicial con docs PlantUML, requerimientos y CU.</li>
         <li><strong>V1</strong> (<code>andrei-iteracion1@86c75cc</code>, 08/09): bad smells; <code>Permisos</code>, <code>Cuota</code> con importe y su cobranza, tasa de interés, panel de supervisor.</li>
         <li><strong>V2</strong> (<code>main@45e228c</code>, tag <code>v2</code>, 15/09): GRASP + interfaces de modelo y de servicio.</li>
-        <li><strong>V3</strong> (este repo, entrega 13/10): MVC + Strategy + Adapter; bugs TPO-001..004, 007, 008, 009, 010, 012 cerrados; Creator del plan de cuotas y dashboard con saldo y vencido; 43 tests (dominio, códigos HTTP y concurrencia); perfiles dev y prod; Swagger; <code>GET /api/auth/me</code>; pantallas de UC06 y UC09; UI con formato es-AR y dark theme; casos de uso documentados.</li>
+        <li><strong>V3</strong> (tag <code>v3</code>, entrega 13/10): MVC + Strategy + Adapter; bugs TPO-001..004, 007, 008, 009, 010, 012 cerrados; Creator del plan de cuotas y dashboard con saldo y vencido; 43 tests (dominio, códigos HTTP y concurrencia); perfiles dev y prod; Swagger; <code>GET /api/auth/me</code>; pantallas de UC06 y UC09; UI con formato es-AR y dark theme; casos de uso documentados.</li>
+        <li><strong>V4</strong> (rama <code>iteracion4</code>, entrega 27/10): Composite (<code>Deuda</code>, <code>Cartera</code>), Decorator (seguro de vida y gastos sobre la cuota) y Facade (<code>AuthService</code>); regla de mora, deuda del cliente en Clientes y cargos en Créditos; 62 tests.</li>
       </ul>
     </section>
 

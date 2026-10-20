@@ -1,0 +1,35 @@
+@startuml
+skinparam shadowing false
+skinparam defaultFontName Calibri
+skinparam defaultFontSize 12
+skinparam ClassBackgroundColor #FFFFFF
+skinparam ClassBorderColor #1D2B4F
+skinparam ClassHeaderBackgroundColor #FFFFFF
+skinparam ArrowColor #2E75B6
+skinparam NoteBackgroundColor #FFF8E1
+skinparam NoteBorderColor #B38600
+hide empty members
+class AuthController {
+  +actual(UserDetails)
+}
+interface AuthService {
+  +registrar(request)
+  +login(request)
+  +actual(username)
+}
+class AuthServiceImpl
+interface "UserDetails (Spring)" as UD
+interface "AuthenticationManager (Spring)" as AM
+interface "PasswordEncoder (Spring)" as PE
+interface TokenService
+AuthController --> AuthService
+AuthController ..> UD
+AuthService <|.. AuthServiceImpl
+AuthServiceImpl --> AM
+AuthServiceImpl --> PE
+AuthServiceImpl --> TokenService
+note bottom of AuthController #FFE0E0
+  patrón sin nombrar;
+  el controlador recibe un tipo de Spring
+end note
+@enduml

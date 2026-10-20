@@ -1,0 +1,36 @@
+@startuml
+skinparam shadowing false
+skinparam defaultFontName Calibri
+skinparam defaultFontSize 12
+skinparam ClassBackgroundColor #FFFFFF
+skinparam ClassBorderColor #1D2B4F
+skinparam ClassHeaderBackgroundColor #FFFFFF
+skinparam ArrowColor #2E75B6
+skinparam NoteBackgroundColor #FFF8E1
+skinparam NoteBorderColor #B38600
+hide empty members
+class DashboardServiceImpl {
+  +obtenerEstadisticasGenerales()
+}
+class Credito {
+  -anulado : boolean
+  +saldo() : BigDecimal
+  +montoVencido() : BigDecimal
+  -sumarCuotas(Predicate<Cuota>)
+}
+class Cuota {
+  -importe : BigDecimal
+  +estaPagada() : boolean
+  +estaVencida() : boolean
+}
+DashboardServiceImpl ..> Credito : stream().map(saldo)\n.reduce(...)
+Credito *-- "1..*" Cuota
+note bottom of DashboardServiceImpl #FFE0E0
+  repite la suma de Credito
+  un nivel más arriba
+end note
+note right of Cuota #FFE0E0
+  no contesta su deuda:
+  Credito filtra e importa
+end note
+@enduml

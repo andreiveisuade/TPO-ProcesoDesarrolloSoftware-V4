@@ -1,0 +1,34 @@
+@startuml
+skinparam shadowing false
+skinparam defaultFontName Calibri
+skinparam defaultFontSize 12
+skinparam ClassBackgroundColor #FFFFFF
+skinparam ClassBorderColor #1D2B4F
+skinparam ClassHeaderBackgroundColor #FFFFFF
+skinparam ArrowColor #2E75B6
+skinparam NoteBackgroundColor #FFF8E1
+skinparam NoteBorderColor #B38600
+hide empty members
+class Credito <<Context>> {
+  -tipoPlan : TipoPlan
+  -calculo() : CalculoDeCuota
+}
+enum TipoPlan {
+  INTERES_SIMPLE
+  SISTEMA_FRANCES
+  +calculo() : CalculoDeCuota
+}
+interface CalculoDeCuota <<Strategy>> {
+  +importeCuota(capital, tasa, cuotas)
+}
+class InteresSimple <<ConcreteStrategy>>
+class SistemaFrances <<ConcreteStrategy>>
+Credito --> TipoPlan
+TipoPlan --> CalculoDeCuota
+CalculoDeCuota <|.. InteresSimple
+CalculoDeCuota <|.. SistemaFrances
+note bottom of Credito #FFE0E0
+  sin cargos: con herencia serían
+  2 planes × 4 combinaciones = 8 clases
+end note
+@enduml
