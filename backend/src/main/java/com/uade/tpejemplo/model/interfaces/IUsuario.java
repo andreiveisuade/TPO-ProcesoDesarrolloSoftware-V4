@@ -14,6 +14,8 @@ public interface IUsuario {
 
     IPermisos getPermisos();
 
+    boolean isActivo();
+
     boolean puedeAnularCredito();
 
     boolean puedeAnularCobranza();
@@ -21,4 +23,8 @@ public interface IUsuario {
     void otorgarPermisos(IPermisos permisos);
 
     void asignarRol(Rol rol);
+
+    void desactivar();
+
+    void reactivar();
 }

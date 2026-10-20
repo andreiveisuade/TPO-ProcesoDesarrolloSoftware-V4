@@ -31,6 +31,10 @@ public class Usuario implements IUsuario {
     @Embedded
     private Permisos permisos;
 
+    // Baja logica: el usuario inactivo no entra, pero su historial queda.
+    @Column(nullable = false, columnDefinition = "boolean default true")
+    private boolean activo = true;
+
     private Usuario(String username, String passwordHasheado, Rol rol, Permisos permisos) {
         this.username = username;
         this.password = passwordHasheado;
@@ -69,5 +73,16 @@ public class Usuario implements IUsuario {
             throw new BusinessException("No se puede otorgar el rol de administrador");
         }
         this.rol = rol;
+    }
+
+    public void desactivar() {
+        if (rol == Rol.ADMIN) {
+            throw new BusinessException("No se puede desactivar un administrador");
+        }
+        this.activo = false;
+    }
+
+    public void reactivar() {
+        this.activo = true;
     }
 }

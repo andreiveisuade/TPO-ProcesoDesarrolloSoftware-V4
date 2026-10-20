@@ -16,6 +16,7 @@ public class UsuarioResponse {
     private Rol rol;
     private boolean puedeAnularCredito;
     private boolean puedeAnularCobranza;
+    private boolean activo;
 
     public static UsuarioResponse desde(IUsuario usuario) {
         return new UsuarioResponse(
@@ -23,7 +24,8 @@ public class UsuarioResponse {
             usuario.getUsername(),
             usuario.getRol(),
             usuario.puedeAnularCredito(),
-            usuario.puedeAnularCobranza()
+            usuario.puedeAnularCobranza(),
+            usuario.isActivo()
         );
     }
 }

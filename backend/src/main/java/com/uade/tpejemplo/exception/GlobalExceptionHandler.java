@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.FieldError;
@@ -48,6 +49,11 @@ public class GlobalExceptionHandler {
     @ExceptionHandler({HttpMessageNotReadableException.class, MethodArgumentTypeMismatchException.class})
     public ResponseEntity<ErrorResponse> handleSolicitudInvalida(Exception ex) {
         return error(HttpStatus.BAD_REQUEST, "Solicitud inválida", List.of("Solicitud inválida"));
+    }
+
+    @ExceptionHandler(DisabledException.class)
+    public ResponseEntity<ErrorResponse> handleDesactivado(DisabledException ex) {
+        return error(HttpStatus.UNAUTHORIZED, "No autenticado", List.of("El usuario está desactivado"));
     }
 
     @ExceptionHandler(AuthenticationException.class)

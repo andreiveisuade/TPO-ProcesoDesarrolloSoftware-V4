@@ -3,6 +3,7 @@ package com.uade.tpejemplo.service.impl;
 import com.uade.tpejemplo.dto.request.LoginRequest;
 import com.uade.tpejemplo.dto.request.RegisterRequest;
 import com.uade.tpejemplo.dto.response.AuthResponse;
+import com.uade.tpejemplo.dto.response.UsuarioResponse;
 import com.uade.tpejemplo.exception.BusinessException;
 import com.uade.tpejemplo.exception.ResourceNotFoundException;
 import com.uade.tpejemplo.model.Permisos;
@@ -18,7 +19,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-// Login y registro: autentica contra Spring Security y emite el token.
+// Login y registro (propio o por el ADMIN): autentica contra Spring Security y emite el token.
 @Service
 @RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
@@ -31,20 +32,19 @@ public class AuthServiceImpl implements AuthService {
     @Transactional
     @Override
     public AuthResponse registrar(RegisterRequest request) {
-        if (usuarioRepository.existsByUsername(request.getUsername())) {
-            throw new BusinessException("El usuario '" + request.getUsername() + "' ya existe");
-        }
-
-        Usuario usuario = Usuario.nuevo(
-            request.getUsername(),
-            passwordEncoder.encode(request.getPassword()),
-            Rol.USER,
-            Permisos.ninguno()
-        );
-
-        usuarioRepository.save(usuario);
+        Usuario usuario = crear(request, Rol.USER);
 
         return AuthResponse.desde(tokenService.generarToken(usuario.getUsername()), usuario);
+    }
+
+    // Sin token: lo usa el ADMIN para dar de alta a otro, no para entrar.
+    @Transactional
+    @Override
+    public UsuarioResponse registrarConRol(RegisterRequest request, Rol rol) {
+        if (rol == Rol.ADMIN) {
+            throw new BusinessException("No se puede dar de alta un administrador");
+        }
+        return UsuarioResponse.desde(crear(request, rol));
     }
 
     @Override
@@ -62,6 +62,21 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public AuthResponse actual(String username) {
         return AuthResponse.desde(null, buscar(username));
+    }
+
+    private Usuario crear(RegisterRequest request, Rol rol) {
+        if (usuarioRepository.existsByUsername(request.getUsername())) {
+            throw new BusinessException("El usuario '" + request.getUsername() + "' ya existe");
+        }
+
+        Usuario usuario = Usuario.nuevo(
+            request.getUsername(),
+            passwordEncoder.encode(request.getPassword()),
+            rol,
+            Permisos.ninguno()
+        );
+
+        return usuarioRepository.save(usuario);
     }
 
     private Usuario buscar(String username) {

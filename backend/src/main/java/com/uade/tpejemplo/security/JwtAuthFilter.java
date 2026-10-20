@@ -56,8 +56,8 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     }
 
     // extraerUsername ya valida firma y vencimiento. Un token invalido, vencido o
-    // de un usuario que ya no existe no es un error del filtro: la request sigue
-    // sin autenticar y quien decide si eso alcanza es la cadena de seguridad.
+    // de un usuario que ya no existe o esta desactivado no es un error del filtro:
+    // la request sigue sin autenticar y quien decide si eso alcanza es la cadena de seguridad.
     private void autenticar(String token, HttpServletRequest request) {
         Optional<String> username = tokenService.extraerUsername(token);
         if (username.isEmpty()) {
@@ -68,6 +68,9 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         try {
             userDetails = userDetailsService.loadUserByUsername(username.get());
         } catch (UsernameNotFoundException e) {
+            return;
+        }
+        if (!userDetails.isEnabled()) {
             return;
         }
 

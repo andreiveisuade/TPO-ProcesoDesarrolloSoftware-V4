@@ -1,8 +1,12 @@
 package com.uade.tpejemplo.controller;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import com.uade.tpejemplo.dto.request.ActivoRequest;
+import com.uade.tpejemplo.dto.request.AltaUsuarioRequest;
 import com.uade.tpejemplo.dto.request.PermisosRequest;
 import com.uade.tpejemplo.dto.request.RolRequest;
 import com.uade.tpejemplo.dto.response.UsuarioResponse;
@@ -35,6 +39,16 @@ public class AdminController {
         return adminService.listarUsuarios();
     }
 
+    @Operation(summary = "Dar de alta un usuario")
+    @ApiResponse(responseCode = "201", description = "Creado")
+    @ApiResponse(responseCode = "400", description = "Error de validación o regla de negocio")
+    @ApiResponse(responseCode = "401", description = "Sin token o token inválido")
+    @ApiResponse(responseCode = "403", description = "Sin rol o permiso")
+    @PostMapping("/usuarios")
+    public ResponseEntity<UsuarioResponse> crearUsuario(@Valid @RequestBody AltaUsuarioRequest request) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(adminService.crearUsuario(request));
+    }
+
     @Operation(summary = "Actualizar permisos de anulación")
     @ApiResponse(responseCode = "200", description = "OK")
     @ApiResponse(responseCode = "400", description = "Error de validación o regla de negocio")
@@ -55,5 +69,16 @@ public class AdminController {
     @PutMapping("/usuarios/{id}/rol")
     public UsuarioResponse actualizarRol(@PathVariable Long id, @Valid @RequestBody RolRequest request) {
         return adminService.actualizarRol(id, request);
+    }
+
+    @Operation(summary = "Desactivar o reactivar un usuario")
+    @ApiResponse(responseCode = "200", description = "OK")
+    @ApiResponse(responseCode = "400", description = "Error de validación o regla de negocio")
+    @ApiResponse(responseCode = "401", description = "Sin token o token inválido")
+    @ApiResponse(responseCode = "403", description = "Sin rol o permiso")
+    @ApiResponse(responseCode = "404", description = "No encontrado")
+    @PutMapping("/usuarios/{id}/activo")
+    public UsuarioResponse actualizarActivo(@PathVariable Long id, @Valid @RequestBody ActivoRequest request) {
+        return adminService.actualizarActivo(id, request);
     }
 }

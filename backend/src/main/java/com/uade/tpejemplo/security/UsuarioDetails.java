@@ -33,4 +33,10 @@ public class UsuarioDetails implements UserDetails {
     public String getUsername() {
         return usuario.getUsername();
     }
+
+    // Traduce el concepto del dominio (baja logica) al contrato de Spring.
+    @Override
+    public boolean isEnabled() {
+        return usuario.isActivo();
+    }
 }
