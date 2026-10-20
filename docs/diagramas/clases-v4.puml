@@ -337,11 +337,19 @@ package "model.interfaces" {
     + getNombre() : String
   }
   interface ICredito {
-    + getCondiciones() : CondicionesDeCredito
+    + getCondiciones() : ICondicionesDeCredito
     + totalADevolver() : BigDecimal
     + estado() : EstadoCredito
     + puedeAnularse() : boolean
     + anular() : void
+  }
+  interface ICondicionesDeCredito {
+    + getDeudaOriginal() : BigDecimal
+    + getTasaInteres() : BigDecimal
+    + getCantidadCuotas() : Integer
+    + getTipoPlan() : TipoPlan
+    + getCargos() : Set<TipoCargo>
+    + importeCuota() : BigDecimal
   }
   interface ICuota {
     + estaPagada() : boolean
@@ -500,6 +508,7 @@ Deuda <|-- ICuota
 Deuda <|.. Cartera
 ICliente <|.. Cliente
 ICredito <|.. Credito
+ICondicionesDeCredito <|.. CondicionesDeCredito
 ICuota <|.. Cuota
 ICobranza <|.. Cobranza
 IUsuario <|.. Usuario

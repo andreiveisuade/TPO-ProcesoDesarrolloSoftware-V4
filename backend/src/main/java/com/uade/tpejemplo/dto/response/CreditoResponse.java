@@ -1,9 +1,9 @@
 package com.uade.tpejemplo.dto.response;
 
-import com.uade.tpejemplo.model.CondicionesDeCredito;
 import com.uade.tpejemplo.model.EstadoCredito;
 import com.uade.tpejemplo.model.TipoCargo;
 import com.uade.tpejemplo.model.TipoPlan;
+import com.uade.tpejemplo.model.interfaces.ICondicionesDeCredito;
 import com.uade.tpejemplo.model.interfaces.ICredito;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -38,7 +38,7 @@ public class CreditoResponse {
     private boolean puedeAnularse;
 
     public static CreditoResponse desde(ICredito credito) {
-        CondicionesDeCredito condiciones = credito.getCondiciones();
+        ICondicionesDeCredito condiciones = credito.getCondiciones();
         return CreditoResponse.builder()
             .id(credito.getId())
             .dniCliente(credito.getCliente().getDni())

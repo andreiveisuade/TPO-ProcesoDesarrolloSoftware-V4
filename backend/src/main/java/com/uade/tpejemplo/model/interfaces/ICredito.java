@@ -1,6 +1,5 @@
 package com.uade.tpejemplo.model.interfaces;
 
-import com.uade.tpejemplo.model.CondicionesDeCredito;
 import com.uade.tpejemplo.model.EstadoCredito;
 
 import java.math.BigDecimal;
@@ -15,7 +14,7 @@ public interface ICredito extends Deuda {
 
     LocalDate getFecha();
 
-    CondicionesDeCredito getCondiciones();
+    ICondicionesDeCredito getCondiciones();
 
     BigDecimal getImporteCuota();
 

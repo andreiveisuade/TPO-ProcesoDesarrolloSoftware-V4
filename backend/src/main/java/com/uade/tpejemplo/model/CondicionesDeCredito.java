@@ -1,6 +1,7 @@
 package com.uade.tpejemplo.model;
 
 import com.uade.tpejemplo.model.interfaces.CalculoDeCuota;
+import com.uade.tpejemplo.model.interfaces.ICondicionesDeCredito;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
@@ -18,7 +19,7 @@ import java.util.Set;
 @Embeddable
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class CondicionesDeCredito {
+public class CondicionesDeCredito implements ICondicionesDeCredito {
 
     @NotNull
     @Column(name = "deuda_original", nullable = false, precision = 12, scale = 2)

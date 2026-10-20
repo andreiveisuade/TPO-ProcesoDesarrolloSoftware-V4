@@ -29,9 +29,11 @@ class CondicionesDeCredito <<Context / Embeddable>> {
   +importeCuota() : BigDecimal
   -calculo() : CalculoDeCuota
 }
+interface ICondicionesDeCredito
 interface CalculoDeCuota <<Strategy>>
 class Cuota <<Leaf>>
 Credito *-- "1" CondicionesDeCredito
+ICondicionesDeCredito <|.. CondicionesDeCredito
 CondicionesDeCredito ..> CalculoDeCuota : calculo()
 Credito *-- "1..*" Cuota
 @enduml
