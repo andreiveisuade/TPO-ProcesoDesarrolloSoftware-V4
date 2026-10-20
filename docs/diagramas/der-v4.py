@@ -21,7 +21,6 @@ TABLAS = {
         ("deuda_original", [], "numeric(12,2)"),
         ("fecha", [], "date"),
         ("tasa_interes", [], "numeric(5,2)"),
-        ("importe_cuota", [], "numeric(12,2)"),
         ("cantidad_cuotas", ["CK"], "integer ≥ 1"),
         ("tipo_plan", [], "varchar(20)"),
         ("anulado", [], "boolean"),

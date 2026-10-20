@@ -19,7 +19,7 @@
 <text x="288" y="84" fill="#555f73" font-size="9" font-family="'SF Mono', Menlo, Consolas, monospace" text-anchor="end">varchar(15)</text>
 <text x="52" y="108" fill="#1D2B4F" font-size="12" font-family="Calibri, Carlito, 'Segoe UI', system-ui, sans-serif">nombre</text>
 <text x="288" y="108" fill="#555f73" font-size="9" font-family="'SF Mono', Menlo, Consolas, monospace" text-anchor="end">varchar(255)</text>
-<rect x="372" y="40" width="260" height="244" rx="6" fill="#ffffff" stroke="#1D2B4F"/>
+<rect x="372" y="40" width="260" height="220" rx="6" fill="#ffffff" stroke="#1D2B4F"/>
 <rect x="372" y="40" width="260" height="28" rx="6" fill="#1D2B4F" fill-opacity=".05"/>
 <line x1="372" y1="68" x2="632" y2="68" stroke="#1D2B4F" stroke-opacity=".22"/>
 <text x="384" y="58" fill="#1D2B4F" font-size="13" font-weight="700" font-family="Calibri, Carlito, 'Segoe UI', system-ui, sans-serif">creditos</text>
@@ -40,17 +40,14 @@
 <rect x="373" y="164" width="258" height="24" fill="#1D2B4F" fill-opacity=".025"/>
 <text x="384" y="180" fill="#1D2B4F" font-size="12" font-family="Calibri, Carlito, 'Segoe UI', system-ui, sans-serif">tasa_interes</text>
 <text x="620" y="180" fill="#555f73" font-size="9" font-family="'SF Mono', Menlo, Consolas, monospace" text-anchor="end">numeric(5,2)</text>
-<text x="384" y="204" fill="#1D2B4F" font-size="12" font-family="Calibri, Carlito, 'Segoe UI', system-ui, sans-serif">importe_cuota</text>
-<text x="620" y="204" fill="#555f73" font-size="9" font-family="'SF Mono', Menlo, Consolas, monospace" text-anchor="end">numeric(12,2)</text>
+<text x="384" y="204" fill="#1D2B4F" font-size="12" font-family="Calibri, Carlito, 'Segoe UI', system-ui, sans-serif">cantidad_cuotas</text>
+<rect x="505.0" y="194" width="20" height="12" rx="2" fill="none" stroke="#1D2B4F" stroke-opacity=".35" stroke-width=".8"/><text x="515.0" y="203" fill="#1D2B4F" fill-opacity=".8" font-size="8" font-family="'SF Mono', Menlo, Consolas, monospace" text-anchor="middle">CK</text>
+<text x="620" y="204" fill="#555f73" font-size="9" font-family="'SF Mono', Menlo, Consolas, monospace" text-anchor="end">integer ≥ 1</text>
 <rect x="373" y="212" width="258" height="24" fill="#1D2B4F" fill-opacity=".025"/>
-<text x="384" y="228" fill="#1D2B4F" font-size="12" font-family="Calibri, Carlito, 'Segoe UI', system-ui, sans-serif">cantidad_cuotas</text>
-<rect x="505.0" y="218" width="20" height="12" rx="2" fill="none" stroke="#1D2B4F" stroke-opacity=".35" stroke-width=".8"/><text x="515.0" y="227" fill="#1D2B4F" fill-opacity=".8" font-size="8" font-family="'SF Mono', Menlo, Consolas, monospace" text-anchor="middle">CK</text>
-<text x="620" y="228" fill="#555f73" font-size="9" font-family="'SF Mono', Menlo, Consolas, monospace" text-anchor="end">integer ≥ 1</text>
-<text x="384" y="252" fill="#1D2B4F" font-size="12" font-family="Calibri, Carlito, 'Segoe UI', system-ui, sans-serif">tipo_plan</text>
-<text x="620" y="252" fill="#555f73" font-size="9" font-family="'SF Mono', Menlo, Consolas, monospace" text-anchor="end">varchar(20)</text>
-<rect x="373" y="260" width="258" height="24" fill="#1D2B4F" fill-opacity=".025"/>
-<text x="384" y="276" fill="#1D2B4F" font-size="12" font-family="Calibri, Carlito, 'Segoe UI', system-ui, sans-serif">anulado</text>
-<text x="620" y="276" fill="#555f73" font-size="9" font-family="'SF Mono', Menlo, Consolas, monospace" text-anchor="end">boolean</text>
+<text x="384" y="228" fill="#1D2B4F" font-size="12" font-family="Calibri, Carlito, 'Segoe UI', system-ui, sans-serif">tipo_plan</text>
+<text x="620" y="228" fill="#555f73" font-size="9" font-family="'SF Mono', Menlo, Consolas, monospace" text-anchor="end">varchar(20)</text>
+<text x="384" y="252" fill="#1D2B4F" font-size="12" font-family="Calibri, Carlito, 'Segoe UI', system-ui, sans-serif">anulado</text>
+<text x="620" y="252" fill="#555f73" font-size="9" font-family="'SF Mono', Menlo, Consolas, monospace" text-anchor="end">boolean</text>
 <rect x="704" y="40" width="260" height="176" rx="6" fill="#ffffff" stroke="#1D2B4F"/>
 <rect x="704" y="40" width="260" height="28" rx="6" fill="#1D2B4F" fill-opacity=".05"/>
 <line x1="704" y1="68" x2="964" y2="68" stroke="#1D2B4F" stroke-opacity=".22"/>

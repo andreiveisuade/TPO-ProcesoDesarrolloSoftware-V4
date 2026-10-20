@@ -377,10 +377,10 @@ package "model" {
     class "Credito\n<size:10><i>implements ICredito</i></size>" as Credito <<Composite>> {
       - id : Long
       - fecha : LocalDate
-      - importeCuota : BigDecimal
       - anulado : boolean
       + {static} nuevo(Cliente, LocalDate, CondicionesDeCredito) : Credito
       + totalADevolver() : BigDecimal
+      + importeCuota() : BigDecimal
       - generarPlanDeCuotas() : void
       + estado() : EstadoCredito
       + saldo() : BigDecimal
@@ -429,7 +429,7 @@ package "model" {
       - cantidadCuotas : Integer
       - tipoPlan : TipoPlan
       - cargos : Set<TipoCargo>
-      + importeCuota() : BigDecimal
+      ~ importeCuota() : BigDecimal
       - calculo() : CalculoDeCuota
     }
     enum TipoPlan {
@@ -471,7 +471,7 @@ package "model.plan" {
 
 ' Zona deuda (Composite)
 Deuda <|.. Cartera
-Deuda "0..*" --o "1" Cartera : deudas
+Deuda "0..*" --o "0..*" Cartera : deudas
 Deuda <|.. Credito : vía ICredito
 Deuda <|.. Cuota : vía ICuota
 Credito "1" *-- "1..*" Cuota : cuotas\n(Creator, cascade PERSIST)

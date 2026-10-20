@@ -8,6 +8,7 @@ J = "backend/src/main/java/com/uade/tpejemplo/"
 A, D = "v3", "iteracion4"
 P = "06f0fc7"  # iteracion4 antes de M17
 P18 = "521b37e"  # iteracion4 antes de M18
+P19 = "6609cd4"  # iteracion4 antes de M19 y M20
 e = html.escape
 
 
@@ -54,7 +55,7 @@ def body(c, path):
 
 
 def cb(c, path, *partes):
-    ver = {A: "V3 (tag v3)", P: "V4 antes de M17 (06f0fc7)", P18: "V4 antes de M18 (521b37e)"}.get(c, "V4 (iteracion4)")
+    ver = {A: "V3 (tag v3)", P: "V4 antes de M17 (06f0fc7)", P18: "V4 antes de M18 (521b37e)", P19: "V4 antes de M19 (6609cd4)"}.get(c, "V4 (iteracion4)")
     return f'<div class="ruta">{e(full(path))} <span class="ver">· {ver}</span></div><pre><code>{e(chr(10).join(partes))}</code></pre>'
 
 
@@ -106,7 +107,7 @@ def bloque(id_, titulo, badge, patron, problema, antes, solucion, despues, por_q
 <dt>Consecuencias</dt><dd>{consecuencias}</dd>
 </dl>
 {extra}
-{diagramas(id_, tit_a)}
+{diagramas(id_, tit_a) if os.path.exists(f"{OUT}/puml/{id_}-antes.puml") else ""}
 </article>'''
 
 
@@ -189,7 +190,7 @@ m17 = bloque("credito", "M17. Credito: Extract Class + ISP", "refactor",
     + cb(P, "model/interfaces/ICredito.java", body(P, "model/interfaces/ICredito.java").replace("\n\n", "\n")),
     "Lo pactado al otorgar pasa a <code>CondicionesDeCredito</code> (<code>@Embeddable</code>), que calcula la cuota: es el «Context» del Strategy. <code>Credito</code> queda con deuda y ciclo de vida.",
     cb(D, "model/Credito.java", method(D, "model/Credito.java", r"public static Credito nuevo"))
-    + cb(D, "model/CondicionesDeCredito.java", method(D, "model/CondicionesDeCredito.java", r"public BigDecimal importeCuota"), "", method(D, "model/CondicionesDeCredito.java", r"private CalculoDeCuota calculo"))
+    + cb(D, "model/CondicionesDeCredito.java", method(D, "model/CondicionesDeCredito.java", r"BigDecimal importeCuota\(\)"), "", method(D, "model/CondicionesDeCredito.java", r"private CalculoDeCuota calculo"))
     + cb(D, "model/interfaces/ICredito.java", body(D, "model/interfaces/ICredito.java").replace("\n\n", "\n")),
     roles([
         ("SRP", "<code>Credito</code>: deuda y ciclo de vida; <code>CondicionesDeCredito</code>: precio de la cuota"),
@@ -225,7 +226,38 @@ m18 = bloque("usuario", "M18. IUsuario depende de IPermisos (DIP)", "refactor",
     ref="Commit <code>c23e93f</code>.",
     tit_a="Antes (521b37e)")
 
-mejoras = [m11, m12, m13, m17, m18]
+# ---------------- M19 tasa mensual ----------------
+ejemplo = roles([
+    ("6 cuotas", "10.300 → <strong>11.800</strong>"),
+    ("24 cuotas", "10.300 → <strong>17.200</strong>"),
+]).replace("<th>Rol</th><th>Clase</th>", "<th>10.000 al 3 %</th><th>Total antes → después</th>")
+m19 = bloque("tasa", "M19. Interés simple real y tasa mensual única", "corrección de dominio",
+    "<strong>Lenguaje ubicuo</strong> sobre la <strong>Strategy</strong> de M9: un atributo, una unidad.",
+    "Error que viene de <strong>V3</strong>: <code>InteresSimple</code> cobraba <code>C · (1 + i)</code>, <strong>lo mismo en 6 o 24 cuotas</strong>: un recargo fijo, no interés. Y <code>tasaInteres</code> tenía <strong>dos unidades</strong>: % total en simple, % mensual en francés.",
+    cb(A, "model/plan/InteresSimple.java", lines(A, "model/plan/InteresSimple.java", r"// La tasa es", 2), "", method(A, "model/plan/InteresSimple.java", r"private BigDecimal totalADevolver"))
+    + cb(P19, "dto/request/CreditoRequest.java", lines(P19, "dto/request/CreditoRequest.java", r"// Interes simple:")),
+    "Interés simple real: <code>total = C · (1 + i · n)</code>, con <code>i</code> mensual. <strong>Las dos estrategias reciben la misma tasa mensual</strong>.",
+    cb(D, "model/plan/InteresSimple.java", lines(D, "model/plan/InteresSimple.java", r"// La tasa es", 2), "", method(D, "model/plan/InteresSimple.java", r"private BigDecimal totalADevolver"))
+    + cb(D, "dto/request/CreditoRequest.java", lines(D, "dto/request/CreditoRequest.java", r"// % mensual")),
+    "<strong>Corrección de dominio</strong>: el interés simple depende del plazo. <strong>Lenguaje ubicuo</strong>: un atributo no cambia de unidad según otro. La interfaz <code>CalculoDeCuota</code> no cambia: solo una estrategia concreta (<strong>OCP</strong>).",
+    ejemplo + "<p>Glosario: <code>deudaOriginal</code> = capital prestado; <code>tasaInteres</code> = % mensual.</p>",
+    ref="Commits <code>9c3f79d</code>, <code>9ff9ed8</code> (textos del panel).")
+
+# ---------------- M20 importe de cuota ----------------
+m20 = bloque("importe", "M20. Una sola fuente del importe", "modelado",
+    "<strong>Information Expert</strong> + <strong>Composite</strong> (M11): el crédito deriva de sus cuotas.",
+    "El importe tenía <strong>tres fuentes</strong>: <code>Credito.importeCuota</code> (columna), <code>Cuota.importe</code> y <code>condiciones.importeCuota()</code>, público. Una fórmula nueva las desincronizaba.",
+    cb(P19, "model/Credito.java", lines(P19, "model/Credito.java", r"// Derivado de las condiciones", 5), "", method(P19, "model/Credito.java", r"public BigDecimal totalADevolver"))
+    + cb(P19, "model/interfaces/ICondicionesDeCredito.java", lines(P19, "model/interfaces/ICondicionesDeCredito.java", r"BigDecimal importeCuota")),
+    "<strong>Única fuente: <code>Cuota.importe</code></strong>, el hecho histórico. <code>Credito</code> suma sus cuotas para el total, igual que <code>saldo()</code>. Las condiciones la calculan solo para generar el plan (package-private).",
+    cb(D, "model/Credito.java", method(D, "model/Credito.java", r"public BigDecimal totalADevolver"), "", method(D, "model/Credito.java", r"public BigDecimal importeCuota"), "", method(D, "model/Credito.java", r"public BigDecimal saldo"))
+    + cb(D, "model/CondicionesDeCredito.java", method(D, "model/CondicionesDeCredito.java", r"BigDecimal importeCuota\(\)")),
+    "<strong>Composite</strong>: el total es una suma más sobre las hojas. <strong>Information Expert</strong>: la cuota conoce su importe. <strong>Se guardan hechos, se derivan totales</strong>.",
+    "Todas las cuotas iguales; el total es la suma de las cuotas. Sale la columna <code>importe_cuota</code> de <code>creditos</code>; el JSON no cambia. <code>CondicionesDeCredito</code> además <strong>nace válida</strong>: capital &gt; 0, cuotas ≥ 1, tasa ≥ 0 y plan, en su constructor.",
+    ref="Commit <code>9c3f79d</code>.",
+    tit_a="Antes (6609cd4)")
+
+mejoras = [m11, m12, m13, m17, m18, m19, m20]
 
 indice = [
  ("composite", "M11", "Saldo y mora por cuota, crédito y cartera", "<strong>Composite</strong>", "sumas repetidas"),
@@ -233,6 +265,8 @@ indice = [
  ("facade", "M13", "Autenticación detrás de <code>AuthService</code>", "<strong>Facade</strong> (identificado)", "patrón sin nombrar"),
  ("credito", "M17", "Condiciones del crédito en su propia clase", "Extract Class + ISP", "7 parámetros, 3 responsabilidades"),
  ("usuario", "M18", "<code>IUsuario</code> recibe <code>IPermisos</code>", "DIP", "interfaz atada a una clase concreta"),
+ ("tasa", "M19", "Interés simple real, tasa siempre mensual", "Lenguaje ubicuo (Strategy)", "una tasa con dos unidades"),
+ ("importe", "M20", "El importe vive en la cuota; el crédito suma", "Information Expert + Composite", "tres fuentes del importe"),
  ("panel", "M14-M16", "Regla de mora, deuda del cliente, cargos en el alta", "Composite, Decorator", "panel"),
 ]
 tabla_indice = "".join(f'<tr><td><a href="#{k}">{i}</a></td><td>{a}</td><td>{b}</td><td>{c}</td></tr>' for k, i, a, b, c in indice)
@@ -266,7 +300,7 @@ convenciones = """<p>Convención: <strong><code>I&lt;Clase&gt;</code></strong> p
 </tbody></table>"""
 
 matriz = [
- ("Information Expert", "<code>Cuota</code> sabe su saldo y su mora; <code>Credito</code>, su estado; <code>CondicionesDeCredito</code>, su cuota"),
+ ("Information Expert", "<code>Cuota</code> sabe su saldo, su mora y su importe; <code>Credito</code>, su estado y su total (M20); <code>CondicionesDeCredito</code>, su cuota"),
  ("Creator", "<code>Credito</code> crea sus cuotas"),
  ("Controller", "<code>controller/*Controller</code> delegan en <code>XService</code>"),
  ("Polymorphism", "<code>Deuda</code> y <code>CalculoDeCuota</code>, sin <code>if</code> por tipo"),
@@ -292,7 +326,7 @@ timeline = f'''<div class="timeline">
 <div class="hito"><div class="punto"></div><h4>V3</h4><p class="tema">MVC + Strategy + Adapter</p><p class="meta">13/10 · tag <code>v3</code></p>
 <ul><li>Cuota simple o francesa</li><li><code>TokenService</code> sobre jjwt</li><li>43 tests</li></ul></div>
 <div class="hito actual"><div class="punto"></div><h4>V4</h4><p class="tema">Composite + Decorator + Facade</p><p class="meta">27/10 · {n_v4} commits</p>
-<ul><li><strong>Composite</strong>: <code>Deuda</code> (M11)</li><li><strong>Decorator</strong>: cargos (M12)</li><li><strong>Facade</strong>: <code>AuthService</code> (M13)</li><li><code>Credito</code>: Extract Class (M17)</li><li>Panel: deuda del cliente y cargos</li><li>64 tests</li></ul></div>
+<ul><li><strong>Composite</strong>: <code>Deuda</code> (M11)</li><li><strong>Decorator</strong>: cargos (M12)</li><li><strong>Facade</strong>: <code>AuthService</code> (M13)</li><li><code>Credito</code>: Extract Class (M17)</li><li>Interés simple real (M19)</li><li>Panel: deuda del cliente y cargos</li><li>66 tests</li></ul></div>
 </div>
 <details><summary>Commits V3 → V4 (git log v3..iteracion4)</summary><pre><code>{e(log_v4)}</code></pre></details>'''
 
@@ -326,7 +360,7 @@ def clases(vista):
 
 pendientes = '''<ul>
 <li><strong>H8</strong>: quién cobró y quién anuló.</li>
-<li><strong>P-M9</strong>: tasa con unidad por plan; cuota con capital e interés separados (habilita IVA sobre intereses).</li>
+<li><strong>P-M9</strong>: cuota con capital e interés separados (habilita IVA sobre intereses).</li>
 <li><strong>O3b</strong>: ajustar la última cuota para que el total cierre exacto.</li>
 <li><strong>O8</strong>: pagos parciales.</li>
 <li><strong>Base persistente</strong>: prod sigue en H2 en memoria.</li>
@@ -402,7 +436,7 @@ doc = f'''<!doctype html>
 <title>Reporte V4 — TPO Grupo 7</title><style>{CSS}</style></head>
 <body>
 <div id="barra"><strong style="color:var(--navy)">Reporte V4</strong>
-<nav><a href="#portada">Portada</a><a href="#timeline">Timeline</a><a href="#tecnologias">Tecnologías</a><a href="#mvc">MVC</a><a href="#mejoras">Mejoras</a><a href="#composite">Composite</a><a href="#decorator">Decorator</a><a href="#facade">Facade</a><a href="#credito">Credito</a><a href="#panel">Panel</a><a href="#convenciones">Convenciones</a><a href="#matriz">GRASP/SOLID</a><a href="#revision">Revisión</a><a href="#verificacion">Verificación</a><a href="#casos-de-uso">Casos de uso</a><a href="#clases">Diagramas</a><a href="#pendientes">Pendientes</a></nav>
+<nav><a href="#portada">Portada</a><a href="#timeline">Timeline</a><a href="#tecnologias">Tecnologías</a><a href="#mvc">MVC</a><a href="#mejoras">Mejoras</a><a href="#composite">Composite</a><a href="#decorator">Decorator</a><a href="#facade">Facade</a><a href="#credito">Credito</a><a href="#tasa">Tasa</a><a href="#importe">Importe</a><a href="#panel">Panel</a><a href="#convenciones">Convenciones</a><a href="#matriz">GRASP/SOLID</a><a href="#revision">Revisión</a><a href="#verificacion">Verificación</a><a href="#casos-de-uso">Casos de uso</a><a href="#clases">Diagramas</a><a href="#pendientes">Pendientes</a></nav>
 <button class="sec" onclick="document.querySelectorAll('details.detalle').forEach(d=>d.open=true);window.print()">Exportar PDF</button></div>
 <main>
 
@@ -453,7 +487,7 @@ doc = f'''<!doctype html>
 
 <section id="verificacion"><h2>Verificación</h2>
 <ul>
-<li><strong>64 tests, 0 fallas</strong> (<code>mvn test</code>; V3: 43): 29 de dominio, 14 de cálculo de cuota, 12 HTTP, 8 de integración, <code>contextLoads</code>.</li>
+<li><strong>66 tests, 0 fallas</strong> (<code>mvn test</code>; V3: 43): 31 de dominio, 14 de cálculo de cuota, 12 HTTP, 8 de integración, <code>contextLoads</code>.</li>
 <li><strong>Casos de uso por API</strong>: <code>docs/casos-de-uso/verificar-cu.sh</code>, incluida la mora (400).</li>
 <li><strong>Hallazgo H5, corregido</strong>: <code>verificar-cu.sh</code> detectó 500 al consultar créditos (<code>Credito.cargos</code> lazy fuera de la transacción); fix: <code>CreditoResponse.desde</code> copia los cargos (<code>6286109</code>), test <code>CreditoConCargosTest</code>.</li>
 <li><strong>Hallazgo H6, corregido</strong>: <code>"cargos":[null]</code> daba 500; ahora 400 (<code>06eb1eb</code>, test <code>cargoNuloDa400</code>, <code>verificar-cu.sh</code>).</li>

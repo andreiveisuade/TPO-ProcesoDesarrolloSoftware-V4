@@ -1,0 +1,29 @@
+@startuml
+skinparam shadowing false
+skinparam defaultFontName Calibri
+skinparam defaultFontSize 12
+skinparam ClassBackgroundColor #FFFFFF
+skinparam ClassBorderColor #1D2B4F
+skinparam ClassHeaderBackgroundColor #FFFFFF
+skinparam ArrowColor #2E75B6
+skinparam NoteBackgroundColor #FFF8E1
+skinparam NoteBorderColor #B38600
+hide empty members
+class Credito {
+  -importeCuota : BigDecimal
+  +totalADevolver() = importeCuota × n
+}
+class CondicionesDeCredito {
+  +importeCuota() : BigDecimal
+}
+interface ICondicionesDeCredito {
+  +importeCuota() : BigDecimal
+}
+class Cuota <<Leaf>> {
+  -importe : BigDecimal
+}
+ICondicionesDeCredito <|.. CondicionesDeCredito
+Credito *-- "1" CondicionesDeCredito
+Credito *-- "1..*" Cuota
+note bottom of Credito : tres fuentes del importe
+@enduml

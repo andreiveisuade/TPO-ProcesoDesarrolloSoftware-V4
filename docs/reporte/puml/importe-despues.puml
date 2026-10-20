@@ -1,0 +1,26 @@
+@startuml
+skinparam shadowing false
+skinparam defaultFontName Calibri
+skinparam defaultFontSize 12
+skinparam ClassBackgroundColor #FFFFFF
+skinparam ClassBorderColor #1D2B4F
+skinparam ClassHeaderBackgroundColor #FFFFFF
+skinparam ArrowColor #2E75B6
+skinparam NoteBackgroundColor #FFF8E1
+skinparam NoteBorderColor #B38600
+hide empty members
+class Credito <<Composite>> {
+  +totalADevolver() = Σ cuota.importe
+  +importeCuota() = primera cuota
+  +saldo() = Σ cuota.saldo()
+}
+class CondicionesDeCredito {
+  ~importeCuota() : BigDecimal
+}
+class Cuota <<Leaf>> {
+  -importe : BigDecimal
+}
+Credito *-- "1" CondicionesDeCredito : genera el plan
+Credito *-- "1..*" Cuota
+note right of Cuota : única fuente:\nlo que se le exige
+@enduml

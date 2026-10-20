@@ -57,10 +57,10 @@ c "UC10 por cliente" GET /creditos/cliente/30111222 $U
 c "UC10 cliente inexistente" GET /creditos/cliente/999 $U
 c "GET /creditos (sin CU)" GET /creditos $U
 echo "== UC13-15"
-c "UC13 cobrar cuota 1 cred 1" POST /cobranzas $U '{"idCredito":1,"numeroCuota":1,"importe":440}'
-c "UC13 cobrar de nuevo" POST /cobranzas $U '{"idCredito":1,"numeroCuota":1,"importe":440}'
+c "UC13 cobrar cuota 1 cred 1" POST /cobranzas $U '{"idCredito":1,"numeroCuota":1,"importe":520}'
+c "UC13 cobrar de nuevo" POST /cobranzas $U '{"idCredito":1,"numeroCuota":1,"importe":520}'
 c "UC13 importe distinto" POST /cobranzas $U '{"idCredito":1,"numeroCuota":2,"importe":100}'
-c "UC13 cuota inexistente" POST /cobranzas $U '{"idCredito":1,"numeroCuota":9,"importe":440}'
+c "UC13 cuota inexistente" POST /cobranzas $U '{"idCredito":1,"numeroCuota":9,"importe":520}'
 c "UC13 importe negativo" POST /cobranzas $U '{"idCredito":1,"numeroCuota":2,"importe":-1}'
 c "UC14 listar cobranzas cred 1" GET /cobranzas/credito/1 $U
 c "UC14 credito inexistente" GET /cobranzas/credito/999 $U
@@ -75,7 +75,7 @@ c "UC15 user sin permiso" DELETE /cobranzas/1 $U
 c "UC15 supervisor ok" DELETE /cobranzas/1 $S
 c "UC15 anular otra vez la misma" DELETE /cobranzas/1 $S
 c "UC15 inexistente" DELETE /cobranzas/999 $S
-c "UC13 recobrar cuota liberada" POST /cobranzas $U '{"idCredito":1,"numeroCuota":1,"importe":440}'
+c "UC13 recobrar cuota liberada" POST /cobranzas $U '{"idCredito":1,"numeroCuota":1,"importe":520}'
 c "UC09 cuotas del credito vencido (3)" GET /creditos/3 $U
 echo "== UC16"
 c "UC16 supervisor" GET /dashboard/stats $S
