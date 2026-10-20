@@ -1,0 +1,19 @@
+@startuml
+!include _estilo.iuml
+skinparam classAttributeIconSize 0
+interface ReglaDeOtorgamiento <<Component>> {
+  + verificar(cliente : Cliente, request : CreditoRequest) : void
+}
+class SinCuotasVencidas <<Leaf>>
+class MontoMaximo <<Leaf>>
+class TodasLasReglas <<Composite>> {
+  - reglas : List<ReglaDeOtorgamiento>
+  + verificar(cliente, request) : void
+}
+class CreditoServiceImpl <<Client>>
+ReglaDeOtorgamiento <|.. SinCuotasVencidas
+ReglaDeOtorgamiento <|.. MontoMaximo
+ReglaDeOtorgamiento <|.. TodasLasReglas
+TodasLasReglas o-- "1..*" ReglaDeOtorgamiento
+CreditoServiceImpl ..> ReglaDeOtorgamiento
+@enduml

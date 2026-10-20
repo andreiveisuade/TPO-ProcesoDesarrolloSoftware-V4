@@ -1,0 +1,19 @@
+@startuml
+!include _estilo.iuml
+skinparam classAttributeIconSize 0
+interface CalculoDeCuota <<Strategy>> {
+  + planDeCuotas(capital, tasaInteres, cantidadCuotas) : List<ImporteDeCuota>
+}
+class ImporteDeCuota <<record>> {
+  + capital : BigDecimal
+  + interes : BigDecimal
+  + total() : BigDecimal
+}
+class InteresSimple
+class SistemaFrances
+class Credito <<Context>>
+CalculoDeCuota <|.. InteresSimple
+CalculoDeCuota <|.. SistemaFrances
+CalculoDeCuota ..> ImporteDeCuota
+Credito --> CalculoDeCuota
+@enduml

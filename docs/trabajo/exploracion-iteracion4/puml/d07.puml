@@ -1,0 +1,25 @@
+@startuml
+!include _estilo.iuml
+skinparam classAttributeIconSize 0
+class AuthController <<Client>>
+interface AuthService <<Facade>> {
+  + registrar(request : RegisterRequest) : AuthResponse
+  + login(request : LoginRequest) : AuthResponse
+  + actual(username : String) : AuthResponse
+}
+class AuthServiceImpl <<Facade>>
+package "Subsistema: Spring Security + jjwt (no conoce a la Facade)" {
+  interface "AuthenticationManager (Spring)" as AM
+  interface "PasswordEncoder (Spring)" as PE
+  interface TokenService <<Target>>
+  class JwtUtil <<Adapter>>
+  interface UsuarioRepository
+}
+AuthController --> AuthService
+AuthService <|.. AuthServiceImpl
+AuthServiceImpl --> AM
+AuthServiceImpl --> PE
+AuthServiceImpl --> TokenService
+AuthServiceImpl --> UsuarioRepository
+TokenService <|.. JwtUtil
+@enduml

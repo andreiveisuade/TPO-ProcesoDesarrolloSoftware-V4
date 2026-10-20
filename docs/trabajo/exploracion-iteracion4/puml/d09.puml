@@ -1,0 +1,12 @@
+@startuml
+!include _estilo.iuml
+class DashboardController
+interface DashboardService <<¿Facade?>>
+interface ClienteRepository
+interface CreditoRepository
+interface CobranzaRepository
+DashboardController --> DashboardService
+DashboardService ..> ClienteRepository
+DashboardService ..> CreditoRepository
+DashboardService ..> CobranzaRepository
+@enduml

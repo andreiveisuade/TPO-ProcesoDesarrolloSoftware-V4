@@ -1,0 +1,17 @@
+@startuml
+!include _estilo.iuml
+skinparam classAttributeIconSize 0
+interface Deuda <<Component>> {
+  + saldo() : BigDecimal
+  + montoVencido() : BigDecimal
+}
+class Cuota <<ConcreteComponent>>
+class DeudaConPunitorio <<Decorator>> {
+  - envuelta : Deuda
+  - tasaPunitoriaDiaria : BigDecimal
+  + montoVencido() : BigDecimal
+}
+Deuda <|.. Cuota
+Deuda <|.. DeudaConPunitorio
+DeudaConPunitorio o--> Deuda : envuelta
+@enduml

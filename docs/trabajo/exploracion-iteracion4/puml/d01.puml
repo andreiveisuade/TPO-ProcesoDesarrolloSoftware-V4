@@ -1,0 +1,33 @@
+@startuml
+!include _estilo.iuml
+skinparam classAttributeIconSize 0
+interface Deuda <<Component>> {
+  + saldo() : BigDecimal
+  + montoVencido() : BigDecimal
+}
+class Cuota <<Leaf>> {
+  - importe : BigDecimal
+  + saldo() : BigDecimal
+  + montoVencido() : BigDecimal
+}
+class Credito <<Composite>> {
+  - cuotas : List<Cuota>
+  + saldo() : BigDecimal
+  + montoVencido() : BigDecimal
+}
+class Cartera <<Composite>> {
+  - deudas : List<Deuda>
+  + {static} de(deudas : List<? extends Deuda>) : Cartera
+  + saldo() : BigDecimal
+  + montoVencido() : BigDecimal
+}
+class DashboardServiceImpl <<Client>> {
+  + obtenerEstadisticasGenerales() : DashboardStatsResponse
+}
+Deuda <|.. Cuota
+Deuda <|.. Credito
+Deuda <|.. Cartera
+Credito *-- "1..*" Cuota : cuotas
+Cartera o-- "0..*" Deuda : deudas
+DashboardServiceImpl ..> Deuda
+@enduml

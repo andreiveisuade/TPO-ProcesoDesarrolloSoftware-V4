@@ -1,0 +1,12 @@
+@startuml
+!include _estilo.iuml
+interface Deuda
+class Credito
+class CreditoRefinanciado {
+  - originales : List<Credito>
+}
+Deuda <|.. Credito
+Deuda <|.. CreditoRefinanciado
+CreditoRefinanciado o-- Credito
+note bottom of CreditoRefinanciado : semántica falsa: los originales\nquedan cancelados, no "contenidos"
+@enduml

@@ -1,0 +1,7 @@
+@startuml
+!include _estilo.iuml
+interface CalculoDeCuota <<Strategy>> {
+  + importeCuota(capital, tna, cantidadCuotas) : BigDecimal
+}
+note right of CalculoDeCuota : la unidad de la tasa es una sola (TNA);\ncada estrategia la convierte
+@enduml

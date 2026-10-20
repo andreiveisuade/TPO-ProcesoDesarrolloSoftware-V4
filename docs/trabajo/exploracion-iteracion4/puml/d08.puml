@@ -1,0 +1,23 @@
+@startuml
+!include _estilo.iuml
+skinparam classAttributeIconSize 0
+class CreditoController <<Client>> {
+  + cronograma(id : Long) : ResponseEntity<byte[]>
+}
+interface GeneradorDeCronograma <<Facade>> {
+  + generar(credito : ICredito) : byte[]
+}
+class CronogramaPdf <<Facade>>
+package "OpenPDF (tercero)" {
+  class Document
+  class PdfWriter
+  class PdfPTable
+  class Font
+}
+CreditoController --> GeneradorDeCronograma
+GeneradorDeCronograma <|.. CronogramaPdf
+CronogramaPdf --> Document
+CronogramaPdf --> PdfWriter
+CronogramaPdf --> PdfPTable
+CronogramaPdf --> Font
+@enduml

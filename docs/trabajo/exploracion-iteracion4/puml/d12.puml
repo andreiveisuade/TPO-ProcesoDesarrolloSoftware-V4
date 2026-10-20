@@ -1,0 +1,10 @@
+@startuml
+!include _estilo.iuml
+class AuthServiceImpl <<Facade / Client>>
+interface TokenService <<Target>>
+class JwtUtil <<Adapter>>
+class "JwtParser (jjwt)" as JwtParser <<Adaptee>>
+AuthServiceImpl --> TokenService
+TokenService <|.. JwtUtil
+JwtUtil --> JwtParser
+@enduml

@@ -1,0 +1,25 @@
+@startuml
+!include _estilo.iuml
+skinparam classAttributeIconSize 0
+interface CobranzaService <<Component>> {
+  + registrar(request) : CobranzaResponse
+  + anularCobranza(id, usuario) : void
+}
+class CobranzaServiceImpl <<ConcreteComponent>>
+class CobranzaServiceAuditada <<Decorator>> {
+  - envuelto : CobranzaService
+  - registros : RegistroDeOperacionRepository
+}
+class RegistroDeOperacion <<Entity>> {
+  - username : String
+  - operacion : String
+  - idRecurso : Long
+  - fechaHora : LocalDateTime
+}
+class CobranzaController <<Client>>
+CobranzaService <|.. CobranzaServiceImpl
+CobranzaService <|.. CobranzaServiceAuditada
+CobranzaServiceAuditada o--> CobranzaService : envuelto
+CobranzaServiceAuditada ..> RegistroDeOperacion
+CobranzaController --> CobranzaService
+@enduml

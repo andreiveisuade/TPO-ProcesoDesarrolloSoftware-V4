@@ -1,0 +1,43 @@
+@startuml
+!include _estilo.iuml
+skinparam classAttributeIconSize 0
+interface CalculoDeCuota <<Strategy / Component>> {
+  + importeCuota(capital : BigDecimal, tasaInteres : BigDecimal, cantidadCuotas : int) : BigDecimal
+}
+class InteresSimple <<ConcreteStrategy / ConcreteComponent>> {
+  + importeCuota(...) : BigDecimal
+}
+class SistemaFrances <<ConcreteStrategy / ConcreteComponent>> {
+  + importeCuota(...) : BigDecimal
+}
+abstract class CargoSobreCuota <<Decorator>> {
+  - envuelto : CalculoDeCuota
+  + importeCuota(...) : BigDecimal
+  # cargo(capital : BigDecimal, cantidadCuotas : int) : BigDecimal
+}
+class SeguroDeVida <<ConcreteDecorator>> {
+  # cargo(capital, cantidadCuotas) : BigDecimal
+}
+class GastoDeAdministracion <<ConcreteDecorator>> {
+  # cargo(capital, cantidadCuotas) : BigDecimal
+}
+enum TipoCargo {
+  SEGURO_DE_VIDA
+  GASTO_DE_ADMINISTRACION
+  + aplicarSobre(calculo : CalculoDeCuota) : CalculoDeCuota
+}
+class Credito <<Context / Client>> {
+  - tipoPlan : TipoPlan
+  - cargos : Set<TipoCargo>
+  - calculo() : CalculoDeCuota
+}
+CalculoDeCuota <|.. InteresSimple
+CalculoDeCuota <|.. SistemaFrances
+CalculoDeCuota <|.. CargoSobreCuota
+CargoSobreCuota o--> "1" CalculoDeCuota : envuelto
+CargoSobreCuota <|-- SeguroDeVida
+CargoSobreCuota <|-- GastoDeAdministracion
+TipoCargo ..> CargoSobreCuota : crea
+Credito --> CalculoDeCuota
+Credito --> "0..*" TipoCargo
+@enduml
