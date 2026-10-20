@@ -15,7 +15,7 @@ Convenciones:
 | Visitante | Persona sin sesión | Solo `/api/auth/**` es público, salvo `/api/auth/me` que pide token (`config/SecurityConfig.java` `filterChain`) |
 | Usuario (USER) | Operador de créditos y cobranzas. Semilla `user`/`user`, sin permisos de anulación | `anyRequest().authenticated()` (`config/SecurityConfig.java` `filterChain`); semilla en `config/DataInitializer.java` `run` |
 | Supervisor (SUPERVISOR) | Es un Usuario que además ve el dashboard y reparte los permisos de anulación. Semilla `supervisor`/`supervisor`, con los dos permisos | `/api/supervisor/**` y `/api/dashboard/**` (`config/SecurityConfig.java` `filterChain`); `config/DataInitializer.java` `run` |
-| Administrador (ADMIN) | Es un Usuario que además ve el dashboard y cambia roles. Semilla `admin`/`admin`, con los dos permisos | `/api/admin/**` y `/api/dashboard/**` (`config/SecurityConfig.java` `filterChain`); `config/DataInitializer.java` `run` |
+| Administrador (ADMIN) | Es un Usuario que además ve el dashboard, cambia roles y da de alta o de baja usuarios (UC22). Semilla `admin`/`admin`, con los dos permisos | `/api/admin/**` y `/api/dashboard/**` (`config/SecurityConfig.java` `filterChain`); `config/DataInitializer.java` `run` |
 
 Dos aclaraciones que cambian respecto de V0 y de los diagramas de la clase 3:
 
@@ -37,7 +37,7 @@ Fuente: `casos-de-uso-v4.puml` (renderizado con `plantuml -tsvg` y `-tpng`). Sup
 - **Flujo principal**: 1. El visitante carga usuario y contraseña en la pantalla de registro. 2. El sistema valida los campos. 3. Verifica que el usuario no exista. 4. Crea el usuario con rol USER y sin permisos de anulación. 5. Emite el token y responde **201** con token, rol y permisos. 6. El front guarda la sesión y navega a `/clientes`.
 - **Errores**: usuario repetido → **400** "El usuario 'x' ya existe". Usuario vacío o contraseña de menos de 6 caracteres → **400** de validación (`dto/request/RegisterRequest.java`).
 - **Postcondición**: existe un USER con `Permisos.ninguno()` y tiene sesión iniciada.
-- **Reglas**: unicidad del username y rol fijo USER en `service/impl/AuthServiceImpl.java` `registrar`; alta solo por `model/Usuario.java` `nuevo`. Nadie puede registrarse como SUPERVISOR o ADMIN.
+- **Reglas**: unicidad del username y rol fijo USER en `service/impl/AuthServiceImpl.java` `registrar` (el alta comparte `crear` con UC22); alta solo por `model/Usuario.java` `nuevo`. Nadie puede registrarse como SUPERVISOR o ADMIN.
 - **Endpoint**: `POST /api/auth/register` → `controller/AuthController.java` `registrar`.
 - **Pantalla**: `pages/Register.jsx` (`/register`).
 - **Verificación**: API (UC01). Sin test unitario.
@@ -47,8 +47,8 @@ Fuente: `casos-de-uso-v4.puml` (renderizado con `plantuml -tsvg` y `-tpng`). Sup
 - **Actor**: Visitante. **RF V0**: RF-AU-02, RF-AU-03. Absorbe a UC03 "Emitir token JWT" (ver sección 4).
 - **Precondición**: el usuario existe.
 - **Flujo principal**: 1. Carga usuario y contraseña. 2. El sistema autentica contra la contraseña hasheada (BCrypt: `AuthenticationManager` de Spring con el `passwordEncoder` de `config/SecurityConfig.java`). 3. Emite un token JWT de 24 h (`service/TokenService.java`, adaptado por `security/JwtUtil.java`, M7). 4. Responde **200** con token, rol y permisos. 5. El front guarda token y usuario en `localStorage` y navega a `/clientes`.
-- **Errores**: contraseña incorrecta o usuario inexistente → **401** "Bad credentials" (el mismo mensaje para los dos: no revela qué usuarios existen). Campos vacíos → **400** de validación.
-- **Postcondición**: cada request siguiente lleva el token; `security/JwtAuthFilter.java` `autenticar` vuelve a cargar el usuario de la base en cada request, así que rol y permisos se leen siempre actualizados. El front los refresca con `GET /api/auth/me` (`controller/AuthController.java` `actual`, `service/impl/AuthServiceImpl.java` `actual`) cada vez que se navega a una pantalla (`components/PrivateRoute.jsx`).
+- **Errores**: contraseña incorrecta o usuario inexistente → **401** "Bad credentials" (el mismo mensaje para los dos: no revela qué usuarios existen). Campos vacíos → **400** de validación. Usuario desactivado (UC22) → **401** "El usuario está desactivado" (`UsuarioDetails.isEnabled`, `GlobalExceptionHandler` `handleDesactivado`).
+- **Postcondición**: cada request siguiente lleva el token; `security/JwtAuthFilter.java` `autenticar` vuelve a cargar el usuario de la base en cada request, así que rol, permisos y estado se leen siempre actualizados: el token de un usuario desactivado deja de servir (401). El front los refresca con `GET /api/auth/me` (`controller/AuthController.java` `actual`, `service/impl/AuthServiceImpl.java` `actual`) cada vez que se navega a una pantalla (`components/PrivateRoute.jsx`).
 - **Reglas**: `service/impl/AuthServiceImpl.java` `login`.
 - **Endpoint**: `POST /api/auth/login` → `controller/AuthController.java` `login`; `GET /api/auth/me` → `controller/AuthController.java` `actual`.
 - **Pantalla**: `pages/Login.jsx` (`/login`).
@@ -196,7 +196,7 @@ Fuente: `casos-de-uso-v4.puml` (renderizado con `plantuml -tsvg` y `-tpng`). Sup
 ### UC18 Listar usuarios
 
 - **Actor**: Supervisor (para repartir permisos) y Administrador (para cambiar roles). **RF V0**: RF-AD-01.
-- **Flujo principal**: 1. El actor entra a su panel. 2. El sistema devuelve todos los usuarios salvo los ADMIN, con rol y permisos (**200**). 3. La pantalla los muestra con los controles de UC19 o UC20.
+- **Flujo principal**: 1. El actor entra a su panel. 2. El sistema devuelve todos los usuarios salvo los ADMIN, con rol, permisos y estado (**200**). 3. La pantalla los muestra con los controles de UC19 o UC20.
 - **Errores**: cada actor solo puede llamar a su endpoint: USER o ADMIN contra `/api/supervisor/usuarios`, o SUPERVISOR contra `/api/admin/usuarios` → **403**.
 - **Reglas**: `service/impl/AdminServiceImpl.java` `listarUsuarios` (sin ADMIN para los dos, O5).
 - **Endpoint**: `GET /api/supervisor/usuarios` → `controller/SupervisorController.java` `listarUsuarios`; `GET /api/admin/usuarios` → `controller/AdminController.java` `listarUsuarios`.
@@ -240,6 +240,19 @@ Fuente: `casos-de-uso-v4.puml` (renderizado con `plantuml -tsvg` y `-tpng`). Sup
 - **Pantalla**: `pages/Clientes.jsx` (bloque "Buscar cliente por DNI"). Usa `api/clientes.js` `getDeudaCliente`.
 - **Verificación**: Test `service/DeudaClienteTest` (con vencida, al día, cliente inexistente), `model/CarteraTest`; API (UC21).
 
+### UC22 Gestionar usuarios (alta y baja)
+
+- **Actor**: Administrador. **RF V0**: no existía; se agregó en V4 (M13 y M22).
+- **Precondición**: sesión de ADMIN.
+- **Flujo principal (alta)**: 1. En el panel de administración el admin carga usuario, contraseña y rol (USER o SUPERVISOR). 2. El sistema valida los campos y que el usuario no exista. 3. Crea el usuario sin permisos de anulación, por la misma Facade que UC01. 4. Responde **201** con el usuario, sin token. 5. La tabla lo agrega.
+- **Flujo principal (baja)**: 1. En la tabla el admin aprieta Desactivar (o Reactivar). 2. El sistema cambia el estado y responde **200**. 3. La columna Estado se actualiza.
+- **Errores**: rol ADMIN → **400** "No se puede dar de alta un administrador". Usuario repetido → **400** "El usuario 'x' ya existe". Contraseña corta o rol vacío → **400** de validación. Desactivar un ADMIN → **400** "No se puede desactivar un administrador". Usuario inexistente → **404**.
+- **Postcondición**: el usuario desactivado no puede iniciar sesión (UC02 → **401**) y su token anterior deja de servir desde la request siguiente. Sus créditos y cobranzas quedan (baja lógica).
+- **Reglas**: alta en `service/impl/AuthServiceImpl.java` `registrarConRol` (Facade, M13), llamado desde `service/impl/AdminServiceImpl.java` `crearUsuario`; baja en `model/Usuario.java` `desactivar`, `reactivar` (M22); `security/UsuarioDetails.java` `isEnabled` y `security/JwtAuthFilter.java` `autenticar`.
+- **Endpoint**: `POST /api/admin/usuarios` → `controller/AdminController.java` `crearUsuario`; `PUT /api/admin/usuarios/{id}/activo` → `controller/AdminController.java` `actualizarActivo`.
+- **Pantalla**: `pages/PanelAdmin.jsx` (bloque "Nuevo usuario" y columna Estado).
+- **Verificación**: Test `controller/GestionUsuariosTest` (alta 201, rol ADMIN 400, login de desactivado 401, token previo 401, reactivar, desactivar ADMIN 400).
+
 ## 4. Casos de uso retirados o reclasificados
 
 | CU V0 | Qué era | Estado en V3 | Motivo |
@@ -272,6 +285,7 @@ Fuente: `casos-de-uso-v4.puml` (renderizado con `plantuml -tsvg` y `-tpng`). Sup
 | UC19 | `PUT /api/supervisor/usuarios/{id}/permisos-anulacion` (+ `PUT /api/admin/usuarios/{id}/permisos`) | `pages/GestorPermisos.jsx` (el de ADMIN, **—**) | **—** | Final, API |
 | UC20 | `PUT /api/admin/usuarios/{id}/rol` | `pages/PanelAdmin.jsx` | **—** | API |
 | UC21 | `GET /api/clientes/{dni}/deuda` | `pages/Clientes.jsx` (buscar) | `DeudaClienteTest`, `CarteraTest` | API |
+| UC22 | `POST /api/admin/usuarios`, `PUT /api/admin/usuarios/{id}/activo` | `pages/PanelAdmin.jsx` | `GestionUsuariosTest` | — |
 
 Los tests de dominio están en `model/` y `model/plan/` del árbol de tests; los de códigos HTTP en `controller/CodigosHttpTest`, que además cubre el 405 de cualquier endpoint.
 

@@ -36,6 +36,7 @@ rectangle "Dashboard de préstamos" {
   usecase "UC18 Listar usuarios" as UC18
   usecase "UC19 Asignar permisos de anulación" as UC19
   usecase "UC20 Cambiar rol de usuario" as UC20
+  usecase "UC22 Gestionar usuarios\n(alta y baja)" as UC22
 }
 
 Vis --> UC01
@@ -59,6 +60,7 @@ Sup --> UC19
 Adm --> UC16
 Adm --> UC18
 Adm --> UC20
+Adm --> UC22
 
 UC07 ..> UC08 : <<include>>
 
