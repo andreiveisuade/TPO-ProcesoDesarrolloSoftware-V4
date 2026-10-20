@@ -441,8 +441,7 @@ package "model" {
     enum TipoCargo {
       SEGURO_DE_VIDA
       GASTO_DE_ADMINISTRACION
-      - decorador : UnaryOperator<CalculoDeCuota>
-      + aplicarSobre(CalculoDeCuota) : CalculoDeCuota
+      + {abstract} aplicarSobre(CalculoDeCuota) : CalculoDeCuota
     }
   }
 }

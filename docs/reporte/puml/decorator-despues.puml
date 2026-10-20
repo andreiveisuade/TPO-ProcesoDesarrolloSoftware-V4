@@ -32,7 +32,7 @@ class GastoDeAdministracion <<ConcreteDecorator>> {
 enum TipoCargo {
   SEGURO_DE_VIDA
   GASTO_DE_ADMINISTRACION
-  +aplicarSobre(calculo) : CalculoDeCuota
+  +{abstract} aplicarSobre(calculo) : CalculoDeCuota
 }
 CalculoDeCuota <|.. Planes
 CalculoDeCuota <|.. CargoSobreCuota
