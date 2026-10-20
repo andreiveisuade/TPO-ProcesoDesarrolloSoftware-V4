@@ -4,6 +4,7 @@ import com.uade.tpejemplo.dto.response.DashboardStatsResponse;
 import com.uade.tpejemplo.model.Cartera;
 import com.uade.tpejemplo.model.Credito;
 import com.uade.tpejemplo.model.EstadoCredito;
+import com.uade.tpejemplo.model.interfaces.Deuda;
 import com.uade.tpejemplo.repository.ClienteRepository;
 import com.uade.tpejemplo.repository.CreditoRepository;
 import com.uade.tpejemplo.repository.CobranzaRepository;
@@ -35,7 +36,7 @@ public class DashboardServiceImpl implements DashboardService {
         BigDecimal totalCobrado = cobranzaRepository.sumarImporteNoAnulado();
 
         // Composite: la cartera suma lo que cada credito suma de sus cuotas
-        Cartera cartera = Cartera.de(creditos);
+        Deuda cartera = Cartera.de(creditos);
         BigDecimal saldoPendiente = cartera.saldo();
         BigDecimal montoVencido = cartera.montoVencido();
 

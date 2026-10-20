@@ -7,6 +7,7 @@ import com.uade.tpejemplo.exception.BusinessException;
 import com.uade.tpejemplo.exception.ResourceNotFoundException;
 import com.uade.tpejemplo.model.Cartera;
 import com.uade.tpejemplo.model.Cliente;
+import com.uade.tpejemplo.model.interfaces.Deuda;
 import com.uade.tpejemplo.repository.ClienteRepository;
 import com.uade.tpejemplo.repository.CreditoRepository;
 import com.uade.tpejemplo.service.ClienteService;
@@ -57,8 +58,8 @@ public class ClienteServiceImpl implements ClienteService {
         if (!clienteRepository.existsById(dni)) {
             throw new ResourceNotFoundException("cliente", "DNI", dni);
         }
-        // Composite: la cartera suma la deuda de los creditos del cliente sin recorrer cuotas
-        Cartera cartera = Cartera.de(creditoRepository.buscarPorCliente(dni));
+        // Composite: la cartera suma la deuda de los creditos del cliente sin que el servicio recorra cuotas
+        Deuda cartera = Cartera.de(creditoRepository.buscarPorCliente(dni));
         return new DeudaClienteResponse(dni, cartera.saldo(), cartera.montoVencido());
     }
 }
