@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 // Cuota de un credito: sabe si esta pagada o vencida y registra su cobranza.
+// Composite: hoja, contesta su propia deuda
 @Entity
 @Table(name = "cuotas", uniqueConstraints = @UniqueConstraint(columnNames = {"id_credito", "numero"}))
 @Getter
@@ -68,6 +69,15 @@ public class Cuota implements ICuota {
     // La cuota de un credito anulado ya no se debe: no entra en mora.
     public boolean estaVencida(LocalDate hoy) {
         return !credito.isAnulado() && !estaPagada() && fechaVencimiento.isBefore(hoy);
+    }
+
+    // La cuota de un credito anulado ya no se debe.
+    public BigDecimal saldo() {
+        return estaPagada() || credito.isAnulado() ? BigDecimal.ZERO : importe;
+    }
+
+    public BigDecimal montoVencido() {
+        return estaVencida() ? importe : BigDecimal.ZERO;
     }
 
     // Creator: la cuota crea su cobranza (sabe si ya esta pagada y cuanto vale)

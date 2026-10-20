@@ -17,10 +17,11 @@ import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
-import java.util.function.Predicate;
+import java.util.function.Function;
 
 // Credito otorgado a un cliente: genera sus cuotas, calcula saldo y estado
 // y decide si se puede anular.
+// Composite: suma la deuda de sus cuotas
 @Entity
 @Table(name = "creditos")
 @Getter
@@ -141,21 +142,16 @@ public class Credito implements ICredito {
     }
 
     public BigDecimal saldo() {
-        if (anulado) {
-            return BigDecimal.ZERO;
-        }
-        return sumarCuotas(cuota -> !cuota.estaPagada());
+        return sumar(Cuota::saldo);
     }
 
-    // Information Expert: suma lo que la cuota sabe que esta vencido
     public BigDecimal montoVencido() {
-        return sumarCuotas(Cuota::estaVencida);
+        return sumar(Cuota::montoVencido);
     }
 
-    private BigDecimal sumarCuotas(Predicate<Cuota> filtro) {
+    private BigDecimal sumar(Function<Cuota, BigDecimal> monto) {
         return cuotas.stream()
-            .filter(filtro)
-            .map(Cuota::getImporte)
+            .map(monto)
             .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 

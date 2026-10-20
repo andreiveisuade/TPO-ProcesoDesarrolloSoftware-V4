@@ -97,4 +97,31 @@ class CuotaTest {
 
         assertThat(cuota.estaPagada()).isTrue();
     }
+
+    @Test
+    void saldoEsElImporteHastaQueSePaga() {
+        Cuota cuota = creditoOtorgado(LocalDate.now()).getCuotas().get(0);
+
+        assertThat(cuota.saldo()).isEqualByComparingTo("100.00");
+        cuota.registrarCobranza(new BigDecimal("100.00"));
+        assertThat(cuota.saldo()).isEqualByComparingTo("0");
+    }
+
+    @Test
+    void cuotaDeUnCreditoAnuladoNoTieneSaldoNiVencido() {
+        Credito credito = creditoOtorgado(LocalDate.now().minusMonths(2));
+        credito.anular();
+        Cuota cuota = credito.getCuotas().get(0);
+
+        assertThat(cuota.saldo()).isEqualByComparingTo("0");
+        assertThat(cuota.montoVencido()).isEqualByComparingTo("0");
+    }
+
+    @Test
+    void montoVencidoEsElImporteSoloSiEstaVencida() {
+        Credito credito = creditoOtorgado(LocalDate.now().minusMonths(2));
+
+        assertThat(credito.getCuotas().get(0).montoVencido()).isEqualByComparingTo("100.00");
+        assertThat(credito.getCuotas().get(1).montoVencido()).isEqualByComparingTo("0");
+    }
 }

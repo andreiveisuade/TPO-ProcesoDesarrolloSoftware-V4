@@ -3,7 +3,7 @@ package com.uade.tpejemplo.model.interfaces;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-public interface ICuota {
+public interface ICuota extends Deuda {
 
     Long getId();
 

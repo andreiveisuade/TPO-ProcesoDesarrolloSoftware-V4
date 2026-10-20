@@ -9,7 +9,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Set;
 
-public interface ICredito {
+public interface ICredito extends Deuda {
 
     Long getId();
 
@@ -36,10 +36,6 @@ public interface ICredito {
     List<? extends ICuota> getCuotas();
 
     EstadoCredito estado();
-
-    BigDecimal saldo();
-
-    BigDecimal montoVencido();
 
     boolean estaCancelado();
 
