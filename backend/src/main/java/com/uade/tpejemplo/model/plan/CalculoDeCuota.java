@@ -1,6 +1,4 @@
-package com.uade.tpejemplo.model.interfaces;
-
-import com.uade.tpejemplo.model.plan.Renglon;
+package com.uade.tpejemplo.model.plan;
 
 import java.math.BigDecimal;
 import java.util.List;

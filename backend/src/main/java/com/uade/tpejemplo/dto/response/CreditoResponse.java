@@ -1,11 +1,11 @@
 package com.uade.tpejemplo.dto.response;
 
-import com.uade.tpejemplo.model.EstadoCredito;
-import com.uade.tpejemplo.model.TipoCargo;
-import com.uade.tpejemplo.model.TipoPlan;
-import com.uade.tpejemplo.model.interfaces.ICondicionesDeCredito;
-import com.uade.tpejemplo.model.interfaces.ICredito;
+import com.uade.tpejemplo.model.credito.EstadoCredito;
+import com.uade.tpejemplo.model.credito.ICondicionesDeCredito;
+import com.uade.tpejemplo.model.credito.ICredito;
 import com.uade.tpejemplo.model.plan.Renglon;
+import com.uade.tpejemplo.model.plan.TipoCargo;
+import com.uade.tpejemplo.model.plan.TipoPlan;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

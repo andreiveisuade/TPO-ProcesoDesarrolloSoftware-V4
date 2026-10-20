@@ -1,6 +1,6 @@
 package com.uade.tpejemplo.dto.response;
 
-import com.uade.tpejemplo.model.interfaces.ICuota;
+import com.uade.tpejemplo.model.credito.ICuota;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 

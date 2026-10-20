@@ -1,6 +1,4 @@
-package com.uade.tpejemplo.model;
-
-import com.uade.tpejemplo.model.interfaces.IRol;
+package com.uade.tpejemplo.model.usuario;
 
 // Rol de un usuario y su nombre como autoridad de Spring Security.
 public enum Rol implements IRol {

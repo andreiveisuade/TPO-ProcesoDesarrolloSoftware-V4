@@ -1,8 +1,8 @@
-package com.uade.tpejemplo.model.interfaces;
+package com.uade.tpejemplo.model.credito;
 
-import com.uade.tpejemplo.model.TipoCargo;
-import com.uade.tpejemplo.model.TipoPlan;
 import com.uade.tpejemplo.model.plan.Renglon;
+import com.uade.tpejemplo.model.plan.TipoCargo;
+import com.uade.tpejemplo.model.plan.TipoPlan;
 
 import java.math.BigDecimal;
 import java.util.List;

@@ -3,13 +3,13 @@ package com.uade.tpejemplo.service.impl;
 import com.uade.tpejemplo.dto.request.CobranzaRequest;
 import com.uade.tpejemplo.dto.response.CobranzaResponse;
 import com.uade.tpejemplo.exception.ResourceNotFoundException;
-import com.uade.tpejemplo.model.Cobranza;
-import com.uade.tpejemplo.model.Cuota;
+import com.uade.tpejemplo.model.credito.Cobranza;
+import com.uade.tpejemplo.model.credito.Cuota;
+import com.uade.tpejemplo.model.usuario.IUsuario;
 import com.uade.tpejemplo.repository.CobranzaRepository;
 import com.uade.tpejemplo.repository.CreditoRepository;
 import com.uade.tpejemplo.repository.CuotaRepository;
 import com.uade.tpejemplo.service.CobranzaService;
-import com.uade.tpejemplo.model.interfaces.IUsuario;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.security.access.AccessDeniedException;

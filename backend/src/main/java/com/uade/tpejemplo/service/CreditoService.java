@@ -2,7 +2,7 @@ package com.uade.tpejemplo.service;
 
 import com.uade.tpejemplo.dto.request.CreditoRequest;
 import com.uade.tpejemplo.dto.response.CreditoResponse;
-import com.uade.tpejemplo.model.interfaces.IUsuario;
+import com.uade.tpejemplo.model.usuario.IUsuario;
 
 import java.util.List;
 

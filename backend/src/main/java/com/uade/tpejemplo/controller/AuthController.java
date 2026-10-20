@@ -3,7 +3,7 @@ package com.uade.tpejemplo.controller;
 import com.uade.tpejemplo.dto.request.LoginRequest;
 import com.uade.tpejemplo.dto.request.RegisterRequest;
 import com.uade.tpejemplo.dto.response.AuthResponse;
-import com.uade.tpejemplo.model.interfaces.IUsuario;
+import com.uade.tpejemplo.model.usuario.IUsuario;
 import com.uade.tpejemplo.service.AuthService;
 import jakarta.validation.Valid;
 import io.swagger.v3.oas.annotations.Operation;

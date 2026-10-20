@@ -1,13 +1,13 @@
 package com.uade.tpejemplo.service.impl;
 
 import com.uade.tpejemplo.dto.response.DashboardStatsResponse;
-import com.uade.tpejemplo.model.Cartera;
-import com.uade.tpejemplo.model.Credito;
-import com.uade.tpejemplo.model.EstadoCredito;
-import com.uade.tpejemplo.model.interfaces.Deuda;
+import com.uade.tpejemplo.model.credito.Cartera;
+import com.uade.tpejemplo.model.credito.Credito;
+import com.uade.tpejemplo.model.credito.Deuda;
+import com.uade.tpejemplo.model.credito.EstadoCredito;
 import com.uade.tpejemplo.repository.ClienteRepository;
-import com.uade.tpejemplo.repository.CreditoRepository;
 import com.uade.tpejemplo.repository.CobranzaRepository;
+import com.uade.tpejemplo.repository.CreditoRepository;
 import com.uade.tpejemplo.service.DashboardService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

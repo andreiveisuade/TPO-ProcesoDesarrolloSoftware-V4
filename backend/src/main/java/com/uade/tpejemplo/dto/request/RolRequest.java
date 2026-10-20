@@ -1,6 +1,6 @@
  package com.uade.tpejemplo.dto.request;
 
-import com.uade.tpejemplo.model.Rol;
+import com.uade.tpejemplo.model.usuario.Rol;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 

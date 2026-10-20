@@ -1,4 +1,4 @@
-package com.uade.tpejemplo.model.interfaces;
+package com.uade.tpejemplo.model.credito;
 
 import java.math.BigDecimal;
 

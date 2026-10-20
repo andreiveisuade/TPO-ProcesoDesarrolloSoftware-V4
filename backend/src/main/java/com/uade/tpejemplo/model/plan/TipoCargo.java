@@ -1,8 +1,4 @@
-package com.uade.tpejemplo.model;
-
-import com.uade.tpejemplo.model.interfaces.CalculoDeCuota;
-import com.uade.tpejemplo.model.plan.GastoDeAdministracion;
-import com.uade.tpejemplo.model.plan.SeguroDeVida;
+package com.uade.tpejemplo.model.plan;
 
 // Cargos opcionales que se eligen al otorgar un credito. Se guarda el nombre
 // del cargo (no el decorador) y con el se vuelve a armar el calculo.

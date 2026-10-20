@@ -1,9 +1,10 @@
-package com.uade.tpejemplo.model;
+package com.uade.tpejemplo.model.credito;
 
 import com.uade.tpejemplo.exception.BusinessException;
-import com.uade.tpejemplo.model.interfaces.CalculoDeCuota;
-import com.uade.tpejemplo.model.interfaces.ICondicionesDeCredito;
+import com.uade.tpejemplo.model.plan.CalculoDeCuota;
 import com.uade.tpejemplo.model.plan.Renglon;
+import com.uade.tpejemplo.model.plan.TipoCargo;
+import com.uade.tpejemplo.model.plan.TipoPlan;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;

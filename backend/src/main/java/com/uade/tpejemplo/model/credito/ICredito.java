@@ -1,6 +1,6 @@
-package com.uade.tpejemplo.model.interfaces;
+package com.uade.tpejemplo.model.credito;
 
-import com.uade.tpejemplo.model.EstadoCredito;
+import com.uade.tpejemplo.model.cliente.ICliente;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;

@@ -1,6 +1,4 @@
-package com.uade.tpejemplo.model;
-
-import com.uade.tpejemplo.model.interfaces.Deuda;
+package com.uade.tpejemplo.model.credito;
 
 import java.math.BigDecimal;
 import java.util.List;

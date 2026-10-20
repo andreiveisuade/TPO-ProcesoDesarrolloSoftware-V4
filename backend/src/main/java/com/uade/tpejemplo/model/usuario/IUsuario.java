@@ -1,6 +1,4 @@
-package com.uade.tpejemplo.model.interfaces;
-
-import com.uade.tpejemplo.model.Rol;
+package com.uade.tpejemplo.model.usuario;
 
 public interface IUsuario {
 

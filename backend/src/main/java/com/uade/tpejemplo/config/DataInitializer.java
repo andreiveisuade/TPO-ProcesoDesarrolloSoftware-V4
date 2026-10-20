@@ -1,8 +1,8 @@
 package com.uade.tpejemplo.config;
 
-import com.uade.tpejemplo.model.Permisos;
-import com.uade.tpejemplo.model.Rol;
-import com.uade.tpejemplo.model.Usuario;
+import com.uade.tpejemplo.model.usuario.Permisos;
+import com.uade.tpejemplo.model.usuario.Rol;
+import com.uade.tpejemplo.model.usuario.Usuario;
 import com.uade.tpejemplo.repository.UsuarioRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

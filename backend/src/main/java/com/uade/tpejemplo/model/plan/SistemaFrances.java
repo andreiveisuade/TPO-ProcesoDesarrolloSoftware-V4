@@ -1,7 +1,5 @@
 package com.uade.tpejemplo.model.plan;
 
-import com.uade.tpejemplo.model.interfaces.CalculoDeCuota;
-
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.math.RoundingMode;

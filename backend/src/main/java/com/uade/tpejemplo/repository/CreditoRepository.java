@@ -1,6 +1,6 @@
 package com.uade.tpejemplo.repository;
 
-import com.uade.tpejemplo.model.Credito;
+import com.uade.tpejemplo.model.credito.Credito;
 import jakarta.persistence.LockModeType;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Lock;

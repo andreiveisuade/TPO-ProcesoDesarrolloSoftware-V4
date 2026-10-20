@@ -1,6 +1,6 @@
 package com.uade.tpejemplo.repository;
 
-import com.uade.tpejemplo.model.Usuario;
+import com.uade.tpejemplo.model.usuario.Usuario;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

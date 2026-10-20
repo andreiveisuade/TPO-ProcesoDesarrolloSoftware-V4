@@ -1,6 +1,6 @@
 package com.uade.tpejemplo.dto.response;
 
-import com.uade.tpejemplo.model.interfaces.ICobranza;
+import com.uade.tpejemplo.model.credito.ICobranza;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

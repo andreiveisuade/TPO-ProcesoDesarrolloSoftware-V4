@@ -1,6 +1,6 @@
 package com.uade.tpejemplo.dto.response;
 
-import com.uade.tpejemplo.model.interfaces.ICliente;
+import com.uade.tpejemplo.model.cliente.ICliente;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 

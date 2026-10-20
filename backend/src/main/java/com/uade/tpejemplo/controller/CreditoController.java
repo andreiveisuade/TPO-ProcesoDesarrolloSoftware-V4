@@ -2,7 +2,7 @@ package com.uade.tpejemplo.controller;
 
 import com.uade.tpejemplo.dto.request.CreditoRequest;
 import com.uade.tpejemplo.dto.response.CreditoResponse;
-import com.uade.tpejemplo.model.interfaces.IUsuario;
+import com.uade.tpejemplo.model.usuario.IUsuario;
 import com.uade.tpejemplo.service.CreditoService;
 import jakarta.validation.Valid;
 import io.swagger.v3.oas.annotations.Operation;

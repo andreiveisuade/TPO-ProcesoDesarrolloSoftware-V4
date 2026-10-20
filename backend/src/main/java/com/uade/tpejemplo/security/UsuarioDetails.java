@@ -1,6 +1,6 @@
 package com.uade.tpejemplo.security;
 
-import com.uade.tpejemplo.model.interfaces.IUsuario;
+import com.uade.tpejemplo.model.usuario.IUsuario;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;

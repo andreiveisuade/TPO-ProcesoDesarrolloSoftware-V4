@@ -1,4 +1,7 @@
-package com.uade.tpejemplo.model;
+package com.uade.tpejemplo.model.credito;
+
+import com.uade.tpejemplo.model.cliente.Cliente;
+import com.uade.tpejemplo.model.plan.TipoPlan;
 
 import org.junit.jupiter.api.Test;
 

@@ -1,7 +1,6 @@
-package com.uade.tpejemplo.model;
+package com.uade.tpejemplo.model.credito;
 
 import com.uade.tpejemplo.exception.BusinessException;
-import com.uade.tpejemplo.model.interfaces.ICuota;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;

@@ -1,6 +1,5 @@
-package com.uade.tpejemplo.model;
+package com.uade.tpejemplo.model.usuario;
 
-import com.uade.tpejemplo.model.interfaces.IPermisos;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import lombok.AccessLevel;

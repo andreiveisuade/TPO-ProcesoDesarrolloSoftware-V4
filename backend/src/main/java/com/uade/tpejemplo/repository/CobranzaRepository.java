@@ -1,6 +1,6 @@
 package com.uade.tpejemplo.repository;
 
-import com.uade.tpejemplo.model.Cobranza;
+import com.uade.tpejemplo.model.credito.Cobranza;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

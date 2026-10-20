@@ -1,8 +1,6 @@
-package com.uade.tpejemplo.model;
+package com.uade.tpejemplo.model.usuario;
 
 import com.uade.tpejemplo.exception.BusinessException;
-import com.uade.tpejemplo.model.interfaces.IPermisos;
-import com.uade.tpejemplo.model.interfaces.IUsuario;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;

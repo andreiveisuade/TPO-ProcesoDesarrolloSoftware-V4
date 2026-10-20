@@ -1,6 +1,5 @@
-package com.uade.tpejemplo.model;
+package com.uade.tpejemplo.model.cliente;
 
-import com.uade.tpejemplo.model.interfaces.ICliente;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AccessLevel;

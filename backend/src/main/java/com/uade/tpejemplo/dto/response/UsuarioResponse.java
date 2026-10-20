@@ -1,7 +1,7 @@
 package com.uade.tpejemplo.dto.response;
 
-import com.uade.tpejemplo.model.Rol;
-import com.uade.tpejemplo.model.interfaces.IUsuario;
+import com.uade.tpejemplo.model.usuario.IUsuario;
+import com.uade.tpejemplo.model.usuario.Rol;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

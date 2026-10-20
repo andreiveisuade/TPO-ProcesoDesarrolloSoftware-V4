@@ -1,8 +1,4 @@
-package com.uade.tpejemplo.model;
-
-import com.uade.tpejemplo.model.interfaces.CalculoDeCuota;
-import com.uade.tpejemplo.model.plan.InteresSimple;
-import com.uade.tpejemplo.model.plan.SistemaFrances;
+package com.uade.tpejemplo.model.plan;
 
 // Plan de pago elegido al otorgar un credito.
 // Strategy: cada plan asocia su estrategia concreta de CalculoDeCuota

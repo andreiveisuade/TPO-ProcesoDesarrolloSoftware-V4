@@ -1,6 +1,5 @@
 package com.uade.tpejemplo.model.plan;
 
-import com.uade.tpejemplo.model.interfaces.CalculoDeCuota;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;

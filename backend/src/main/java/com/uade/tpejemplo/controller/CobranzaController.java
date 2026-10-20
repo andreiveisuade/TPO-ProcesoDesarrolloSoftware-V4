@@ -2,7 +2,7 @@ package com.uade.tpejemplo.controller;
 
 import com.uade.tpejemplo.dto.request.CobranzaRequest;
 import com.uade.tpejemplo.dto.response.CobranzaResponse;
-import com.uade.tpejemplo.model.interfaces.IUsuario;
+import com.uade.tpejemplo.model.usuario.IUsuario;
 import com.uade.tpejemplo.service.CobranzaService;
 import jakarta.validation.Valid;
 import io.swagger.v3.oas.annotations.Operation;

@@ -4,7 +4,7 @@ import com.uade.tpejemplo.dto.request.ClienteRequest;
 import com.uade.tpejemplo.dto.request.CreditoRequest;
 import com.uade.tpejemplo.dto.response.DeudaClienteResponse;
 import com.uade.tpejemplo.exception.ResourceNotFoundException;
-import com.uade.tpejemplo.model.TipoPlan;
+import com.uade.tpejemplo.model.plan.TipoPlan;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
