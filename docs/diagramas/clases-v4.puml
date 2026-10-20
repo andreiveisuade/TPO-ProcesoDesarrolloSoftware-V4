@@ -347,7 +347,7 @@ package "model" {
       - username : String
       - password : String
       + {static} nuevo(String, String, Rol, Permisos) : Usuario
-      + otorgarPermisos(Permisos) : void
+      + otorgarPermisos(IPermisos) : void
       + asignarRol(Rol) : void
       + puedeAnularCredito() : boolean
       + puedeAnularCobranza() : boolean

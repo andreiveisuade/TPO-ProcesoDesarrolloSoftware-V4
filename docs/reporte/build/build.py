@@ -7,6 +7,7 @@ REPO = os.path.abspath(os.path.join(OUT, "..", ".."))
 J = "backend/src/main/java/com/uade/tpejemplo/"
 A, D = "v3", "iteracion4"
 P = "06f0fc7"  # iteracion4 antes de M17
+P18 = "521b37e"  # iteracion4 antes de M18
 e = html.escape
 
 
@@ -53,7 +54,7 @@ def body(c, path):
 
 
 def cb(c, path, *partes):
-    ver = {A: "V3 (tag v3)", P: "V4 antes de M17 (06f0fc7)"}.get(c, "V4 (iteracion4)")
+    ver = {A: "V3 (tag v3)", P: "V4 antes de M17 (06f0fc7)", P18: "V4 antes de M18 (521b37e)"}.get(c, "V4 (iteracion4)")
     return f'<div class="ruta">{e(full(path))} <span class="ver">· {ver}</span></div><pre><code>{e(chr(10).join(partes))}</code></pre>'
 
 
@@ -211,13 +212,27 @@ m17 = bloque("credito", "M17. Credito: Extract Class + ISP", "refactor",
         ("Extraer el plan de cuotas", "<strong>Creator</strong>: <code>Credito</code> contiene y registra sus cuotas"),
     ]).replace("<th>Rol</th><th>Clase</th>", "<th>Idea</th><th>Por qué no</th>"))
 
-mejoras = [m11, m12, m13, m17]
+# ---------------- M18 IUsuario ----------------
+m18 = bloque("usuario", "M18. IUsuario depende de IPermisos (DIP)", "refactor",
+    "<strong>DIP</strong> (SOLID): depender de abstracciones, no de clases concretas.",
+    "<code>IUsuario</code> importaba la clase concreta <code>Permisos</code> para <code>otorgarPermisos</code>.",
+    cb(P18, "model/interfaces/IUsuario.java", lines(P18, "model/interfaces/IUsuario.java", r"import com.uade.tpejemplo.model.Permisos"), "", lines(P18, "model/interfaces/IUsuario.java", r"void otorgarPermisos", before=1)),
+    "La interfaz recibe <code>IPermisos</code>; <code>Usuario</code> guarda una copia en <code>Permisos</code>.",
+    cb(D, "model/interfaces/IUsuario.java", lines(D, "model/interfaces/IUsuario.java", r"void otorgarPermisos"))
+    + cb(D, "model/Usuario.java", method(D, "model/Usuario.java", r"public void otorgarPermisos")),
+    "<strong>DIP</strong>: la interfaz del modelo no depende de una clase concreta. El detalle de JPA (embebido) queda encerrado en <code>Usuario</code>.",
+    "No se cambió: <code>getRol()</code> y <code>asignarRol</code> siguen con <code>Rol</code>, enum de valores cerrados como <code>TipoPlan</code>, <code>TipoCargo</code> y <code>EstadoCredito</code>; DIP apunta a dependencias volátiles, no a enums.",
+    ref="Commit <code>c23e93f</code>.",
+    tit_a="Antes (521b37e)")
+
+mejoras = [m11, m12, m13, m17, m18]
 
 indice = [
  ("composite", "M11", "Saldo y mora por cuota, crédito y cartera", "<strong>Composite</strong>", "sumas repetidas"),
  ("decorator", "M12", "Seguro de vida y gastos sobre la cuota", "<strong>Decorator</strong>", "expansión del dominio"),
  ("facade", "M13", "Autenticación detrás de <code>AuthService</code>", "<strong>Facade</strong> (identificado)", "patrón sin nombrar"),
  ("credito", "M17", "Condiciones del crédito en su propia clase", "Extract Class + ISP", "7 parámetros, 3 responsabilidades"),
+ ("usuario", "M18", "<code>IUsuario</code> recibe <code>IPermisos</code>", "DIP", "interfaz atada a una clase concreta"),
  ("panel", "M14-M16", "Regla de mora, deuda del cliente, cargos en el alta", "Composite, Decorator", "panel"),
 ]
 tabla_indice = "".join(f'<tr><td><a href="#{k}">{i}</a></td><td>{a}</td><td>{b}</td><td>{c}</td></tr>' for k, i, a, b, c in indice)
@@ -259,7 +274,7 @@ matriz = [
  ("Protected Variations", "fórmula, cargos, librería JWT"),
  ("SRP / OCP", "un cargo o una fórmula por clase; agregar uno no toca <code>Credito</code> (M17)"),
  ("LSP / ISP", "cualquier <code>Deuda</code> sirve donde se pide una; <code>ICredito</code> sin métodos internos (M17)"),
- ("DIP", "<code>CondicionesDeCredito</code> → <code>CalculoDeCuota</code>; clientes → <code>Deuda</code>; controladores → interfaces de servicio"),
+ ("DIP", "<code>CondicionesDeCredito</code> → <code>CalculoDeCuota</code>; clientes → <code>Deuda</code>; controladores → interfaces de servicio; <code>IUsuario</code> → <code>IPermisos</code> (M18)"),
 ]
 matriz_html = "<table><thead><tr><th>Principio</th><th>Dónde</th></tr></thead><tbody>" + "".join(f"<tr><td><strong>{a}</strong></td><td>{b}</td></tr>" for a, b in matriz) + "</tbody></table>"
 
