@@ -1,11 +1,12 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1336 430" role="img" aria-labelledby="der-v3-title der-v3-desc">
-<title id="der-v3-title">DER V3: dashboard de préstamos</title>
-<desc id="der-v3-desc">Esquema físico de las cinco tablas que genera Hibernate sobre H2, con tipos SQL, claves y cada clave foránea unida columna a columna.</desc>
-<defs><marker id="der-v3-arrow" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#555f73"/></marker></defs>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1336 430" role="img" aria-labelledby="der-v4-title der-v4-desc">
+<title id="der-v4-title">DER V4: dashboard de préstamos</title>
+<desc id="der-v4-desc">Esquema físico de las seis tablas que genera Hibernate sobre H2, con tipos SQL, claves y cada clave foránea unida columna a columna.</desc>
+<defs><marker id="der-v4-arrow" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#555f73"/></marker></defs>
 <rect width="100%" height="100%" fill="#ffffff"/>
-<path d="M 372,104 H 344 Q 336,104 336,96 V 88 Q 336,80 328,80 H 302" fill="none" stroke="#555f73" stroke-width="1.2" marker-end="url(#der-v3-arrow)"/><rect x="306" y="112" width="60" height="14" rx="2" fill="#ffffff"/><text x="336" y="122" fill="#555f73" font-size="9" font-family="'SF Mono', Menlo, Consolas, monospace" text-anchor="middle">1 : 0..N</text>
-<path d="M 704,104 H 676 Q 668,104 668,96 V 88 Q 668,80 660,80 H 634" fill="none" stroke="#555f73" stroke-width="1.2" marker-end="url(#der-v3-arrow)"/><rect x="638" y="112" width="60" height="14" rx="2" fill="#ffffff"/><text x="668" y="122" fill="#555f73" font-size="9" font-family="'SF Mono', Menlo, Consolas, monospace" text-anchor="middle">1 : 1..N</text>
-<path d="M 1036,104 H 1008 Q 1000,104 1000,96 V 88 Q 1000,80 992,80 H 966" fill="none" stroke="#555f73" stroke-width="1.2" marker-end="url(#der-v3-arrow)"/><rect x="970" y="112" width="60" height="14" rx="2" fill="#ffffff"/><text x="1000" y="122" fill="#555f73" font-size="9" font-family="'SF Mono', Menlo, Consolas, monospace" text-anchor="middle">1 : 0..N</text>
+<path d="M 704,302 H 676 Q 668,302 668,294 V 88 Q 668,80 660,80 H 634" fill="none" stroke="#555f73" stroke-width="1.2" marker-end="url(#der-v4-arrow)"/><rect x="638" y="310" width="60" height="14" rx="2" fill="#ffffff"/><text x="668" y="320" fill="#555f73" font-size="9" font-family="'SF Mono', Menlo, Consolas, monospace" text-anchor="middle">1 : 0..N</text>
+<path d="M 372,104 H 344 Q 336,104 336,96 V 88 Q 336,80 328,80 H 302" fill="none" stroke="#555f73" stroke-width="1.2" marker-end="url(#der-v4-arrow)"/><rect x="306" y="112" width="60" height="14" rx="2" fill="#ffffff"/><text x="336" y="122" fill="#555f73" font-size="9" font-family="'SF Mono', Menlo, Consolas, monospace" text-anchor="middle">1 : 0..N</text>
+<path d="M 704,104 H 676 Q 668,104 668,96 V 88 Q 668,80 660,80 H 634" fill="none" stroke="#555f73" stroke-width="1.2" marker-end="url(#der-v4-arrow)"/><rect x="638" y="112" width="60" height="14" rx="2" fill="#ffffff"/><text x="668" y="122" fill="#555f73" font-size="9" font-family="'SF Mono', Menlo, Consolas, monospace" text-anchor="middle">1 : 1..N</text>
+<path d="M 1036,104 H 1008 Q 1000,104 1000,96 V 88 Q 1000,80 992,80 H 966" fill="none" stroke="#555f73" stroke-width="1.2" marker-end="url(#der-v4-arrow)"/><rect x="970" y="112" width="60" height="14" rx="2" fill="#ffffff"/><text x="1000" y="122" fill="#555f73" font-size="9" font-family="'SF Mono', Menlo, Consolas, monospace" text-anchor="middle">1 : 0..N</text>
 <rect x="40" y="40" width="260" height="76" rx="6" fill="#ffffff" stroke="#1D2B4F"/>
 <rect x="40" y="40" width="260" height="28" rx="6" fill="#1D2B4F" fill-opacity=".05"/>
 <line x1="40" y1="68" x2="300" y2="68" stroke="#1D2B4F" stroke-opacity=".22"/>
@@ -95,6 +96,22 @@
 <rect x="1037" y="164" width="258" height="24" fill="#1D2B4F" fill-opacity=".025"/>
 <text x="1048" y="180" fill="#1D2B4F" font-size="12" font-family="Calibri, Carlito, 'Segoe UI', system-ui, sans-serif">anulada</text>
 <text x="1284" y="180" fill="#555f73" font-size="9" font-family="'SF Mono', Menlo, Consolas, monospace" text-anchor="end">boolean</text>
+<rect x="704" y="262" width="400" height="104" rx="6" fill="#ffffff" stroke="#1D2B4F"/>
+<rect x="704" y="262" width="400" height="28" rx="6" fill="#1D2B4F" fill-opacity=".05"/>
+<line x1="704" y1="290" x2="1104" y2="290" stroke="#1D2B4F" stroke-opacity=".22"/>
+<text x="716" y="280" fill="#1D2B4F" font-size="13" font-weight="700" font-family="Calibri, Carlito, 'Segoe UI', system-ui, sans-serif">credito_cargos</text>
+<rect x="1052" y="270" width="40" height="12" rx="2" fill="none" stroke="#1D2B4F" stroke-opacity=".4" stroke-width=".8"/>
+<text x="1072" y="279" fill="#1D2B4F" fill-opacity=".8" font-size="8" font-family="'SF Mono', Menlo, Consolas, monospace" text-anchor="middle" letter-spacing=".08em">TABLE</text>
+<rect x="705" y="290" width="398" height="24" fill="#1D2B4F" fill-opacity=".025"/>
+<text x="716" y="306" fill="#1D2B4F" font-size="12" font-family="Calibri, Carlito, 'Segoe UI', system-ui, sans-serif">id_credito</text>
+<rect x="800.0" y="296" width="20" height="12" rx="2" fill="none" stroke="#1D2B4F" stroke-opacity=".35" stroke-width=".8"/><text x="810.0" y="305" fill="#1D2B4F" fill-opacity=".8" font-size="8" font-family="'SF Mono', Menlo, Consolas, monospace" text-anchor="middle">PK</text>
+<rect x="824.0" y="296" width="20" height="12" rx="2" fill="none" stroke="#1D2B4F" stroke-opacity=".35" stroke-width=".8"/><text x="834.0" y="305" fill="#1D2B4F" fill-opacity=".8" font-size="8" font-family="'SF Mono', Menlo, Consolas, monospace" text-anchor="middle">FK</text>
+<text x="1092" y="306" fill="#555f73" font-size="9" font-family="'SF Mono', Menlo, Consolas, monospace" text-anchor="end">bigint</text>
+<text x="716" y="330" fill="#1D2B4F" font-size="12" font-family="Calibri, Carlito, 'Segoe UI', system-ui, sans-serif">tipo_cargo</text>
+<rect x="800.0" y="320" width="20" height="12" rx="2" fill="none" stroke="#1D2B4F" stroke-opacity=".35" stroke-width=".8"/><text x="810.0" y="329" fill="#1D2B4F" fill-opacity=".8" font-size="8" font-family="'SF Mono', Menlo, Consolas, monospace" text-anchor="middle">PK</text>
+<text x="1092" y="330" fill="#555f73" font-size="9" font-family="'SF Mono', Menlo, Consolas, monospace" text-anchor="end">enum GASTO_DE_ADMINISTRACION/SEGURO_DE_VIDA</text>
+<line x1="704" y1="338" x2="1104" y2="338" stroke="#1D2B4F" stroke-opacity=".12"/>
+<text x="716" y="356" fill="#555f73" font-size="9" font-family="'SF Mono', Menlo, Consolas, monospace">pk (id_credito, tipo_cargo)</text>
 <rect x="40" y="200" width="260" height="172" rx="6" fill="#ffffff" stroke="#1D2B4F"/>
 <rect x="40" y="200" width="260" height="28" rx="6" fill="#1D2B4F" fill-opacity=".05"/>
 <line x1="40" y1="228" x2="300" y2="228" stroke="#1D2B4F" stroke-opacity=".22"/>
@@ -112,13 +129,13 @@
 <text x="52" y="292" fill="#1D2B4F" font-size="12" font-family="Calibri, Carlito, 'Segoe UI', system-ui, sans-serif">password</text>
 <text x="288" y="292" fill="#555f73" font-size="9" font-family="'SF Mono', Menlo, Consolas, monospace" text-anchor="end">varchar(255) BCrypt</text>
 <text x="52" y="316" fill="#1D2B4F" font-size="12" font-family="Calibri, Carlito, 'Segoe UI', system-ui, sans-serif">rol</text>
-<text x="288" y="316" fill="#555f73" font-size="9" font-family="'SF Mono', Menlo, Consolas, monospace" text-anchor="end">enum(3)</text>
+<text x="288" y="316" fill="#555f73" font-size="9" font-family="'SF Mono', Menlo, Consolas, monospace" text-anchor="end">enum ADMIN/SUPERVISOR/USER</text>
 <rect x="41" y="324" width="258" height="24" fill="#1D2B4F" fill-opacity=".025"/>
 <text x="52" y="340" fill="#1D2B4F" font-size="12" font-family="Calibri, Carlito, 'Segoe UI', system-ui, sans-serif">puede_anular_credito</text>
 <text x="288" y="340" fill="#555f73" font-size="9" font-family="'SF Mono', Menlo, Consolas, monospace" text-anchor="end">boolean</text>
 <text x="52" y="364" fill="#1D2B4F" font-size="12" font-family="Calibri, Carlito, 'Segoe UI', system-ui, sans-serif">puede_anular_cobranza</text>
 <text x="288" y="364" fill="#555f73" font-size="9" font-family="'SF Mono', Menlo, Consolas, monospace" text-anchor="end">boolean</text>
-<line x1="372" y1="305" x2="372" y2="335" stroke="#2E75B6" stroke-width="2"/><text x="382" y="316" fill="#1D2B4F" font-size="12" font-style="italic" font-family="Calibri, Carlito, 'Segoe UI', system-ui, sans-serif"><tspan x="382" dy="0">Sin columna de estado: VIGENTE / CANCELADO / ANULADO</tspan><tspan x="382" dy="15">lo calcula Credito.estado() con anulado y las cobranzas.</tspan></text>
+<line x1="372" y1="305" x2="372" y2="350" stroke="#2E75B6" stroke-width="2"/><text x="382" y="316" fill="#1D2B4F" font-size="12" font-style="italic" font-family="Calibri, Carlito, 'Segoe UI', system-ui, sans-serif"><tspan x="382" dy="0">Sin columna de estado:</tspan><tspan x="382" dy="15">VIGENTE / CANCELADO / ANULADO lo calcula</tspan><tspan x="382" dy="15">Credito.estado() con anulado y las cobranzas.</tspan></text>
 <line x1="1036" y1="209" x2="1036" y2="254" stroke="#2E75B6" stroke-width="2"/><text x="1046" y="220" fill="#1D2B4F" font-size="12" font-style="italic" font-family="Calibri, Carlito, 'Segoe UI', system-ui, sans-serif"><tspan x="1046" dy="0">A lo sumo una cobranza vigente por cuota:</tspan><tspan x="1046" dy="15">el esquema no lo impide; lo valida</tspan><tspan x="1046" dy="15">Cuota.registrarCobranza() con bloqueo.</tspan></text>
 <line x1="40" y1="382" x2="1296" y2="382" stroke="#D9E1EC"/>
 <rect x="40" y="396" width="20" height="12" rx="2" fill="none" stroke="#1D2B4F" stroke-opacity=".35" stroke-width=".8"/><text x="50" y="405" fill="#1D2B4F" fill-opacity=".8" font-size="8" font-family="'SF Mono', Menlo, Consolas, monospace" text-anchor="middle">PK</text>
