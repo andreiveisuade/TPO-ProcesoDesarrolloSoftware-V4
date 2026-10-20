@@ -22,6 +22,9 @@
         },
         "security": {
           "label": "Spring Security"
+        },
+        "default": {
+          "label": "request HTTP"
         }
       }
     }
@@ -40,16 +43,10 @@
       "sublabel": "Client"
     },
     {
-      "id": "target",
-      "type": "backend",
-      "label": "TokenService",
-      "sublabel": "Target"
-    },
-    {
       "id": "adapter",
       "type": "backend",
-      "label": "JwtUtil",
-      "sublabel": "Adapter"
+      "label": "TokenService : JwtUtil",
+      "sublabel": "Target / Adapter"
     },
     {
       "id": "jjwt",
@@ -87,18 +84,10 @@
     {
       "id": "extraer",
       "from": "filtro",
-      "to": "target",
+      "to": "adapter",
       "y": 230,
       "label": "extraerUsername(token)",
       "variant": "emphasis"
-    },
-    {
-      "id": "impl",
-      "from": "target",
-      "to": "adapter",
-      "y": 265,
-      "label": "implementado por",
-      "variant": "dashed"
     },
     {
       "id": "parse",
@@ -149,14 +138,8 @@
       "type": "security"
     },
     {
-      "participant": "target",
-      "from": 225,
-      "to": 270,
-      "type": "backend"
-    },
-    {
       "participant": "adapter",
-      "from": 260,
+      "from": 225,
       "to": 370,
       "type": "backend"
     },

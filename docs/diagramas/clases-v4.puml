@@ -23,7 +23,7 @@ package "Controlador (controller)" as Controlador {
     - authService : AuthService
     + registrar(RegisterRequest) : AuthResponse
     + login(LoginRequest) : AuthResponse
-    + actual(UsuarioDetails) : AuthResponse
+    + actual(IUsuario) : AuthResponse
   }
   class ClienteController <<RestController>> {
     - clienteService : ClienteService
@@ -38,13 +38,13 @@ package "Controlador (controller)" as Controlador {
     + buscarPorId(Long) : CreditoResponse
     + listarTodos() : List<CreditoResponse>
     + listarPorCliente(String) : List<CreditoResponse>
-    + anularCredito(Long, UsuarioDetails) : void
+    + anularCredito(Long, IUsuario) : void
   }
   class CobranzaController <<RestController>> {
     - cobranzaService : CobranzaService
     + registrar(CobranzaRequest) : CobranzaResponse
     + listarPorCredito(Long) : List<CobranzaResponse>
-    + anularCobranza(Long, UsuarioDetails) : void
+    + anularCobranza(Long, IUsuario) : void
   }
   class AdminController <<RestController>> {
     - adminService : AdminService
@@ -199,7 +199,7 @@ package "Facade: autenticación" {
     - authService : AuthService
     + registrar(RegisterRequest) : AuthResponse
     + login(LoginRequest) : AuthResponse
-    + actual(UsuarioDetails) : AuthResponse
+    + actual(IUsuario) : AuthResponse
   }
   interface AuthService <<Facade>> {
     + registrar(RegisterRequest) : AuthResponse
@@ -243,6 +243,9 @@ package "Subsistema (no conoce a la Facade)" {
     }
     interface "JwtParser (jjwt)" as JwtParser <<Adaptee>> {
       + parseSignedClaims(CharSequence) : Jws<Claims>
+    }
+    class "Jwts (jjwt)" as Jwts <<Adaptee>> {
+      + {static} builder() : JwtBuilder
     }
     interface "SecretKey (javax.crypto)" as SecretKey {
       + getAlgorithm() : String
@@ -294,13 +297,14 @@ JwtAuthFilter --> "1" TokenService
 TokenService <|.. JwtUtil
 JwtUtil *-- "1" JwtParser : parser
 JwtUtil *-- "1" SecretKey : key
+JwtUtil ..> Jwts : builder()
 
 JwtAuthFilter --> "1" UserDetailsService
 UserDetailsService <|.. UserDetailsServiceImpl
 UserDetailsServiceImpl --> "1" UsuarioRepository
 UserDetailsServiceImpl ..> UsuarioDetails : crea
 UserDetails <|.. UsuarioDetails
-UsuarioDetails --> "1" IUsuario : usuario
+UsuarioDetails o--> "1" IUsuario : usuario
 
 note right of AuthServiceImpl
   Facade: tres operaciones de negocio sobre
@@ -308,15 +312,18 @@ note right of AuthServiceImpl
   Ningún controlador importa el subsistema.
   También es Client del Adapter 1.
 end note
-note bottom of JwtUtil
-  Object Adapter: implementa el Target
-  y compone el JwtParser de jjwt.
+note left of JwtUtil
+  Object Adapter: implementa el Target,
+  compone el JwtParser de jjwt y firma
+  con Jwts.builder().
   Única clase que importa jjwt.
 end note
-note left of IUsuario
+note bottom of IUsuario
   Object Adapter: Spring Security pide
   UserDetails; envuelve al IUsuario
-  del dominio.
+  del dominio. Los controllers reciben
+  el IUsuario, no el Adapter:
+  @AuthenticationPrincipal(expression = "usuario").
 end note
 @enduml
 
@@ -328,6 +335,7 @@ skinparam shadowing false
 skinparam nodesep 40
 skinparam ranksep 60
 set separator none
+hide empty members
 
 package "model.interfaces" {
   interface Deuda <<Component>> {
@@ -335,6 +343,8 @@ package "model.interfaces" {
     + montoVencido() : BigDecimal
     + tieneMora() : boolean
   }
+  interface ICredito
+  interface ICuota
   interface CalculoDeCuota <<Strategy / Component>> {
     + importeCuota(BigDecimal capital, BigDecimal tasa, int cuotas) : BigDecimal
   }
@@ -374,7 +384,7 @@ package "model" {
       + montoVencido() : BigDecimal
       - sumar(Function<Deuda, BigDecimal>) : BigDecimal
     }
-    class "Credito\n<size:10><i>implements ICredito</i></size>" as Credito <<Composite>> {
+    class Credito <<Composite>> {
       - id : Long
       - fecha : LocalDate
       - anulado : boolean
@@ -391,7 +401,7 @@ package "model" {
       + puedeAnularse() : boolean
       + anular() : void
     }
-    class "Cuota\n<size:10><i>implements ICuota</i></size>" as Cuota <<Leaf>> {
+    class Cuota <<Leaf>> {
       - id : Long
       - numero : Integer
       - importe : BigDecimal
@@ -471,8 +481,10 @@ package "model.plan" {
 ' Zona deuda (Composite)
 Deuda <|.. Cartera
 Deuda "0..*" --o "0..*" Cartera : deudas
-Deuda <|.. Credito : vía ICredito
-Deuda <|.. Cuota : vía ICuota
+Deuda <|-- ICredito
+ICredito <|.. Credito
+Deuda <|-- ICuota
+ICuota <|.. Cuota
 Credito "1" *-- "1..*" Cuota : cuotas\n(Creator, cascade PERSIST)
 Cuota "1" *-- "0..*" Cobranza : cobranzas
 Credito "0..*" --> "1" Cliente : cliente
@@ -501,6 +513,10 @@ note bottom of SeguroDeVida
   en tipoPlan.calculo(). Decorator: calculo() lo
   envuelve con cada cargo (TipoCargo.aplicarSobre);
   cada capa delega en la envuelta y suma su cargo.
+  JPA guarda el plan por nombre (tipo_plan); TipoPlan
+  es el selector persistible y el Contexto
+  (CondicionesDeCredito) obtiene la estrategia en
+  calculo(); mismo criterio que TipoCargo.
 end note
 note bottom of Cobranza
   Composite: Cartera contiene créditos, que contienen
@@ -510,7 +526,7 @@ note bottom of Cobranza
 end note
 note as NConv
   Cada entidad implementa su interfaz I* de model.interfaces
-  (convención de cátedra); se omiten las flechas.
-  ICredito e ICuota extienden Deuda.
+  (convención de cátedra); se omiten las flechas, salvo
+  ICredito e ICuota: extienden Deuda (parte del Composite).
 end note
 @enduml

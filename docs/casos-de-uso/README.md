@@ -5,7 +5,7 @@ Casos de uso del dashboard de préstamos tal como funcionan en V4 (rama `iteraci
 Convenciones:
 
 - Rutas del backend relativas a `backend/src/main/java/com/uade/tpejemplo/`; tests relativos a `backend/src/test/java/com/uade/tpejemplo/`; front relativo a `frontend/src/`. Cada cita de código es `archivo` + método.
-- **Verificación**: *Test* = test automático (`mvn test`, 64 tests, todos pasan al 2026-10-20): de dominio en `model/` y `model/plan/`, y de códigos HTTP en `controller/CodigosHttpTest` (`@WebMvcTest` con la seguridad JWT real). *Smoke* = smoke test manual del equipo. *Final* = verificación final manual del equipo, con capturas. Smoke y Final son notas de trabajo internas que no van en la entrega. *API* = `verificar-cu.sh` de esta carpeta, corrido sobre una base limpia (resultados en la sección 6).
+- **Verificación**: *Test* = test automático (`mvn test`; cantidad y resultado en el reporte V4, sección Verificación): de dominio en `model/` y `model/plan/`, y de códigos HTTP en `controller/CodigosHttpTest` (`@WebMvcTest` con la seguridad JWT real). *Smoke* = smoke test manual del equipo. *Final* = verificación final manual del equipo, con capturas. Smoke y Final son notas de trabajo internas que no van en la entrega. *API* = `verificar-cu.sh` de esta carpeta, corrido sobre una base limpia (resultados en la sección 6).
 - Errores: todos salen por `exception/GlobalExceptionHandler.java` con cuerpo `{status, error, mensajes[]}`: 400 regla de negocio (`handleNegocio`), 400 validación del DTO (`handleValidacion`), 400 body o parámetro mal formado (`handleSolicitudInvalida`), 401 credenciales (`handleNoAutenticado`), 403 sin permiso (`handleAccesoDenegado`), 404 no encontrado (`handleNoEncontrado`). Sin token, o con token inválido, la cadena de seguridad responde 401 sin cuerpo; con token y sin el rol, 403 sin cuerpo (`config/SecurityConfig.java` `filterChain`). Los dos casos y el 400/404/405 los cubre `controller/CodigosHttpTest`.
 
 ## 1. Actores
@@ -40,7 +40,7 @@ Fuente: `casos-de-uso-v4.puml` (renderizado con `plantuml -tsvg` y `-tpng`). Sup
 - **Reglas**: unicidad del username y rol fijo USER en `service/impl/AuthServiceImpl.java` `registrar`; alta solo por `model/Usuario.java` `nuevo`. Nadie puede registrarse como SUPERVISOR o ADMIN.
 - **Endpoint**: `POST /api/auth/register` → `controller/AuthController.java` `registrar`.
 - **Pantalla**: `pages/Register.jsx` (`/register`).
-- **Verificación**: API (UC01 x3). Sin test unitario.
+- **Verificación**: API (UC01). Sin test unitario.
 
 ### UC02 Iniciar sesión
 
@@ -52,7 +52,7 @@ Fuente: `casos-de-uso-v4.puml` (renderizado con `plantuml -tsvg` y `-tpng`). Sup
 - **Reglas**: `service/impl/AuthServiceImpl.java` `login`.
 - **Endpoint**: `POST /api/auth/login` → `controller/AuthController.java` `login`; `GET /api/auth/me` → `controller/AuthController.java` `actual`.
 - **Pantalla**: `pages/Login.jsx` (`/login`).
-- **Verificación**: Smoke "Login con password incorrecta (M5)"; Final "Login", "Token basura / alterado / vencido", capturas `01-login.png`, `02-login-error.png`, `03-login-ok.png`; API (UC02 x4).
+- **Verificación**: Smoke "Login con password incorrecta (M5)"; Final "Login", "Token basura / alterado / vencido", capturas `01-login.png`, `02-login-error.png`, `03-login-ok.png`; API (UC02).
 - **Evolución**: en V0-V2 la contraseña incorrecta daba 500 (TPO-001); V3 lo mapea a 401 (M5).
 
 ### UC04 Registrar cliente
@@ -65,7 +65,7 @@ Fuente: `casos-de-uso-v4.puml` (renderizado con `plantuml -tsvg` y `-tpng`). Sup
 - **Reglas**: unicidad del DNI (es la clave primaria) en `service/impl/ClienteServiceImpl.java` `crear`; alta por `model/Cliente.java` `nuevo`.
 - **Endpoint**: `POST /api/clientes` → `controller/ClienteController.java` `crear`.
 - **Pantalla**: `pages/Clientes.jsx` (formulario).
-- **Verificación**: Smoke "Crear cliente 111"; Final "Crear cliente"; API (UC04 x4); Test `controller/CodigosHttpTest.java` `dniConLetrasDa400`, `sinTokenDa401`.
+- **Verificación**: Smoke "Crear cliente 111"; Final "Crear cliente"; API (UC04); Test `controller/CodigosHttpTest.java` `dniConLetrasDa400`, `sinTokenDa401`.
 - **Hueco**: no hay modificación ni baja de clientes (A-09 de V0, ver P3). El DNI sin formato (`"abc"` daba 201) se cerró con BS14.
 
 ### UC05 Listar clientes
@@ -86,7 +86,7 @@ Fuente: `casos-de-uso-v4.puml` (renderizado con `plantuml -tsvg` y `-tpng`). Sup
 - **Reglas**: `service/impl/ClienteServiceImpl.java` `buscarPorDni`.
 - **Endpoint**: `GET /api/clientes/{dni}` → `controller/ClienteController.java` `buscarPorDni`.
 - **Pantalla**: `pages/Clientes.jsx` (bloque "Buscar cliente por DNI"): muestra nombre y DNI, o el 404 del back en el mismo bloque. Usa `api/clientes.js` `getCliente`. Desde V4 muestra además la deuda del cliente (UC21).
-- **Verificación**: API (UC06 x2); Test `controller/CodigosHttpTest.java` `clienteInexistenteDa404`; captura de la pantalla en la verificación del equipo.
+- **Verificación**: API (UC06); Test `controller/CodigosHttpTest.java` `clienteInexistenteDa404`; captura de la pantalla en la verificación del equipo.
 
 ### UC07 Otorgar crédito
 
@@ -99,7 +99,7 @@ Fuente: `casos-de-uso-v4.puml` (renderizado con `plantuml -tsvg` y `-tpng`). Sup
 - **Reglas**: `service/impl/CreditoServiceImpl.java` `crear` (mora y cargos opcionales); `model/Credito.java` `totalADevolver` (suma de sus cuotas, M20); `model/CondicionesDeCredito.java` constructor (condiciones válidas, M20).
 - **Endpoint**: `POST /api/creditos` → `controller/CreditoController.java` `crear`.
 - **Pantalla**: `pages/Creditos.jsx` (formulario de alta).
-- **Verificación**: Test `model/plan/InteresSimpleTest` (4), `model/plan/SistemaFrancesTest` (4), `model/plan/SeguroDeVidaTest` (2), `model/plan/GastoDeAdministracionTest` (2), `model/plan/CargosApiladosTest` (2), `model/CreditoTest.java` `nuevoEstaVigenteConSaldoIgualAlTotal`, `elTotalADevolverEsLaSumaDeSusCuotas`, `model/CondicionesDeCreditoTest` (1), `service/ReglaDeMoraTest` (2); Smoke "Crédito INTERES_SIMPLE… (M9)", "Crédito SISTEMA_FRANCES…"; Final captura `04-creditos.png`; API (UC07 x13).
+- **Verificación**: Test `model/plan/InteresSimpleTest`, `model/plan/SistemaFrancesTest`, `model/plan/SeguroDeVidaTest`, `model/plan/GastoDeAdministracionTest`, `model/plan/CargosApiladosTest`, `model/CreditoTest.java` `nuevoEstaVigenteConSaldoIgualAlTotal`, `elTotalADevolverEsLaSumaDeSusCuotas`, `model/CondicionesDeCreditoTest` (1), `service/ReglaDeMoraTest` (2); Smoke "Crédito INTERES_SIMPLE… (M9)", "Crédito SISTEMA_FRANCES…"; Final captura `04-creditos.png`; API (UC07).
 - **Evolución**: V0 cargaba el importe de cuota a mano (B-07); V1 lo calcula con tasa; V3 lo hace intercambiable por plan (M9); V4 suma cargos opcionales (M12) y rechaza al cliente en mora (M14).
 - **Fecha libre a propósito**: permite cargar créditos históricos para la demo; uno fechado a futuro todavía no tiene cuotas vencidas.
 
@@ -118,7 +118,7 @@ Fuente: `casos-de-uso-v4.puml` (renderizado con `plantuml -tsvg` y `-tpng`). Sup
 - **Reglas**: `service/impl/CreditoServiceImpl.java` `buscarPorId`; estado, saldo y anulabilidad los calcula el crédito: `model/Credito.java` `estado`, `saldo`, `puedeAnularse` (M8); mora en `model/Cuota.java` `estaVencida`, que delega en `estaVencida(LocalDate)` (M6).
 - **Endpoint**: `GET /api/creditos/{id}` → `controller/CreditoController.java` `buscarPorId`.
 - **Pantalla**: `pages/Creditos.jsx` (bloque "Consultar crédito por número"): muestra la misma ficha que el listado de UC10 (estado, plan, saldo, cuotas y Anular si corresponde). Usa `api/creditos.js` `getCredito`.
-- **Verificación**: Smoke "Respuesta del crédito recién creado", "Saldo tras pagar 1 de 3 cuotas"; API (UC09 x4); captura de la pantalla en la verificación del equipo.
+- **Verificación**: Smoke "Respuesta del crédito recién creado", "Saldo tras pagar 1 de 3 cuotas"; API (UC09); captura de la pantalla en la verificación del equipo.
 
 ### UC10 Listar créditos del cliente
 
@@ -128,7 +128,7 @@ Fuente: `casos-de-uso-v4.puml` (renderizado con `plantuml -tsvg` y `-tpng`). Sup
 - **Reglas**: `service/impl/CreditoServiceImpl.java` `listarPorCliente`.
 - **Endpoint**: `GET /api/creditos/cliente/{dni}` → `controller/CreditoController.java` `listarPorCliente`.
 - **Pantalla**: `pages/Creditos.jsx` (búsqueda y listado).
-- **Verificación**: Test `model/CuotaTest.java` `cuotaConVencimientoPasadoSinPagarEstaVencida`, `venceElDiaSiguienteAlVencimiento`, `cuotaPagadaNoEstaVencida`; Smoke "Cuota vencida (M6)"; Final "Botón Anular según puedeAnularse", captura `05-creditos-listado.png`; API (UC10 x2).
+- **Verificación**: Test `model/CuotaTest.java` `cuotaConVencimientoPasadoSinPagarEstaVencida`, `venceElDiaSiguienteAlVencimiento`, `cuotaPagadaNoEstaVencida`; Smoke "Cuota vencida (M6)"; Final "Botón Anular según puedeAnularse", captura `05-creditos-listado.png`; API (UC10).
 
 ### UC11 Anular crédito
 
@@ -140,7 +140,7 @@ Fuente: `casos-de-uso-v4.puml` (renderizado con `plantuml -tsvg` y `-tpng`). Sup
 - **Reglas**: permiso en `service/impl/CreditoServiceImpl.java` `anularCredito` (M4); doble anulación y cobranzas vigentes en `model/Credito.java` `anular` (M8).
 - **Endpoint**: `DELETE /api/creditos/anular/{id}` → `controller/CreditoController.java` `anularCredito`.
 - **Pantalla**: `pages/Creditos.jsx` (botón Anular por crédito).
-- **Verificación**: Test `model/CreditoTest.java` `anuladoQuedaConSaldoCero`, `rechazaDobleAnulacion`, `rechazaAnularConCobranzasVigentes`, `permiteAnularSiLaUnicaCobranzaEstaAnulada`; Smoke "Anular crédito con `user` sin permiso (M4)", "Anular un crédito ya anulado"; Final capturas `06-anular-refresca.png`, `09-user-sin-anular.png`; API (UC11 x6).
+- **Verificación**: Test `model/CreditoTest.java` `anuladoQuedaConSaldoCero`, `rechazaDobleAnulacion`, `rechazaAnularConCobranzasVigentes`, `permiteAnularSiLaUnicaCobranzaEstaAnulada`; Smoke "Anular crédito con `user` sin permiso (M4)", "Anular un crédito ya anulado"; Final capturas `06-anular-refresca.png`, `09-user-sin-anular.png`; API (UC11).
 - **Evolución**: en V0-V2 el permiso solo lo miraba el front (TPO-007): por API anulaba cualquiera. V3 lo valida en el backend (M4). V0 tenía además UC12, retirado.
 
 ### UC13 Registrar cobranza
@@ -153,7 +153,7 @@ Fuente: `casos-de-uso-v4.puml` (renderizado con `plantuml -tsvg` y `-tpng`). Sup
 - **Reglas**: las tres reglas viven en `model/Cuota.java` `registrarCobranza` (Information Expert: la cuota sabe si está paga y cuánto vale); el servicio solo busca y guarda (`service/impl/CobranzaServiceImpl.java` `registrar`).
 - **Endpoint**: `POST /api/cobranzas` → `controller/CobranzaController.java` `registrar`.
 - **Pantalla**: `pages/Cobranzas.jsx` (formulario).
-- **Verificación**: Test `model/CuotaTest.java` `rechazaCobrarDosVeces`, `rechazaCobrarSiElCreditoEstaAnulado`, `rechazaImporteDistintoAlDeLaCuota`, `aceptaElMismoImporteConOtraEscala`, `model/CreditoTest.java` `elSaldoBajaConCadaCuotaPagada`, `pagarTodasLasCuotasLoCancela`; Smoke "Cobrar sobre crédito anulado (M1)", "Cobrar una cuota ya pagada"; API (UC13 x9).
+- **Verificación**: Test `model/CuotaTest.java` `rechazaCobrarDosVeces`, `rechazaCobrarSiElCreditoEstaAnulado`, `rechazaImporteDistintoAlDeLaCuota`, `aceptaElMismoImporteConOtraEscala`, `model/CreditoTest.java` `elSaldoBajaConCadaCuotaPagada`, `pagarTodasLasCuotasLoCancela`; Smoke "Cobrar sobre crédito anulado (M1)", "Cobrar una cuota ya pagada"; API (UC13).
 - **Evolución**: TPO-006 (importe sin validar) cerrado en V1; TPO-004 (cobrar un crédito anulado) cerrado en V3 (M1).
 - **Huecos**: la pantalla no lista las cuotas: el usuario tipea id, número e importe a mano, sacándolos de Créditos. No se registra quién cobró (ver P4).
 
@@ -164,7 +164,7 @@ Fuente: `casos-de-uso-v4.puml` (renderizado con `plantuml -tsvg` y `-tpng`). Sup
 - **Reglas**: `service/impl/CobranzaServiceImpl.java` `listarPorCredito`.
 - **Endpoint**: `GET /api/cobranzas/credito/{idCredito}` → `controller/CobranzaController.java` `listarPorCredito`.
 - **Pantalla**: `pages/Cobranzas.jsx` (búsqueda y tabla).
-- **Verificación**: API (UC14 x2). Sin test unitario.
+- **Verificación**: API (UC14). Sin test unitario.
 - **Hueco**: para un crédito inexistente responde **200** con lista vacía, mientras UC10 responde 404 para un cliente inexistente (sección 6, H2).
 
 ### UC15 Anular cobranza
@@ -177,7 +177,7 @@ Fuente: `casos-de-uso-v4.puml` (renderizado con `plantuml -tsvg` y `-tpng`). Sup
 - **Reglas**: permiso en `service/impl/CobranzaServiceImpl.java` `anularCobranza` (M4); regla del día y doble anulación en `model/Cobranza.java` `anular(LocalDate)`; `anular()` le pasa la fecha de hoy.
 - **Endpoint**: `DELETE /api/cobranzas/{id}` → `controller/CobranzaController.java` `anularCobranza`.
 - **Pantalla**: `pages/Cobranzas.jsx` (botón Anular por cobranza).
-- **Verificación**: Test `model/CobranzaTest.java` `seRegistraConFechaDeHoyYSePuedeAnularElMismoDia`, `noSePuedeAnularDosVeces`, `noSePuedeAnularUnaCobranzaDeOtroDia`, `model/CuotaTest.java` `cobranzaAnuladaDejaLaCuotaImpaga`, `model/CreditoTest.java` `permiteAnularSiLaUnicaCobranzaEstaAnulada`; Smoke "M2: anular cobranza (admin) y luego el crédito…", "M2: anular cobranza con `user` sin permiso"; API (UC15 x4 y "recobrar cuota liberada").
+- **Verificación**: Test `model/CobranzaTest.java` `seRegistraConFechaDeHoyYSePuedeAnularElMismoDia`, `noSePuedeAnularDosVeces`, `noSePuedeAnularUnaCobranzaDeOtroDia`, `model/CuotaTest.java` `cobranzaAnuladaDejaLaCuotaImpaga`, `model/CreditoTest.java` `permiteAnularSiLaUnicaCobranzaEstaAnulada`; Smoke "M2: anular cobranza (admin) y luego el crédito…", "M2: anular cobranza con `user` sin permiso"; API (UC15 y "recobrar cuota liberada").
 - **Evolución**: TPO-005 (la cuota quedaba trabada como pagada) cerrado en V1; permiso validado en el backend desde V3 (M4).
 - **Huecos**: anular una cobranza ya anulada respondía **204** (H1); corregido, ahora 400. El rechazo "de otro día" tenía la fecha fija en `LocalDate.now()` y no se podía probar; resuelto con `Cobranza.anular(LocalDate)`, que recibe la fecha y lo testea `noSePuedeAnularUnaCobranzaDeOtroDia`. Por API sigue sin poder provocarse.
 
@@ -189,7 +189,7 @@ Fuente: `casos-de-uso-v4.puml` (renderizado con `plantuml -tsvg` y `-tpng`). Sup
 - **Reglas**: `service/impl/DashboardServiceImpl.java` `obtenerEstadisticasGenerales` (activos con `Credito.estado()`, O4); `repository/CreditoRepository.java` `sumarDeudaOriginalNoAnulada`; `repository/CobranzaRepository.java` `sumarImporteNoAnulado`.
 - **Endpoint**: `GET /api/dashboard/stats` → `controller/DashboardController.java` `obtenerEstadisticas`.
 - **Pantalla**: `pages/Dashboard.jsx` (`/estadisticas`).
-- **Verificación**: Smoke "Dashboard excluye anulados y financiado = deuda original (M3)", "Dashboard con ADMIN (M10)", "Dashboard con `user`"; Final capturas `07-dashboard-admin.png`, `08-dashboard-supervisor.png`; API (UC16 x4).
+- **Verificación**: Smoke "Dashboard excluye anulados y financiado = deuda original (M3)", "Dashboard con ADMIN (M10)", "Dashboard con `user`"; Final capturas `07-dashboard-admin.png`, `08-dashboard-supervisor.png`; API (UC16).
 - **Evolución**: V0-V2 sumaba importes de cuota como financiado y contaba anulados (TPO-003) y el ADMIN no lo veía (TPO-010); V3 lo corrige (M3, M10, O4).
 - **Observación**: "Créditos activos" cuenta solo VIGENTES, pero "Monto total financiado" incluye los CANCELADOS. Al cancelar un crédito la tarjeta de activos baja y la de financiado no (H3). No es un error de cálculo, son dos recortes distintos (cartera actual vs. histórico); conviene decirlo en la pantalla o alinearlo. Las tarjetas de saldo pendiente y monto vencido (O7) dan la foto de la cartera actual.
 
@@ -201,7 +201,7 @@ Fuente: `casos-de-uso-v4.puml` (renderizado con `plantuml -tsvg` y `-tpng`). Sup
 - **Reglas**: `service/impl/AdminServiceImpl.java` `listarUsuarios` (sin ADMIN para los dos, O5).
 - **Endpoint**: `GET /api/supervisor/usuarios` → `controller/SupervisorController.java` `listarUsuarios`; `GET /api/admin/usuarios` → `controller/AdminController.java` `listarUsuarios`.
 - **Pantalla**: `pages/GestorPermisos.jsx` (`/supervisor/permisos-anulacion`) y `pages/PanelAdmin.jsx` (`/admin/roles`).
-- **Verificación**: Final "Supervisor lista usuarios (O5)"; API (UC18 x4). Sin test unitario.
+- **Verificación**: Final "Supervisor lista usuarios (O5)"; API (UC18). Sin test unitario.
 
 ### UC19 Asignar permisos de anulación
 
@@ -212,7 +212,7 @@ Fuente: `casos-de-uso-v4.puml` (renderizado con `plantuml -tsvg` y `-tpng`). Sup
 - **Reglas**: `service/impl/AdminServiceImpl.java` `actualizarPermisos`; guarda del ADMIN en `model/Usuario.java` `otorgarPermisos` (O5).
 - **Endpoint**: `PUT /api/supervisor/usuarios/{id}/permisos-anulacion` → `controller/SupervisorController.java` `actualizarPermisosAnulacion`. Gemelo para ADMIN: `PUT /api/admin/usuarios/{id}/permisos` → `controller/AdminController.java` `actualizarPermisos`, sin pantalla.
 - **Pantalla**: `pages/GestorPermisos.jsx`.
-- **Verificación**: Final "Supervisor modifica permisos del ADMIN (BS1)"; API (UC19 x5, incluido "op1 anula con el MISMO token").
+- **Verificación**: Final "Supervisor modifica permisos del ADMIN (BS1)"; API (UC19, incluido "op1 anula con el MISMO token").
 - **Evolución**: en V0-V2 el permiso se guardaba pero el backend nunca lo consultaba (el CU "decorativo" de V0, TPO-007). Desde M4 es lo que efectivamente habilita UC11 y UC15.
 - **Hueco resuelto (H4)**: el front del usuario afectado no se enteraba hasta volver a iniciar sesión. Ahora `components/PrivateRoute.jsx` llama a `GET /api/auth/me` al navegar y actualiza el usuario guardado (`store/slices/authSlice.js` `refrescarUsuario`), así que el botón Anular aparece o desaparece al cambiar de pantalla.
 
@@ -225,7 +225,7 @@ Fuente: `casos-de-uso-v4.puml` (renderizado con `plantuml -tsvg` y `-tpng`). Sup
 - **Reglas**: `service/impl/AdminServiceImpl.java` `actualizarRol`; guardas en `model/Usuario.java` `asignarRol` (O5).
 - **Endpoint**: `PUT /api/admin/usuarios/{id}/rol` → `controller/AdminController.java` `actualizarRol`.
 - **Pantalla**: `pages/PanelAdmin.jsx`.
-- **Verificación**: API (UC20 x5). Sin test unitario.
+- **Verificación**: API (UC20). Sin test unitario.
 - **Hueco resuelto (H4)**: igual que UC19, el usuario promovido ve los links nuevos del Navbar al navegar, sin volver a loguearse.
 
 ### UC21 Consultar deuda del cliente
@@ -238,7 +238,7 @@ Fuente: `casos-de-uso-v4.puml` (renderizado con `plantuml -tsvg` y `-tpng`). Sup
 - **Reglas**: `service/impl/ClienteServiceImpl.java` `deuda`: `model/Cartera.java` `de`, `saldo`, `montoVencido` (Composite, M11): la cartera suma lo que cada crédito suma de sus cuotas; la cuota de un crédito anulado no se debe (`model/Cuota.java` `saldo`) y la vencida es la impaga con vencimiento pasado (`model/Cuota.java` `montoVencido`). Es la misma consulta que usa la regla de mora de UC07 (M14).
 - **Endpoint**: `GET /api/clientes/{dni}/deuda` → `controller/ClienteController.java` `deuda`.
 - **Pantalla**: `pages/Clientes.jsx` (bloque "Buscar cliente por DNI"). Usa `api/clientes.js` `getDeudaCliente`.
-- **Verificación**: Test `service/DeudaClienteTest` (3: con vencida, al día, cliente inexistente), `model/CarteraTest` (4); API (UC21 x5).
+- **Verificación**: Test `service/DeudaClienteTest` (con vencida, al día, cliente inexistente), `model/CarteraTest`; API (UC21).
 
 ## 4. Casos de uso retirados o reclasificados
 
@@ -311,7 +311,7 @@ Los tests de dominio están en `model/` y `model/plan/` del árbol de tests; los
 | Sin token | 401 | |
 | UC04 crear / DNI repetido / sin nombre / DNI `"abc"` | 201 / 400 / 400 / **201** | DNI sin formato |
 | UC05 listar; UC06 ok / inexistente | 200; 200 / 404 | |
-| UC07 simple 1200 10 % 3 cuotas / francés / fecha 2025 / fecha 2030 | 201 x4 | Total 1320,00 y 1447,62; **la fecha futura se acepta** |
+| UC07 simple 1200 10 % 3 cuotas / francés / fecha 2025 / fecha 2030 | 201 | Total 1320,00 y 1447,62; **la fecha futura se acepta** |
 | UC07 cliente inexistente / deuda 0 y cuotas 0 / plan inválido / tasa 1000 | 404 / 400 / 400 / 400 | |
 | UC09 ok / inexistente / id `abc`; crédito de 2025 | 200 / 404 / 400; cuotas con `vencida:true` | |
 | UC10 ok / cliente inexistente; `GET /api/creditos` | 200 / 404; 200 | El último no tiene CU |
@@ -325,9 +325,9 @@ Los tests de dominio están en `model/` y `model/plan/` del árbol de tests; los
 | UC18 admin / supervisor / `user` al de supervisor / supervisor al de admin | 200 / 200 / 403 / 403 | Ninguna lista incluye al ADMIN |
 | UC19 permiso a `op1` / `op1` anula **con el token de antes** / permisos del admin / usuario 99 / vía endpoint de ADMIN | 200 / **204** / 400 / 404 / 200 | H4 (resuelto después en el front) |
 | UC20 `op1` a SUPERVISOR / dar ADMIN / cambiar al admin / rol `JEFE` / `op1` ve el dashboard con el token de antes | 200 / 400 / 400 / 400 / **200** | H4 (resuelto después en el front) |
-| Cobrar las 2 cuotas del crédito de 2025 → CANCELADO; dashboard | 201 x2; 200 | **Activos 2 → 1, financiado 1700 → 1700** (H3) |
+| Cobrar las 2 cuotas del crédito de 2025 → CANCELADO; dashboard | 201; 200 | **Activos 2 → 1, financiado 1700 → 1700** (H3) |
 
-Además: `mvn test` → 43 tests, 0 fallas (contando los agregados después de esta corrida).
+Además: `mvn test`, resultado en el reporte V4, sección Verificación.
 
 ### Hallazgos
 

@@ -14,6 +14,8 @@ interface Deuda <<Component>> {
   +montoVencido() : BigDecimal
   +tieneMora() : boolean
 }
+interface ICredito
+interface ICuota
 class Cuota <<Leaf>> {
   +saldo() : BigDecimal
   +montoVencido() : BigDecimal
@@ -30,8 +32,10 @@ class Cartera <<Composite>> {
   +montoVencido() : BigDecimal
 }
 class "DashboardServiceImpl\nCreditoServiceImpl\nClienteServiceImpl" as Clientes <<Client>>
-Deuda <|.. Cuota
-Deuda <|.. Credito
+Deuda <|-- ICuota
+ICuota <|.. Cuota
+Deuda <|-- ICredito
+ICredito <|.. Credito
 Deuda <|.. Cartera
 Credito *-- "1..*" Cuota
 Cartera o-- "0..*" Deuda
