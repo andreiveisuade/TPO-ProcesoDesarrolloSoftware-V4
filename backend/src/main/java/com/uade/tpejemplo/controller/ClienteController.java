@@ -2,6 +2,7 @@ package com.uade.tpejemplo.controller;
 
 import com.uade.tpejemplo.dto.request.ClienteRequest;
 import com.uade.tpejemplo.dto.response.ClienteResponse;
+import com.uade.tpejemplo.dto.response.DeudaClienteResponse;
 import com.uade.tpejemplo.service.ClienteService;
 import jakarta.validation.Valid;
 import io.swagger.v3.oas.annotations.Operation;
@@ -40,6 +41,15 @@ public class ClienteController {
     @GetMapping("/{dni}")
     public ResponseEntity<ClienteResponse> buscarPorDni(@PathVariable String dni) {
         return ResponseEntity.ok(clienteService.buscarPorDni(dni));
+    }
+
+    @Operation(summary = "Deuda del cliente: saldo pendiente y monto vencido")
+    @ApiResponse(responseCode = "200", description = "OK")
+    @ApiResponse(responseCode = "401", description = "Sin token o token inválido")
+    @ApiResponse(responseCode = "404", description = "No encontrado")
+    @GetMapping("/{dni}/deuda")
+    public ResponseEntity<DeudaClienteResponse> deuda(@PathVariable String dni) {
+        return ResponseEntity.ok(clienteService.deuda(dni));
     }
 
     @Operation(summary = "Listar clientes")
