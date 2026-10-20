@@ -347,6 +347,7 @@ package "model.interfaces" {
   interface ICuota
   interface CalculoDeCuota <<Strategy / Component>> {
     + importeCuota(BigDecimal capital, BigDecimal tasa, int cuotas) : BigDecimal
+    + desglose(BigDecimal capital, BigDecimal tasa, int cuotas) : List<Renglon>
   }
 }
 
@@ -440,6 +441,7 @@ package "model" {
       - tipoPlan : TipoPlan
       - cargos : Set<TipoCargo>
       ~ importeCuota() : BigDecimal
+      + desglose() : List<Renglon>
       - calculo() : CalculoDeCuota
     }
     enum TipoPlan {
@@ -466,6 +468,8 @@ package "model.plan" {
   abstract class CargoSobreCuota <<Decorator>> {
     - envuelto : CalculoDeCuota
     + importeCuota(BigDecimal, BigDecimal, int) : BigDecimal
+    + desglose(BigDecimal, BigDecimal, int) : List<Renglon>
+    # {abstract} nombre() : String
     # {abstract} cargo(BigDecimal, int) : BigDecimal
   }
   class SeguroDeVida <<ConcreteDecorator>> {
@@ -475,6 +479,10 @@ package "model.plan" {
   class GastoDeAdministracion <<ConcreteDecorator>> {
     - {static} MONTO_POR_CUOTA : BigDecimal
     # cargo(BigDecimal, int) : BigDecimal
+  }
+  class Renglon <<record>> {
+    + concepto : String
+    + importe : BigDecimal
   }
 }
 
@@ -501,6 +509,7 @@ CalculoDeCuota <|.. InteresSimple
 CalculoDeCuota <|.. SistemaFrances
 CalculoDeCuota <|.. CargoSobreCuota
 CalculoDeCuota "1" <--o CargoSobreCuota : envuelto
+CalculoDeCuota ..> Renglon : desglose
 CargoSobreCuota <|-- SeguroDeVida
 CargoSobreCuota <|-- GastoDeAdministracion
 

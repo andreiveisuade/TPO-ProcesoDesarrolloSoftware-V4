@@ -141,7 +141,7 @@ m12 = bloque("decorator", "M12. Decorator: cargos sobre la cuota", "expansión d
     "<strong>Decorator</strong> (GoF, estructural): agrega responsabilidades a un objeto por composición, en vez de una subclase por combinación.",
     "Un préstamo real suma <strong>cargos opcionales</strong> (seguro de vida, gastos). Con herencia: una subclase por plan × combinación.",
     cb(A, "model/Credito.java", method(A, "model/Credito.java", r"private CalculoDeCuota calculo")),
-    "Cada cargo <strong>envuelve</strong> el cálculo y suma lo suyo; <code>CondicionesDeCredito</code> arma la pila (M17).</p><p>JPA guarda el plan por nombre (<code>tipo_plan</code>); <code>TipoPlan</code> es el selector persistible y el Contexto (<code>CondicionesDeCredito</code>) obtiene la estrategia en <code>calculo()</code>; mismo criterio que <code>TipoCargo</code>.</p><p>",
+    "Cada cargo <strong>envuelve</strong> el cálculo y suma lo suyo; <code>CondicionesDeCredito</code> arma la pila (M17). Cada capa agrega su renglón: el desglose recorre la misma pila; la ficha lo muestra.</p><p>JPA guarda el plan por nombre (<code>tipo_plan</code>); <code>TipoPlan</code> es el selector persistible y el Contexto (<code>CondicionesDeCredito</code>) obtiene la estrategia en <code>calculo()</code>; mismo criterio que <code>TipoCargo</code>.</p><p>",
     cb(D, "model/CondicionesDeCredito.java", method(D, "model/CondicionesDeCredito.java", r"private CalculoDeCuota calculo"))
     + cb(D, "model/plan/CargoSobreCuota.java", body(D, "model/plan/CargoSobreCuota.java"))
     + cb(D, "model/plan/SeguroDeVida.java", method(D, "model/plan/SeguroDeVida.java", r"protected BigDecimal cargo"))
@@ -159,6 +159,8 @@ m12 = bloque("decorator", "M12. Decorator: cargos sobre la cuota", "expansión d
         ("Client", "<code>CondicionesDeCredito.calculo()</code>"),
     ]) + trampa("¿No es otra Strategy?",
         "No: Strategy elige <strong>un</strong> algoritmo; los decoradores <strong>se apilan</strong> sobre él.")
+    + trampa("¿Por qué no se guarda el desglose?",
+        "El importe guardado en la cuota es el <strong>hecho</strong>; el desglose se recalcula desde las condiciones para explicarlo.")
     + trampa("¿Para qué está <code>TipoCargo</code>?",
         "Un decorador no se guarda ni viaja en el JSON: se guarda el <strong>nombre</strong> del cargo (<code>credito_cargos</code>) y con él se rearma la pila. "
         "Cada constante sobrescribe <code>aplicarSobre</code> con su decorador: <strong>Polymorphism</strong> en vez de un <code>switch</code> por tipo.")
@@ -347,7 +349,7 @@ timeline = f'''<div class="timeline">
 <div class="hito"><div class="punto"></div><h4>V3</h4><p class="tema">MVC + Strategy + Adapter</p><p class="meta">13/10 · tag <code>v3</code></p>
 <ul><li>Cuota simple o francesa</li><li><code>TokenService</code> sobre jjwt</li><li>43 tests</li></ul></div>
 <div class="hito actual"><div class="punto"></div><h4>V4</h4><p class="tema">Composite + Decorator + Facade</p><p class="meta">27/10 · {n_v4} commits</p>
-<ul><li><strong>Composite</strong>: <code>Deuda</code> (M11)</li><li><strong>Decorator</strong>: cargos (M12)</li><li><strong>Facade</strong>: <code>AuthService</code> (M13)</li><li><code>Credito</code>: Extract Class (M17)</li><li>Interés simple real (M19)</li><li>Panel: deuda del cliente y cargos</li><li>66 tests</li></ul></div>
+<ul><li><strong>Composite</strong>: <code>Deuda</code> (M11)</li><li><strong>Decorator</strong>: cargos (M12)</li><li><strong>Facade</strong>: <code>AuthService</code> (M13)</li><li><code>Credito</code>: Extract Class (M17)</li><li>Interés simple real (M19)</li><li>Panel: deuda del cliente y cargos</li><li>67 tests</li></ul></div>
 </div>
 <details><summary>Commits V3 → V4 (git log v3..iteracion4)</summary><pre><code>{e(log_v4)}</code></pre></details>'''
 
@@ -508,7 +510,7 @@ doc = f'''<!doctype html>
 
 <section id="verificacion"><h2>Verificación</h2>
 <ul>
-<li><strong>66 tests, 0 fallas</strong> (<code>mvn test</code>; V3: 43): 31 de dominio, 14 de cálculo de cuota, 12 HTTP, 8 de integración, <code>contextLoads</code>.</li>
+<li><strong>67 tests, 0 fallas</strong> (<code>mvn test</code>; V3: 43): 31 de dominio, 15 de cálculo de cuota, 12 HTTP, 8 de integración, <code>contextLoads</code>.</li>
 <li><strong>Casos de uso por API</strong>: <code>docs/casos-de-uso/verificar-cu.sh</code>, incluida la mora (400).</li>
 <li><strong>Hallazgo H5, corregido</strong>: <code>verificar-cu.sh</code> detectó 500 al consultar créditos (<code>Credito.cargos</code> lazy fuera de la transacción); fix: <code>CreditoResponse.desde</code> copia los cargos (<code>6286109</code>), test <code>CreditoConCargosTest</code>.</li>
 <li><strong>Hallazgo H6, corregido</strong>: <code>"cargos":[null]</code> daba 500; ahora 400 (<code>06eb1eb</code>, test <code>cargoNuloDa400</code>, <code>verificar-cu.sh</code>).</li>

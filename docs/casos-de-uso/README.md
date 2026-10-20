@@ -113,7 +113,7 @@ Fuente: `casos-de-uso-v4.puml` (renderizado con `plantuml -tsvg` y `-tpng`). Sup
 ### UC09 Consultar crédito
 
 - **Actor**: Usuario. **RF V0**: RF-CR-03.
-- **Flujo principal**: 1. Se pide un crédito por id. 2. El sistema devuelve el crédito con sus cuotas (cada una con `pagada` y `vencida`), estado (VIGENTE, CANCELADO o ANULADO), saldo y si puede anularse (**200**).
+- **Flujo principal**: 1. Se pide un crédito por id. 2. El sistema devuelve el crédito con sus cuotas (cada una con `pagada` y `vencida`), estado (VIGENTE, CANCELADO o ANULADO), saldo, si puede anularse y el desglose de la cuota: un renglón por capa del Decorator (`model/CondicionesDeCredito.java` `desglose`, M12) (**200**).
 - **Errores**: id inexistente → **404**. Id no numérico → **400**.
 - **Reglas**: `service/impl/CreditoServiceImpl.java` `buscarPorId`; estado, saldo y anulabilidad los calcula el crédito: `model/Credito.java` `estado`, `saldo`, `puedeAnularse` (M8); mora en `model/Cuota.java` `estaVencida`, que delega en `estaVencida(LocalDate)` (M6).
 - **Endpoint**: `GET /api/creditos/{id}` → `controller/CreditoController.java` `buscarPorId`.
