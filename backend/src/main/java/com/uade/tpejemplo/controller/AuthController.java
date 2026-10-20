@@ -3,6 +3,7 @@ package com.uade.tpejemplo.controller;
 import com.uade.tpejemplo.dto.request.LoginRequest;
 import com.uade.tpejemplo.dto.request.RegisterRequest;
 import com.uade.tpejemplo.dto.response.AuthResponse;
+import com.uade.tpejemplo.security.UsuarioDetails;
 import com.uade.tpejemplo.service.AuthService;
 import jakarta.validation.Valid;
 import io.swagger.v3.oas.annotations.Operation;
@@ -14,7 +15,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 // Endpoints de login, registro y usuario autenticado.
@@ -50,7 +50,7 @@ public class AuthController {
     @ApiResponse(responseCode = "200", description = "OK")
     @ApiResponse(responseCode = "401", description = "Sin token o token inválido")
     @GetMapping("/me")
-    public ResponseEntity<AuthResponse> actual(@AuthenticationPrincipal UserDetails usuario) {
+    public ResponseEntity<AuthResponse> actual(@AuthenticationPrincipal UsuarioDetails usuario) {
         return ResponseEntity.ok(authService.actual(usuario.getUsername()));
     }
 }
