@@ -46,5 +46,5 @@ public class CreditoRequest {
     private TipoPlan tipoPlan;
 
     // Opcional: sin cargos si no viene o viene vacio.
-    private Set<TipoCargo> cargos;
+    private Set<@NotNull TipoCargo> cargos;
 }

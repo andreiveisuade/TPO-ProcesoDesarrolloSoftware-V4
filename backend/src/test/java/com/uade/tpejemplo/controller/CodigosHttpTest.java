@@ -5,6 +5,7 @@ import com.uade.tpejemplo.exception.ResourceNotFoundException;
 import com.uade.tpejemplo.security.JwtAuthFilter;
 import com.uade.tpejemplo.service.AdminService;
 import com.uade.tpejemplo.service.ClienteService;
+import com.uade.tpejemplo.service.CreditoService;
 import com.uade.tpejemplo.service.TokenService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,7 +26,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 // Codigos HTTP de GlobalExceptionHandler y SecurityConfig contra los controllers reales, con los servicios mockeados.
-@WebMvcTest({ClienteController.class, SupervisorController.class})
+@WebMvcTest({ClienteController.class, CreditoController.class, SupervisorController.class})
 @Import({SecurityConfig.class, JwtAuthFilter.class})
 class CodigosHttpTest {
 
@@ -34,6 +35,9 @@ class CodigosHttpTest {
 
     @MockitoBean
     private ClienteService clienteService;
+
+    @MockitoBean
+    private CreditoService creditoService;
 
     @MockitoBean
     private AdminService adminService;
@@ -57,6 +61,15 @@ class CodigosHttpTest {
     @WithMockUser
     void jsonRotoDa400() throws Exception {
         mvc.perform(post("/api/clientes").contentType(MediaType.APPLICATION_JSON).content("{\"dni\":"))
+            .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @WithMockUser
+    void cargoNuloDa400() throws Exception {
+        mvc.perform(post("/api/creditos").contentType(MediaType.APPLICATION_JSON)
+                .content("{\"dniCliente\":\"30111222\",\"deudaOriginal\":1000,\"fecha\":\"2026-10-01\","
+                    + "\"tasaInteres\":10,\"cantidadCuotas\":3,\"tipoPlan\":\"INTERES_SIMPLE\",\"cargos\":[null]}"))
             .andExpect(status().isBadRequest());
     }
 
