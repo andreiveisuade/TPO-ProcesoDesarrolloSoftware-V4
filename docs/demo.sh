@@ -10,14 +10,14 @@ trap 'rm -rf "$TMP"' EXIT
 VIM="$TMP/demo.vim"
 
 cambios=(
-  "M9 Strategy|$B/model/Credito.java $B/model/interfaces/CalculoDeCuota.java $B/model/plan/InteresSimple.java $B/model/plan/SistemaFrances.java $B/model/TipoPlan.java"
+  "M9 Strategy|$B/model/credito/Credito.java $B/model/plan/CalculoDeCuota.java $B/model/plan/InteresSimple.java $B/model/plan/SistemaFrances.java $B/model/plan/TipoPlan.java"
   "M7 Adapter|$B/service/TokenService.java $B/security/JwtUtil.java $B/security/JwtAuthFilter.java $B/security/UsuarioDetails.java"
-  "M8+O6 EstadoCredito, agregado y Creator|$B/model/EstadoCredito.java $B/model/Credito.java $B/model/Cuota.java $B/service/impl/CreditoServiceImpl.java"
-  "M4+BS3 permisos en el modelo|$B/controller/CreditoController.java $B/model/Usuario.java $B/service/impl/CreditoServiceImpl.java"
+  "M8+O6 EstadoCredito, agregado y Creator|$B/model/credito/EstadoCredito.java $B/model/credito/Credito.java $B/model/credito/Cuota.java $B/service/impl/CreditoServiceImpl.java"
+  "M4+BS3 permisos en el modelo|$B/controller/CreditoController.java $B/model/usuario/Usuario.java $B/service/impl/CreditoServiceImpl.java"
   "M5 errores, seguridad y perfiles|$B/exception/GlobalExceptionHandler.java $B/config/SecurityConfig.java $B/config/OpenApiConfig.java backend/src/main/resources/application-dev.properties backend/src/main/resources/application-prod.properties"
   "M3+O7 Dashboard|$B/service/impl/DashboardServiceImpl.java $B/dto/response/DashboardStatsResponse.java"
-  "M1 Information Expert|$B/model/Cuota.java"
-  "M6 Cuota.estaVencida|$B/model/Cuota.java"
+  "M1 Information Expert|$B/model/credito/Cuota.java"
+  "M6 Cuota.estaVencida|$B/model/credito/Cuota.java"
   "M10 Dashboard para ADMIN|$B/config/SecurityConfig.java"
   "I-1 Bloqueo al cobrar|$B/repository/CuotaRepository.java $B/service/impl/CobranzaServiceImpl.java"
 )

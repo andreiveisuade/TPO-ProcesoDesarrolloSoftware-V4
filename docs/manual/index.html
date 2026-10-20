@@ -515,19 +515,19 @@ body.lightbox-locked { overflow: hidden; }
           <tr><td>R1</td><td>El DNI del cliente es único</td><td><code>service/impl/ClienteServiceImpl.java</code> <code>crear</code></td></tr>
           <tr><td>R2</td><td>Capital &gt; 0 con hasta 8 enteros y 2 decimales, tasa entre 0 y 999,99 con 2 decimales, al menos 1 cuota, tipo de plan obligatorio. DNI de 7 u 8 dígitos (<code>@Pattern</code>), nombre y username hasta 255, importe de cobranza hasta 10 enteros y 2 decimales (<code>@Size</code> y <code>@Digits</code>, anotaciones de Bean Validation que Spring chequea con <code>@Valid</code> antes de entrar al controller: lo que no entra en la columna da 400 y no 500)</td><td><code>dto/request/CreditoRequest.java</code>, <code>dto/request/ClienteRequest.java</code>, <code>dto/request/CobranzaRequest.java</code>, <code>dto/request/RegisterRequest.java</code></td></tr>
           <tr><td>R3</td><td>Interés simple: <code>total = capital × (1 + tasa/100)</code>, cuota = total / N con redondeo HALF_UP a 2 decimales</td><td><code>model/plan/InteresSimple.java</code> <code>totalADevolver</code>, <code>importeCuota</code></td></tr>
-          <tr><td>R4</td><td>Sistema francés: cuota = C·i / (1 − (1+i)<sup>−n</sup>), con i = tasa/100 por período; tasa 0 → C/N; total = cuota × N</td><td><code>model/plan/SistemaFrances.java</code> <code>importeCuota</code>; el total en <code>model/Credito.java</code> <code>totalADevolver</code></td></tr>
-          <tr><td>R5</td><td>El crédito nace con su plan: N cuotas numeradas 1..N, vencimiento <code>fecha + i meses</code>, persistidas por cascade</td><td><code>model/Credito.java</code> constructor y <code>generarPlanDeCuotas</code> (privado)</td></tr>
-          <tr><td>R6</td><td>No se cobra sobre un crédito anulado</td><td><code>model/Cuota.java</code> <code>registrarCobranza</code></td></tr>
-          <tr><td>R7</td><td>Una cuota tiene a lo sumo una cobranza vigente; las anuladas no cuentan</td><td><code>model/Cuota.java</code> <code>estaPagada</code>, <code>registrarCobranza</code></td></tr>
-          <tr><td>R8</td><td>El importe cobrado tiene que ser exactamente el de la cuota (no hay pago parcial)</td><td><code>model/Cuota.java</code> <code>registrarCobranza</code></td></tr>
-          <tr><td>R9</td><td>La fecha de la cobranza la pone el sistema (hoy)</td><td><code>model/Cobranza.java</code> constructor</td></tr>
-          <tr><td>R10</td><td>Solo se anulan cobranzas del día, y no dos veces</td><td><code>model/Cobranza.java</code> <code>anular(LocalDate)</code></td></tr>
-          <tr><td>R11</td><td>No se anula un crédito ya anulado ni uno con cobranzas vigentes</td><td><code>model/Credito.java</code> <code>anular</code>, <code>tieneCobranzas</code></td></tr>
-          <tr><td>R12</td><td>Una cuota está vencida si no está pagada y su vencimiento es anterior a hoy y el crédito no está anulado</td><td><code>model/Cuota.java</code> <code>estaVencida(LocalDate)</code></td></tr>
-          <tr><td>R13</td><td>Estado del crédito: ANULADO si se anuló; CANCELADO si todas las cuotas están pagas; si no, VIGENTE</td><td><code>model/Credito.java</code> <code>estado</code>, <code>estaCancelado</code></td></tr>
-          <tr><td>R14</td><td>Saldo = suma de cuotas impagas; 0 si está anulado</td><td><code>model/Credito.java</code> <code>saldo</code></td></tr>
+          <tr><td>R4</td><td>Sistema francés: cuota = C·i / (1 − (1+i)<sup>−n</sup>), con i = tasa/100 por período; tasa 0 → C/N; total = cuota × N</td><td><code>model/plan/SistemaFrances.java</code> <code>importeCuota</code>; el total en <code>model/credito/Credito.java</code> <code>totalADevolver</code></td></tr>
+          <tr><td>R5</td><td>El crédito nace con su plan: N cuotas numeradas 1..N, vencimiento <code>fecha + i meses</code>, persistidas por cascade</td><td><code>model/credito/Credito.java</code> constructor y <code>generarPlanDeCuotas</code> (privado)</td></tr>
+          <tr><td>R6</td><td>No se cobra sobre un crédito anulado</td><td><code>model/credito/Cuota.java</code> <code>registrarCobranza</code></td></tr>
+          <tr><td>R7</td><td>Una cuota tiene a lo sumo una cobranza vigente; las anuladas no cuentan</td><td><code>model/credito/Cuota.java</code> <code>estaPagada</code>, <code>registrarCobranza</code></td></tr>
+          <tr><td>R8</td><td>El importe cobrado tiene que ser exactamente el de la cuota (no hay pago parcial)</td><td><code>model/credito/Cuota.java</code> <code>registrarCobranza</code></td></tr>
+          <tr><td>R9</td><td>La fecha de la cobranza la pone el sistema (hoy)</td><td><code>model/credito/Cobranza.java</code> constructor</td></tr>
+          <tr><td>R10</td><td>Solo se anulan cobranzas del día, y no dos veces</td><td><code>model/credito/Cobranza.java</code> <code>anular(LocalDate)</code></td></tr>
+          <tr><td>R11</td><td>No se anula un crédito ya anulado ni uno con cobranzas vigentes</td><td><code>model/credito/Credito.java</code> <code>anular</code>, <code>tieneCobranzas</code></td></tr>
+          <tr><td>R12</td><td>Una cuota está vencida si no está pagada y su vencimiento es anterior a hoy y el crédito no está anulado</td><td><code>model/credito/Cuota.java</code> <code>estaVencida(LocalDate)</code></td></tr>
+          <tr><td>R13</td><td>Estado del crédito: ANULADO si se anuló; CANCELADO si todas las cuotas están pagas; si no, VIGENTE</td><td><code>model/credito/Credito.java</code> <code>estado</code>, <code>estaCancelado</code></td></tr>
+          <tr><td>R14</td><td>Saldo = suma de cuotas impagas; 0 si está anulado</td><td><code>model/credito/Credito.java</code> <code>saldo</code></td></tr>
           <tr><td>R15</td><td>Anular un crédito requiere <code>puedeAnularCredito</code>; anular una cobranza, <code>puedeAnularCobranza</code></td><td><code>service/impl/CreditoServiceImpl.java</code> <code>anularCredito</code>; <code>service/impl/CobranzaServiceImpl.java</code> <code>anularCobranza</code></td></tr>
-          <tr><td>R16</td><td>Nadie otorga ni quita el rol ADMIN</td><td><code>model/Usuario.java</code> <code>asignarRol</code></td></tr>
+          <tr><td>R16</td><td>Nadie otorga ni quita el rol ADMIN</td><td><code>model/usuario/Usuario.java</code> <code>asignarRol</code></td></tr>
           <tr><td>R17</td><td>El registro crea siempre un USER sin permisos; username único</td><td><code>service/impl/AuthServiceImpl.java</code> <code>registrar</code></td></tr>
           <tr><td>R18</td><td>Activos = créditos con <code>estado()</code> VIGENTE (modelo); financiado = deuda original de lo no anulado (incluye cancelados), cobrado = cobranzas no anuladas, saldo pendiente = suma de <code>Credito.saldo</code>, vencido = suma de <code>Credito.montoVencido</code> (cuotas vencidas de créditos no anulados)</td><td><code>service/impl/DashboardServiceImpl.java</code> <code>obtenerEstadisticasGenerales</code>; <code>repository/CreditoRepository.java</code> <code>sumarDeudaOriginalNoAnulada</code>; <code>repository/CobranzaRepository.java</code> <code>sumarImporteNoAnulado</code></td></tr>
         </tbody>
@@ -573,7 +573,7 @@ body.lightbox-locked { overflow: hidden; }
       <div class="table-wrap"><table>
         <thead><tr><th>Componente</th><th>Paquetes</th></tr></thead>
         <tbody>
-          <tr><td>Modelo</td><td><code>model/</code>, <code>model/interfaces/</code>, <code>model/plan/</code>, <code>repository/</code>, <code>service/</code> + <code>service/impl/</code>, <code>exception/BusinessException</code>, <code>exception/ResourceNotFoundException</code>, <code>config/DataInitializer</code></td></tr>
+          <tr><td>Modelo</td><td><code>model/credito/</code>, <code>model/cliente/</code>, <code>model/plan/</code>, <code>model/usuario/</code>, <code>repository/</code>, <code>service/</code> + <code>service/impl/</code>, <code>exception/BusinessException</code>, <code>exception/ResourceNotFoundException</code>, <code>config/DataInitializer</code></td></tr>
           <tr><td>Controlador</td><td><code>controller/</code>, <code>dto/request/</code>, <code>dto/response/</code>, <code>exception/GlobalExceptionHandler</code>, <code>security/</code>, <code>config/SecurityConfig</code>, <code>config/OpenApiConfig</code></td></tr>
           <tr><td>Vista</td><td>Frontend: <code>pages/</code>, <code>components/</code>, <code>store/slices/</code>, <code>api/</code> (<code>apiClient.js</code>, único punto HTTP)</td></tr>
         </tbody>
@@ -1113,14 +1113,14 @@ svg .s-security{color: var(--security-stroke);}
         </g>
       </svg></div><figcaption>Fuente: <code>docs/diagramas/archify/anular-credito.sequence.json</code></figcaption></figure>
       
-      <p>Diagrama de clases UML completo: <a href="../diagramas/clases-v4-mvc.svg">capas MVC</a>, <a href="../diagramas/clases-v4-seguridad.svg">seguridad, Facade y Adapter</a> y <a href="../diagramas/clases-v4-modelo.svg">modelo</a>.</p>
+      <p>Diagrama de clases UML completo: <a href="../diagramas/clases-v4-mvc.svg">capas MVC</a>, <a href="../diagramas/clases-v4-seguridad.svg">seguridad, Facade y Adapter</a>, <a href="../diagramas/clases-v4-modelo.svg">modelo</a> y <a href="../diagramas/clases-v4-paquetes.svg">paquetes del modelo</a>.</p>
     </section>
 
     <section class="doc-section" id="dominio">
       <h2>Modelo de dominio</h2>
       <p>Diagramas: <a href="../reporte/reporte-v4.html#clases">reporte, "Diagramas de clases y DER"</a> (capas MVC, seguridad, modelo y DER). Detalle UML: <a href="../diagramas/clases-v4-modelo.svg">clases-v4-modelo.svg</a>.</p>
       <h3>Estados del crédito</h3>
-      <p>El estado se calcula en <code>model/Credito.java</code> <code>estado</code>; solo se guarda <code>anulado</code>. El crédito es agregado de sus cuotas (M8).</p>
+      <p>El estado se calcula en <code>model/credito/Credito.java</code> <code>estado</code>; solo se guarda <code>anulado</code>. El crédito es agregado de sus cuotas (M8).</p>
       <figure class="diagram"><div class="d2"><svg style="width:100%;height:auto" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 980 680" role="img" lang="es" aria-labelledby="archify-diagram-title archify-diagram-description" data-preset="classic" data-quality-profile="showcase"><style>svg{--bg:#ffffff;--grid:transparent;--panel:#ffffff;--panel-border:#D9E1EC;--text:#1D2B4F;--text-muted:#555f73;--text-dim:#8a94a6;--text-faint:#666;--mask:#ffffff;--lane-fill:#F6F9FD;--lane-stroke:#D9E1EC;--arrow:#7d8aa3;--arrow-emphasis:#2E75B6;
 --frontend-fill:#EEF4FB;--frontend-stroke:#2E75B6;--backend-fill:#ffffff;--backend-stroke:#1D2B4F;--database-fill:#F1F3F7;--database-stroke:#4A5A7A;--cloud-fill:#FFF8E6;--cloud-stroke:#B38600;--security-fill:#FCEFEE;--security-stroke:#B3261E;--messagebus-fill:#FFF3E8;--messagebus-stroke:#B35C00;--external-fill:#F4F4F4;--external-stroke:#666;
 font-family:"Calibri Light",Calibri,Carlito,"Segoe UI",system-ui,sans-serif}
@@ -1234,8 +1234,8 @@ svg .s-security{color: var(--security-stroke);}
           <text data-detail="context" x="710" y="163" class="t-muted" font-size="7" text-anchor="middle">todas las cuotas pagadas</text>
         </g>
 
-        <g id="node-anulado" data-node-id="anulado" data-node-label="ANULADO" tabindex="0" role="button" aria-label="Focus ANULADO, model/Credito.java, Anulación (único campo guardado: anulado)" aria-pressed="false" data-node-kind="failure" data-node-sublabel="model/Credito.java" data-node-context="Anulación (único campo guardado: anulado)">
-          <title>ANULADO · model/Credito.java · Anulación (único campo guardado: anulado)</title>
+        <g id="node-anulado" data-node-id="anulado" data-node-label="ANULADO" tabindex="0" role="button" aria-label="Focus ANULADO, model/credito/Credito.java, Anulación (único campo guardado: anulado)" aria-pressed="false" data-node-kind="failure" data-node-sublabel="model/credito/Credito.java" data-node-context="Anulación (único campo guardado: anulado)">
+          <title>ANULADO · model/credito/Credito.java · Anulación (único campo guardado: anulado)</title>
           <rect x="343" y="450" width="118" height="58" rx="7" class="c-mask"/>
           <rect x="343" y="450" width="118" height="58" rx="7" class="c-security" stroke-width="1.5"/>
           <g aria-hidden="true" data-semantic-sigil="failure" class="semantic-sigil s-security" transform="translate(444 456) scale(0.6875)">
@@ -1243,7 +1243,7 @@ svg .s-security{color: var(--security-stroke);}
             <path d="m5.7 5.7 4.6 4.6m0-4.6-4.6 4.6"/>
           </g>
           <text data-node-label="" data-detail-anchor="" x="402" y="471" class="t-primary" font-size="10" font-weight="600" text-anchor="middle">ANULADO</text>
-          <text data-detail="context" x="402" y="487" class="t-muted" font-size="7" text-anchor="middle">model/Credito.java</text>
+          <text data-detail="context" x="402" y="487" class="t-muted" font-size="7" text-anchor="middle">model/credito/Credito.java</text>
         </g>
 
         <!-- Transition labels -->
@@ -1287,8 +1287,8 @@ svg .s-security{color: var(--security-stroke);}
       </svg></div><figcaption>Fuente: <code>docs/diagramas/archify/credito-estados.lifecycle.json</code></figcaption></figure>
       <h3>Creator: el crédito nace con sus cuotas (O6)</h3>
       <p>
-        El constructor de <code>model/Credito.java</code> llama a <code>generarPlanDeCuotas</code>, que ahora es privado
-        y salió de <code>model/interfaces/ICredito.java</code>. La relación lleva <code>cascade = CascadeType.PERSIST</code>
+        El constructor de <code>model/credito/Credito.java</code> llama a <code>generarPlanDeCuotas</code>, que ahora es privado
+        y salió de <code>model/credito/ICredito.java</code>. La relación lleva <code>cascade = CascadeType.PERSIST</code>
         (JPA guarda las cuotas al guardar el crédito), así que <code>service/impl/CreditoServiceImpl.java</code>
         <code>crear</code> ya no las guarda aparte. No puede existir un crédito sin plan.
       </p>
@@ -1304,10 +1304,10 @@ svg .s-security{color: var(--security-stroke);}
       <div class="table-wrap"><table>
         <thead><tr><th>Rol</th><th>Clase</th></tr></thead>
         <tbody>
-          <tr><td>Context</td><td><code>model/CondicionesDeCredito.java</code> (<code>importeCuota</code> delega, M17); <code>Credito.totalADevolver</code> sale de las cuotas (O3)</td></tr>
-          <tr><td>Strategy</td><td><code>model/interfaces/CalculoDeCuota.java</code></td></tr>
+          <tr><td>Context</td><td><code>model/credito/CondicionesDeCredito.java</code> (<code>importeCuota</code> delega, M17); <code>Credito.totalADevolver</code> sale de las cuotas (O3)</td></tr>
+          <tr><td>Strategy</td><td><code>model/plan/CalculoDeCuota.java</code></td></tr>
           <tr><td>ConcreteStrategy</td><td><code>model/plan/InteresSimple.java</code>, <code>model/plan/SistemaFrances.java</code></td></tr>
-          <tr><td>Selección</td><td><code>model/TipoPlan.java</code> (enum persistido, <code>calculo()</code>); viene en <code>CreditoRequest.tipoPlan</code></td></tr>
+          <tr><td>Selección</td><td><code>model/plan/TipoPlan.java</code> (enum persistido, <code>calculo()</code>); viene en <code>CreditoRequest.tipoPlan</code></td></tr>
         </tbody>
       </table></div>
       <h3>Adapter de seguridad</h3>
@@ -1316,7 +1316,7 @@ svg .s-security{color: var(--security-stroke);}
         <tbody>
           <tr><td>Target</td><td><code>service/TokenService.java</code></td><td><code>UserDetails</code> de Spring Security</td></tr>
           <tr><td>Adapter</td><td><code>security/JwtUtil.java</code></td><td><code>security/UsuarioDetails.java</code></td></tr>
-          <tr><td>Adaptee</td><td>librería jjwt</td><td><code>model/interfaces/IUsuario.java</code></td></tr>
+          <tr><td>Adaptee</td><td>librería jjwt</td><td><code>model/usuario/IUsuario.java</code></td></tr>
           <tr><td>Client</td><td><code>service/impl/AuthServiceImpl.java</code>, <code>security/JwtAuthFilter.java</code></td><td><code>DaoAuthenticationProvider</code> (lo arma Spring solo con los beans <code>UserDetailsService</code> y <code>PasswordEncoder</code>) vía <code>security/UserDetailsServiceImpl.java</code></td></tr>
         </tbody>
       </table></div>
@@ -1346,7 +1346,7 @@ svg .s-security{color: var(--security-stroke);}
       <ul>
         <li><strong>JWT</strong>: login y registro devuelven un token (<code>security/JwtUtil.java</code>, expira en 24 h según <code>jwt.expiration-ms</code>). <code>security/JwtAuthFilter.java</code> lo valida en cada request. Sesión stateless.</li>
         <li><strong>Roles</strong> (<code>config/SecurityConfig.java</code> <code>filterChain</code>): <code>/api/auth/**</code> y Swagger públicos, salvo <code>/api/auth/me</code>, que pide token; <code>/api/admin/**</code> solo ADMIN; <code>/api/supervisor/**</code> solo SUPERVISOR; <code>/api/dashboard/**</code> SUPERVISOR o ADMIN; el resto, cualquier autenticado.</li>
-        <li><strong>Permisos de anulación</strong> (<code>model/Permisos.java</code>): <code>puedeAnularCredito</code> y <code>puedeAnularCobranza</code>, por usuario. Los aplica el servicio (R15) preguntándole al usuario (<code>model/Usuario.java</code> <code>puedeAnularCredito</code>, <code>puedeAnularCobranza</code>, BS3); el front solo oculta botones.</li>
+        <li><strong>Permisos de anulación</strong> (<code>model/usuario/Permisos.java</code>): <code>puedeAnularCredito</code> y <code>puedeAnularCobranza</code>, por usuario. Los aplica el servicio (R15) preguntándole al usuario (<code>model/usuario/Usuario.java</code> <code>puedeAnularCredito</code>, <code>puedeAnularCobranza</code>, BS3); el front solo oculta botones.</li>
         <li>Sin token → 401 (<code>HttpStatusEntryPoint</code>); con token y sin el rol → 403 (<code>accessDeniedHandler</code>, ambos en <code>config/SecurityConfig.java</code> <code>filterChain</code>); sin permiso de anulación → 403 desde <code>exception/GlobalExceptionHandler.java</code> <code>handleAccesoDenegado</code>.</li>
         <li><strong>Doble control de roles</strong>: las zonas de admin y supervisor se chequean en las reglas de URL de <code>config/SecurityConfig.java</code> y otra vez con <code>@PreAuthorize</code> en <code>controller/AdminController.java</code> y <code>controller/SupervisorController.java</code>. Es a propósito (ver "Decisiones de diseño").</li>
         <li><strong>CORS</strong>: <code>config/SecurityConfig.java</code> <code>corsConfigurationSource</code> admite un solo origen, <code>app.cors.origin</code>: <code>http://localhost:5173</code> en dev y la variable <code>CORS_ORIGIN</code> en prod.</li>
@@ -1421,7 +1421,7 @@ SELECT * FROM COBRANZAS WHERE ANULADA = FALSE;  -- cobranzas vigentes</code></pr
       <ul>
         <li><strong>Tests</strong>: <code>cd backend &amp;&amp; mvn test</code> (cantidad y resultado: <a href="../reporte/reporte-v4.html#verificacion">reporte V4, Verificación</a>). JUnit 5 (el framework de tests de Java) con AssertJ (aserciones encadenadas legibles):
           <ul>
-            <li>Unitarios de dominio, sin Spring, en <code>backend/src/test/java/com/uade/tpejemplo/model/</code>: <code>CreditoTest</code>, <code>CuotaTest</code>, <code>CarteraTest</code>, <code>CobranzaTest</code>, <code>plan/InteresSimpleTest</code>, <code>plan/SistemaFrancesTest</code>, <code>plan/SeguroDeVidaTest</code>, <code>plan/GastoDeAdministracionTest</code>, <code>plan/CargosApiladosTest</code>. La fecha de hoy entra por parámetro (<code>model/Cobranza.java</code> <code>anular(LocalDate)</code>, <code>model/Cuota.java</code> <code>estaVencida(LocalDate)</code>), así se prueba el rechazo de anular una cobranza de otro día y el vencimiento sin depender del reloj.</li>
+            <li>Unitarios de dominio, sin Spring, en <code>backend/src/test/java/com/uade/tpejemplo/model/</code>: <code>credito/CreditoTest</code>, <code>credito/CuotaTest</code>, <code>credito/CarteraTest</code>, <code>credito/CobranzaTest</code>, <code>plan/InteresSimpleTest</code>, <code>plan/SistemaFrancesTest</code>, <code>plan/SeguroDeVidaTest</code>, <code>plan/GastoDeAdministracionTest</code>, <code>plan/CargosApiladosTest</code>. La fecha de hoy entra por parámetro (<code>model/credito/Cobranza.java</code> <code>anular(LocalDate)</code>, <code>model/credito/Cuota.java</code> <code>estaVencida(LocalDate)</code>), así se prueba el rechazo de anular una cobranza de otro día y el vencimiento sin depender del reloj.</li>
             <li>De códigos HTTP en <code>backend/src/test/java/com/uade/tpejemplo/controller/CodigosHttpTest.java</code>: <code>@WebMvcTest</code> levanta solo la capa web (controllers, <code>SecurityConfig</code>, el filtro JWT y el <code>GlobalExceptionHandler</code>) con los servicios simulados por <code>@MockitoBean</code>. Cubre 400 (DNI con letras, cargo nulo, JSON roto, parámetro de tipo incorrecto, permisos sin campos), 401 (sin token y token inválido), 403 (rol incorrecto), 404, 405, 406 y 415.</li>
             <li>De concurrencia con <code>@SpringBootTest</code> en <code>backend/src/test/java/com/uade/tpejemplo/service/</code>: <code>CobranzaConcurrenteTest</code>, 20 hilos cobrando la misma cuota, espera una sola cobranza vigente (I-1; sin el bloqueo falla con 10); <code>AnulacionConcurrenteTest</code>, anular y cobrar en paralelo, nunca queda un crédito anulado con cobranza vigente.</li>
             <li>De integración sobre H2 en <code>backend/src/test/java/com/uade/tpejemplo/service/</code>: <code>ReglaDeMoraTest</code> (no se otorga a un cliente con cuotas vencidas), <code>DeudaClienteTest</code> (saldo y vencido del cliente) y <code>CreditoConCargosTest</code> (un crédito con cargos leído de la base se serializa).</li>
@@ -1442,7 +1442,7 @@ SELECT * FROM COBRANZAS WHERE ANULADA = FALSE;  -- cobranzas vigentes</code></pr
         <tbody>
           <tr><td>Reglas en las entidades (<code>Cuota.registrarCobranza</code>, <code>Cobranza.anular</code>, <code>Credito.anular</code>)</td><td>Information Expert: decide quien tiene el dato. Desde V1/V2.</td></tr>
           <tr><td>Interfaces de servicio colapsadas en V1 y <strong>restituidas en V2</strong></td><td>V1 las sacó por Lazy class (una sola impl). V2 las volvió a poner como convención fijada por la cátedra. Revierte el informe 1 §3.7.</td></tr>
-          <tr><td>Interfaz por cada clase de <code>model/</code> (<code>model/interfaces/</code>)</td><td>Pedido de la cátedra en V2. Los DTO de respuesta y <code>UsuarioDetails</code> consumen la interfaz. <code>IRol</code> no tiene consumidor.</td></tr>
+          <tr><td>Interfaz por cada clase de <code>model/</code>, en el paquete de su concepto (M23)</td><td>Pedido de la cátedra en V2. Los DTO de respuesta y <code>UsuarioDetails</code> consumen la interfaz. <code>IRol</code> no tiene consumidor.</td></tr>
           <tr><td><code>MetaCobranza</code> eliminada (V1)</td><td>Data class sin uso real; UC17 retirado.</td></tr>
           <tr><td>Sistema francés <strong>descartado en V2 y reabierto en V3</strong></td><td>El 15/09 se descartó (no se buscaba polimorfismo). En V3 entra como segunda estrategia real para que Strategy no quede con una sola implementación (M9).</td></tr>
           <tr><td><code>Credito</code> como agregado de sus cuotas, con estado calculado (M8)</td><td>Saca la consulta al repositorio de <code>anularCredito</code> y corrige que se contaran cobranzas anuladas (absorbe M2). Cuotas y cobranzas se leen con lazy loading dentro de la transacción.</td></tr>

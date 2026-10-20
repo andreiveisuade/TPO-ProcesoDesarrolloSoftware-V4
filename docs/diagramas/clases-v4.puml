@@ -361,157 +361,155 @@ skinparam ranksep 60
 set separator none
 hide empty members
 
-package "model.interfaces" {
-  interface Deuda <<Component>> {
-    + saldo() : BigDecimal
-    + montoVencido() : BigDecimal
-    + tieneMora() : boolean
+package "model.usuario" {
+  class "Usuario\n<size:10><i>implements IUsuario</i></size>" as Usuario {
+    - id : Long
+    - username : String
+    - password : String
+    - activo : boolean
+    + {static} nuevo(String, String, Rol, Permisos) : Usuario
+    + otorgarPermisos(IPermisos) : void
+    + asignarRol(Rol) : void
+    + desactivar() : void
+    + reactivar() : void
+    + puedeAnularCredito() : boolean
+    + puedeAnularCobranza() : boolean
   }
-  interface ICredito
-  interface ICuota
-  interface CalculoDeCuota <<Strategy / Component>> {
-    + importeCuota(BigDecimal capital, BigDecimal tasa, int cuotas) : BigDecimal
-    + desglose(BigDecimal capital, BigDecimal tasa, int cuotas) : List<Renglon>
+  class "Permisos\n<size:10><i>implements IPermisos</i></size>" as Permisos <<Embeddable>> {
+    - puedeAnularCredito : boolean
+    - puedeAnularCobranza : boolean
+    + {static} de(boolean, boolean) : Permisos
+    + {static} ninguno() : Permisos
+    + {static} todos() : Permisos
+  }
+  enum "Rol\n<size:10><i>implements IRol</i></size>" as Rol {
+    ADMIN
+    SUPERVISOR
+    USER
+    + autoridad() : String
   }
 }
 
-package "model" {
-  together {
-    class "Usuario\n<size:10><i>implements IUsuario</i></size>" as Usuario {
-      - id : Long
-      - username : String
-      - password : String
-      - activo : boolean
-      + {static} nuevo(String, String, Rol, Permisos) : Usuario
-      + otorgarPermisos(IPermisos) : void
-      + asignarRol(Rol) : void
-      + desactivar() : void
-      + reactivar() : void
-      + puedeAnularCredito() : boolean
-      + puedeAnularCobranza() : boolean
-    }
-    class "Permisos\n<size:10><i>implements IPermisos</i></size>" as Permisos <<Embeddable>> {
-      - puedeAnularCredito : boolean
-      - puedeAnularCobranza : boolean
-      + {static} de(boolean, boolean) : Permisos
-      + {static} ninguno() : Permisos
-      + {static} todos() : Permisos
-    }
-    enum "Rol\n<size:10><i>implements IRol</i></size>" as Rol {
-      ADMIN
-      SUPERVISOR
-      USER
-      + autoridad() : String
-    }
+package "model.credito" {
+  interface Deuda <<Component>> {
+  + saldo() : BigDecimal
+  + montoVencido() : BigDecimal
+  + tieneMora() : boolean
   }
-  together {
-    class Cartera <<Composite>> {
-      - deudas : List<Deuda>
-      + {static} de(List<? extends Deuda>) : Cartera
-      + saldo() : BigDecimal
-      + montoVencido() : BigDecimal
-      - sumar(Function<Deuda, BigDecimal>) : BigDecimal
-    }
-    class Credito <<Composite>> {
-      - id : Long
-      - fecha : LocalDate
-      - anulado : boolean
-      + {static} nuevo(Cliente, LocalDate, CondicionesDeCredito) : Credito
-      + totalADevolver() : BigDecimal
-      + importeCuota() : BigDecimal
-      - generarPlanDeCuotas() : void
-      + estado() : EstadoCredito
-      + saldo() : BigDecimal
-      + montoVencido() : BigDecimal
-      - sumar(Function<Cuota, BigDecimal>) : BigDecimal
-      - estaCancelado() : boolean
-      - tieneCobranzas() : boolean
-      + puedeAnularse() : boolean
-      + anular() : void
-    }
-    class Cuota <<Leaf>> {
-      - id : Long
-      - numero : Integer
-      - importe : BigDecimal
-      - fechaVencimiento : LocalDate
-      + estaPagada() : boolean
-      + estaVencida() : boolean
-      + estaVencida(LocalDate) : boolean
-      + saldo() : BigDecimal
-      + montoVencido() : BigDecimal
-      + registrarCobranza(BigDecimal) : Cobranza
-    }
-    class "Cobranza\n<size:10><i>implements ICobranza</i></size>" as Cobranza {
-      - id : Long
-      - importe : BigDecimal
-      - fechaCobranza : LocalDate
-      - anulada : boolean
-      + anular() : void
-      + anular(LocalDate) : void
-    }
-    class "Cliente\n<size:10><i>implements ICliente</i></size>" as Cliente {
-      - dni : String
-      - nombre : String
-      + {static} nuevo(String, String) : Cliente
-    }
-    enum EstadoCredito {
-      VIGENTE
-      CANCELADO
-      ANULADO
-    }
+  interface ICredito
+  interface ICuota
+  class Cartera <<Composite>> {
+    - deudas : List<Deuda>
+    + {static} de(List<? extends Deuda>) : Cartera
+    + saldo() : BigDecimal
+    + montoVencido() : BigDecimal
+    - sumar(Function<Deuda, BigDecimal>) : BigDecimal
   }
-  together {
-    class "CondicionesDeCredito\n<size:10><i>implements ICondicionesDeCredito</i></size>" as CondicionesDeCredito <<Context / Embeddable>> {
-      - deudaOriginal : BigDecimal
-      - tasaInteres : BigDecimal
-      - cantidadCuotas : Integer
-      - tipoPlan : TipoPlan
-      - cargos : Set<TipoCargo>
-      ~ importeCuota() : BigDecimal
-      + desglose() : List<Renglon>
-      - calculo() : CalculoDeCuota
-    }
-    enum TipoPlan {
-      INTERES_SIMPLE
-      SISTEMA_FRANCES
-      - calculo : CalculoDeCuota
-      + calculo() : CalculoDeCuota
-    }
-    enum TipoCargo {
-      SEGURO_DE_VIDA
-      GASTO_DE_ADMINISTRACION
-      + {abstract} aplicarSobre(CalculoDeCuota) : CalculoDeCuota
-    }
+  class Credito <<Composite>> {
+    - id : Long
+    - fecha : LocalDate
+    - anulado : boolean
+    + {static} nuevo(Cliente, LocalDate, CondicionesDeCredito) : Credito
+    + totalADevolver() : BigDecimal
+    + importeCuota() : BigDecimal
+    - generarPlanDeCuotas() : void
+    + estado() : EstadoCredito
+    + saldo() : BigDecimal
+    + montoVencido() : BigDecimal
+    - sumar(Function<Cuota, BigDecimal>) : BigDecimal
+    - estaCancelado() : boolean
+    - tieneCobranzas() : boolean
+    + puedeAnularse() : boolean
+    + anular() : void
+  }
+  class Cuota <<Leaf>> {
+    - id : Long
+    - numero : Integer
+    - importe : BigDecimal
+    - fechaVencimiento : LocalDate
+    + estaPagada() : boolean
+    + estaVencida() : boolean
+    + estaVencida(LocalDate) : boolean
+    + saldo() : BigDecimal
+    + montoVencido() : BigDecimal
+    + registrarCobranza(BigDecimal) : Cobranza
+  }
+  class "Cobranza\n<size:10><i>implements ICobranza</i></size>" as Cobranza {
+    - id : Long
+    - importe : BigDecimal
+    - fechaCobranza : LocalDate
+    - anulada : boolean
+    + anular() : void
+    + anular(LocalDate) : void
+  }
+  enum EstadoCredito {
+    VIGENTE
+    CANCELADO
+    ANULADO
+  }
+  class "CondicionesDeCredito\n<size:10><i>implements ICondicionesDeCredito</i></size>" as CondicionesDeCredito <<Context / Embeddable>> {
+    - deudaOriginal : BigDecimal
+    - tasaInteres : BigDecimal
+    - cantidadCuotas : Integer
+    - tipoPlan : TipoPlan
+    - cargos : Set<TipoCargo>
+    ~ importeCuota() : BigDecimal
+    + desglose() : List<Renglon>
+    - calculo() : CalculoDeCuota
+  }
+}
+
+package "model.cliente" {
+  class "Cliente\n<size:10><i>implements ICliente</i></size>" as Cliente {
+    - dni : String
+    - nombre : String
+    + {static} nuevo(String, String) : Cliente
   }
 }
 
 package "model.plan" {
+  interface CalculoDeCuota <<Strategy / Component>> {
+  + importeCuota(BigDecimal capital, BigDecimal tasa, int cuotas) : BigDecimal
+  + desglose(BigDecimal capital, BigDecimal tasa, int cuotas) : List<Renglon>
+  }
+  enum TipoPlan {
+    INTERES_SIMPLE
+    SISTEMA_FRANCES
+    - calculo : CalculoDeCuota
+    + calculo() : CalculoDeCuota
+  }
+  enum TipoCargo {
+    SEGURO_DE_VIDA
+    GASTO_DE_ADMINISTRACION
+    + {abstract} aplicarSobre(CalculoDeCuota) : CalculoDeCuota
+  }
   class InteresSimple <<ConcreteStrategy / ConcreteComponent>> {
-    + importeCuota(BigDecimal, BigDecimal, int) : BigDecimal
+  + importeCuota(BigDecimal, BigDecimal, int) : BigDecimal
   }
   class SistemaFrances <<ConcreteStrategy / ConcreteComponent>> {
-    + importeCuota(BigDecimal, BigDecimal, int) : BigDecimal
+  + importeCuota(BigDecimal, BigDecimal, int) : BigDecimal
   }
   abstract class CargoSobreCuota <<Decorator>> {
-    - envuelto : CalculoDeCuota
-    + importeCuota(BigDecimal, BigDecimal, int) : BigDecimal
-    + desglose(BigDecimal, BigDecimal, int) : List<Renglon>
-    # {abstract} nombre() : String
-    # {abstract} cargo(BigDecimal, int) : BigDecimal
+  - envuelto : CalculoDeCuota
+  + importeCuota(BigDecimal, BigDecimal, int) : BigDecimal
+  + desglose(BigDecimal, BigDecimal, int) : List<Renglon>
+  # {abstract} nombre() : String
+  # {abstract} cargo(BigDecimal, int) : BigDecimal
   }
   class SeguroDeVida <<ConcreteDecorator>> {
-    - {static} PORCENTAJE_POR_CUOTA : BigDecimal
-    # cargo(BigDecimal, int) : BigDecimal
+  - {static} PORCENTAJE_POR_CUOTA : BigDecimal
+  # cargo(BigDecimal, int) : BigDecimal
   }
   class GastoDeAdministracion <<ConcreteDecorator>> {
-    - {static} MONTO_POR_CUOTA : BigDecimal
-    # cargo(BigDecimal, int) : BigDecimal
+  - {static} MONTO_POR_CUOTA : BigDecimal
+  # cargo(BigDecimal, int) : BigDecimal
   }
   class Renglon <<record>> {
-    + concepto : String
-    + importe : BigDecimal
+  + concepto : String
+  + importe : BigDecimal
   }
 }
+
 
 ' Zona deuda (Composite)
 Deuda <|.. Cartera
@@ -561,8 +559,43 @@ note bottom of Cobranza
   Cuota como hijo (JPA): la profundidad es fija.
 end note
 note as NConv
-  Cada entidad implementa su interfaz I* de model.interfaces
+  Cada entidad implementa su interfaz I* de su paquete
   (convención de cátedra); se omiten las flechas, salvo
   ICredito e ICuota: extienden Deuda (parte del Composite).
+end note
+@enduml
+
+@startuml clases-v4-paquetes
+title Dashboard de préstamos V4 — dependencias entre paquetes del Modelo
+skinparam packageStyle rectangle
+skinparam shadowing false
+set separator none
+hide empty members
+
+package "model.credito" as PCredito {
+  class "Credito, CondicionesDeCredito, Cuota, Cobranza,\nCartera, Deuda, EstadoCredito + ICredito, ICuota,\nICobranza, ICondicionesDeCredito" as CCredito
+}
+package "model.cliente" as PCliente {
+  class "Cliente + ICliente" as CCliente
+}
+package "model.plan" as PPlan {
+  class "CalculoDeCuota, TipoPlan, TipoCargo, InteresSimple,\nSistemaFrances, CargoSobreCuota, SeguroDeVida,\nGastoDeAdministracion, Renglon" as CPlan
+}
+package "model.usuario" as PUsuario {
+  class "Usuario, Permisos, Rol\n+ IUsuario, IPermisos, IRol" as CUsuario
+}
+hide CCredito circle
+hide CCliente circle
+hide CPlan circle
+hide CUsuario circle
+
+PCredito ..> PPlan : cuota y cargos
+PCredito ..> PCliente : titular
+PCliente -[hidden]right- PPlan
+PCredito -[hidden]right- PUsuario
+
+note bottom of PUsuario
+  Sin dependencias con los otros paquetes.
+  Sin ciclos: plan y cliente no conocen a credito.
 end note
 @enduml

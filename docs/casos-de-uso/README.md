@@ -20,7 +20,7 @@ Convenciones:
 Dos aclaraciones que cambian respecto de V0 y de los diagramas de la clase 3:
 
 - **Anular no depende del rol sino del permiso.** UC11 y UC15 los puede ejecutar cualquier Usuario que tenga `puedeAnularCredito` / `puedeAnularCobranza` (lo valida el backend desde M4). Por eso en el diagrama los dos cuelgan de Usuario, con una nota, y no de Supervisor.
-- **El cliente del préstamo no es actor**: no tiene usuario ni interactúa con el sistema. Es un dato (`model/Cliente.java`).
+- **El cliente del préstamo no es actor**: no tiene usuario ni interactúa con el sistema. Es un dato (`model/cliente/Cliente.java`).
 
 ## 2. Diagrama
 
@@ -37,7 +37,7 @@ Fuente: `casos-de-uso-v4.puml` (renderizado con `plantuml -tsvg` y `-tpng`). Sup
 - **Flujo principal**: 1. El visitante carga usuario y contraseña en la pantalla de registro. 2. El sistema valida los campos. 3. Verifica que el usuario no exista. 4. Crea el usuario con rol USER y sin permisos de anulación. 5. Emite el token y responde **201** con token, rol y permisos. 6. El front guarda la sesión y navega a `/clientes`.
 - **Errores**: usuario repetido → **400** "El usuario 'x' ya existe". Usuario vacío o contraseña de menos de 6 caracteres → **400** de validación (`dto/request/RegisterRequest.java`).
 - **Postcondición**: existe un USER con `Permisos.ninguno()` y tiene sesión iniciada.
-- **Reglas**: unicidad del username y rol fijo USER en `service/impl/AuthServiceImpl.java` `registrar` (el alta comparte `crear` con UC22); alta solo por `model/Usuario.java` `nuevo`. Nadie puede registrarse como SUPERVISOR o ADMIN.
+- **Reglas**: unicidad del username y rol fijo USER en `service/impl/AuthServiceImpl.java` `registrar` (el alta comparte `crear` con UC22); alta solo por `model/usuario/Usuario.java` `nuevo`. Nadie puede registrarse como SUPERVISOR o ADMIN.
 - **Endpoint**: `POST /api/auth/register` → `controller/AuthController.java` `registrar`.
 - **Pantalla**: `pages/Register.jsx` (`/register`).
 - **Verificación**: API (UC01). Sin test unitario.
@@ -62,7 +62,7 @@ Fuente: `casos-de-uso-v4.puml` (renderizado con `plantuml -tsvg` y `-tpng`). Sup
 - **Flujo principal**: 1. El usuario carga DNI y nombre. 2. El sistema valida que no estén vacíos. 3. Verifica que no exista otro cliente con ese DNI. 4. Lo guarda y responde **201**. 5. El listado se actualiza.
 - **Errores**: DNI repetido → **400** "Ya existe un cliente con DNI: x". DNI o nombre vacío, DNI que no sea de 7 u 8 dígitos (letras, puntos) o nombre de más de 255 → **400** de validación (`dto/request/ClienteRequest.java`, I-2). Sin sesión → **401**.
 - **Postcondición**: el cliente existe y se le pueden otorgar créditos.
-- **Reglas**: unicidad del DNI (es la clave primaria) en `service/impl/ClienteServiceImpl.java` `crear`; alta por `model/Cliente.java` `nuevo`.
+- **Reglas**: unicidad del DNI (es la clave primaria) en `service/impl/ClienteServiceImpl.java` `crear`; alta por `model/cliente/Cliente.java` `nuevo`.
 - **Endpoint**: `POST /api/clientes` → `controller/ClienteController.java` `crear`.
 - **Pantalla**: `pages/Clientes.jsx` (formulario).
 - **Verificación**: Smoke "Crear cliente 111"; Final "Crear cliente"; API (UC04); Test `controller/CodigosHttpTest.java` `dniConLetrasDa400`, `sinTokenDa401`.
@@ -93,13 +93,13 @@ Fuente: `casos-de-uso-v4.puml` (renderizado con `plantuml -tsvg` y `-tpng`). Sup
 - **Actor**: Usuario. **RF V0**: RF-CR-01. Incluye UC08.
 - **Precondición**: el cliente existe.
 - **Precondición** (V4): el cliente no tiene cuotas vencidas impagas.
-- **Flujo principal**: 1. El usuario carga DNI del cliente, deuda original, fecha, tasa (% mensual en los dos planes, M19), cantidad de cuotas, tipo de plan (interés simple o sistema francés) y, opcionalmente, los cargos (casillas "Seguro de vida" y "Gastos de administración"). 2. El sistema valida los datos. 3. Busca el cliente. 4. Verifica que el cliente no esté en mora (`model/interfaces/Deuda.java` `tieneMora` sobre la `Cartera` de sus créditos, M14). 5. Crea el crédito: el importe de cuota lo calcula la estrategia del plan elegido (`model/CondicionesDeCredito.java` `importeCuota`, `model/TipoPlan.java` `calculo`, `model/plan/InteresSimple.java`, `model/plan/SistemaFrances.java`; M9 Strategy), envuelta por cada cargo elegido (`model/CondicionesDeCredito.java` `calculo`, `model/TipoCargo.java` `aplicarSobre`, `model/plan/SeguroDeVida.java` 0,1 % del capital por cuota, `model/plan/GastoDeAdministracion.java` $500 por cuota; M12 Decorator). 6. Genera el plan de cuotas (UC08). 7. Responde **201** con cuotas, cargos, total a devolver, estado VIGENTE y saldo igual al total.
+- **Flujo principal**: 1. El usuario carga DNI del cliente, deuda original, fecha, tasa (% mensual en los dos planes, M19), cantidad de cuotas, tipo de plan (interés simple o sistema francés) y, opcionalmente, los cargos (casillas "Seguro de vida" y "Gastos de administración"). 2. El sistema valida los datos. 3. Busca el cliente. 4. Verifica que el cliente no esté en mora (`model/credito/Deuda.java` `tieneMora` sobre la `Cartera` de sus créditos, M14). 5. Crea el crédito: el importe de cuota lo calcula la estrategia del plan elegido (`model/credito/CondicionesDeCredito.java` `importeCuota`, `model/plan/TipoPlan.java` `calculo`, `model/plan/InteresSimple.java`, `model/plan/SistemaFrances.java`; M9 Strategy), envuelta por cada cargo elegido (`model/credito/CondicionesDeCredito.java` `calculo`, `model/plan/TipoCargo.java` `aplicarSobre`, `model/plan/SeguroDeVida.java` 0,1 % del capital por cuota, `model/plan/GastoDeAdministracion.java` $500 por cuota; M12 Decorator). 6. Genera el plan de cuotas (UC08). 7. Responde **201** con cuotas, cargos, total a devolver, estado VIGENTE y saldo igual al total.
 - **Errores**: cliente inexistente → **404**. Cliente con cuotas vencidas → **400** "El cliente x tiene cuotas vencidas: no se le puede otorgar un crédito nuevo." (M14). Deuda ≤ 0, cuotas < 1, tasa negativa o > 999,99, algún campo vacío → **400** de validación (`dto/request/CreditoRequest.java`). Tipo de plan o cargo inexistente, o JSON mal formado → **400** "Solicitud inválida". Cargo `null` en la lista → **400** de validación (H6).
 - **Postcondición**: crédito VIGENTE con su plan de cuotas y sus cargos (tabla `credito_cargos`). Sin `cargos` en el request (o vacío) el crédito no tiene cargos.
-- **Reglas**: `service/impl/CreditoServiceImpl.java` `crear` (mora y cargos opcionales); `model/Credito.java` `totalADevolver` (suma de sus cuotas, M20); `model/CondicionesDeCredito.java` constructor (condiciones válidas, M20).
+- **Reglas**: `service/impl/CreditoServiceImpl.java` `crear` (mora y cargos opcionales); `model/credito/Credito.java` `totalADevolver` (suma de sus cuotas, M20); `model/credito/CondicionesDeCredito.java` constructor (condiciones válidas, M20).
 - **Endpoint**: `POST /api/creditos` → `controller/CreditoController.java` `crear`.
 - **Pantalla**: `pages/Creditos.jsx` (formulario de alta).
-- **Verificación**: Test `model/plan/InteresSimpleTest`, `model/plan/SistemaFrancesTest`, `model/plan/SeguroDeVidaTest`, `model/plan/GastoDeAdministracionTest`, `model/plan/CargosApiladosTest`, `model/CreditoTest.java` `nuevoEstaVigenteConSaldoIgualAlTotal`, `elTotalADevolverEsLaSumaDeSusCuotas`, `model/CondicionesDeCreditoTest` (1), `service/ReglaDeMoraTest` (2); Smoke "Crédito INTERES_SIMPLE… (M9)", "Crédito SISTEMA_FRANCES…"; Final captura `04-creditos.png`; API (UC07).
+- **Verificación**: Test `model/plan/InteresSimpleTest`, `model/plan/SistemaFrancesTest`, `model/plan/SeguroDeVidaTest`, `model/plan/GastoDeAdministracionTest`, `model/plan/CargosApiladosTest`, `model/credito/CreditoTest.java` `nuevoEstaVigenteConSaldoIgualAlTotal`, `elTotalADevolverEsLaSumaDeSusCuotas`, `model/credito/CondicionesDeCreditoTest` (1), `service/ReglaDeMoraTest` (2); Smoke "Crédito INTERES_SIMPLE… (M9)", "Crédito SISTEMA_FRANCES…"; Final captura `04-creditos.png`; API (UC07).
 - **Evolución**: V0 cargaba el importe de cuota a mano (B-07); V1 lo calcula con tasa; V3 lo hace intercambiable por plan (M9); V4 suma cargos opcionales (M12) y rechaza al cliente en mora (M14).
 - **Fecha libre a propósito**: permite cargar créditos históricos para la demo; uno fechado a futuro todavía no tiene cuotas vencidas.
 
@@ -107,15 +107,15 @@ Fuente: `casos-de-uso-v4.puml` (renderizado con `plantuml -tsvg` y `-tpng`). Sup
 
 - **Actor**: lo dispara UC07, no tiene actor propio.
 - **Flujo**: el crédito crea N cuotas numeradas 1..N, todas con el importe de cuota, y vencimiento mensual: cuota i vence en fecha + i meses.
-- **Reglas**: `model/Credito.java` `generarPlanDeCuotas`, privado y llamado desde el constructor (`model/Credito.java` constructor, O6): el crédito nace con su plan, no hay forma de tener uno sin cuotas. El servicio solo persiste y las cuotas se guardan en cascada (`service/impl/CreditoServiceImpl.java` `crear`).
-- **Verificación**: Test `model/CreditoTest.java` `generaUnaCuotaPorMesDesdeLaFecha`; las diferencias de centavos por redondeo las fijan los tests de `model/plan/`.
+- **Reglas**: `model/credito/Credito.java` `generarPlanDeCuotas`, privado y llamado desde el constructor (`model/credito/Credito.java` constructor, O6): el crédito nace con su plan, no hay forma de tener uno sin cuotas. El servicio solo persiste y las cuotas se guardan en cascada (`service/impl/CreditoServiceImpl.java` `crear`).
+- **Verificación**: Test `model/credito/CreditoTest.java` `generaUnaCuotaPorMesDesdeLaFecha`; las diferencias de centavos por redondeo las fijan los tests de `model/plan/`.
 
 ### UC09 Consultar crédito
 
 - **Actor**: Usuario. **RF V0**: RF-CR-03.
-- **Flujo principal**: 1. Se pide un crédito por id. 2. El sistema devuelve el crédito con sus cuotas (cada una con `pagada` y `vencida`), estado (VIGENTE, CANCELADO o ANULADO), saldo, si puede anularse y el desglose de la cuota: un renglón por capa del Decorator (`model/CondicionesDeCredito.java` `desglose`, M12) (**200**).
+- **Flujo principal**: 1. Se pide un crédito por id. 2. El sistema devuelve el crédito con sus cuotas (cada una con `pagada` y `vencida`), estado (VIGENTE, CANCELADO o ANULADO), saldo, si puede anularse y el desglose de la cuota: un renglón por capa del Decorator (`model/credito/CondicionesDeCredito.java` `desglose`, M12) (**200**).
 - **Errores**: id inexistente → **404**. Id no numérico → **400**.
-- **Reglas**: `service/impl/CreditoServiceImpl.java` `buscarPorId`; estado, saldo y anulabilidad los calcula el crédito: `model/Credito.java` `estado`, `saldo`, `puedeAnularse` (M8); mora en `model/Cuota.java` `estaVencida`, que delega en `estaVencida(LocalDate)` (M6).
+- **Reglas**: `service/impl/CreditoServiceImpl.java` `buscarPorId`; estado, saldo y anulabilidad los calcula el crédito: `model/credito/Credito.java` `estado`, `saldo`, `puedeAnularse` (M8); mora en `model/credito/Cuota.java` `estaVencida`, que delega en `estaVencida(LocalDate)` (M6).
 - **Endpoint**: `GET /api/creditos/{id}` → `controller/CreditoController.java` `buscarPorId`.
 - **Pantalla**: `pages/Creditos.jsx` (bloque "Consultar crédito por número"): muestra la misma ficha que el listado de UC10 (estado, plan, saldo, cuotas y Anular si corresponde). Usa `api/creditos.js` `getCredito`.
 - **Verificación**: Smoke "Respuesta del crédito recién creado", "Saldo tras pagar 1 de 3 cuotas"; API (UC09); captura de la pantalla en la verificación del equipo.
@@ -128,7 +128,7 @@ Fuente: `casos-de-uso-v4.puml` (renderizado con `plantuml -tsvg` y `-tpng`). Sup
 - **Reglas**: `service/impl/CreditoServiceImpl.java` `listarPorCliente`.
 - **Endpoint**: `GET /api/creditos/cliente/{dni}` → `controller/CreditoController.java` `listarPorCliente`.
 - **Pantalla**: `pages/Creditos.jsx` (búsqueda y listado).
-- **Verificación**: Test `model/CuotaTest.java` `cuotaConVencimientoPasadoSinPagarEstaVencida`, `venceElDiaSiguienteAlVencimiento`, `cuotaPagadaNoEstaVencida`; Smoke "Cuota vencida (M6)"; Final "Botón Anular según puedeAnularse", captura `05-creditos-listado.png`; API (UC10).
+- **Verificación**: Test `model/credito/CuotaTest.java` `cuotaConVencimientoPasadoSinPagarEstaVencida`, `venceElDiaSiguienteAlVencimiento`, `cuotaPagadaNoEstaVencida`; Smoke "Cuota vencida (M6)"; Final "Botón Anular según puedeAnularse", captura `05-creditos-listado.png`; API (UC10).
 
 ### UC11 Anular crédito
 
@@ -137,10 +137,10 @@ Fuente: `casos-de-uso-v4.puml` (renderizado con `plantuml -tsvg` y `-tpng`). Sup
 - **Flujo principal**: 1. En el listado de UC10 el usuario aprieta Anular; el botón solo aparece si el crédito puede anularse y el usuario tiene el permiso (`pages/Creditos.jsx` `fichaCredito`). 2. Confirma. 3. El sistema verifica el permiso. 4. Busca el crédito. 5. El crédito se anula. 6. Responde **204** y la pantalla recarga el listado (O1).
 - **Errores**: sin permiso → **403** "El usuario no tiene permiso para anular creditos". Crédito inexistente → **404**. Ya anulado → **400** "El crédito x ya está anulado.". Con cobranzas vigentes (incluido un crédito cancelado) → **400** "No se puede anular el crédito x porque tiene cobranzas registradas.".
 - **Postcondición**: estado ANULADO, saldo 0, no admite cobranzas y sale del dashboard. Es una baja lógica.
-- **Reglas**: permiso en `service/impl/CreditoServiceImpl.java` `anularCredito` (M4); doble anulación y cobranzas vigentes en `model/Credito.java` `anular` (M8).
+- **Reglas**: permiso en `service/impl/CreditoServiceImpl.java` `anularCredito` (M4); doble anulación y cobranzas vigentes en `model/credito/Credito.java` `anular` (M8).
 - **Endpoint**: `DELETE /api/creditos/anular/{id}` → `controller/CreditoController.java` `anularCredito`.
 - **Pantalla**: `pages/Creditos.jsx` (botón Anular por crédito).
-- **Verificación**: Test `model/CreditoTest.java` `anuladoQuedaConSaldoCero`, `rechazaDobleAnulacion`, `rechazaAnularConCobranzasVigentes`, `permiteAnularSiLaUnicaCobranzaEstaAnulada`; Smoke "Anular crédito con `user` sin permiso (M4)", "Anular un crédito ya anulado"; Final capturas `06-anular-refresca.png`, `09-user-sin-anular.png`; API (UC11).
+- **Verificación**: Test `model/credito/CreditoTest.java` `anuladoQuedaConSaldoCero`, `rechazaDobleAnulacion`, `rechazaAnularConCobranzasVigentes`, `permiteAnularSiLaUnicaCobranzaEstaAnulada`; Smoke "Anular crédito con `user` sin permiso (M4)", "Anular un crédito ya anulado"; Final capturas `06-anular-refresca.png`, `09-user-sin-anular.png`; API (UC11).
 - **Evolución**: en V0-V2 el permiso solo lo miraba el front (TPO-007): por API anulaba cualquiera. V3 lo valida en el backend (M4). V0 tenía además UC12, retirado.
 
 ### UC13 Registrar cobranza
@@ -150,10 +150,10 @@ Fuente: `casos-de-uso-v4.puml` (renderizado con `plantuml -tsvg` y `-tpng`). Sup
 - **Flujo principal**: 1. El usuario carga id del crédito, número de cuota e importe. 2. El sistema valida los datos. 3. Busca la cuota. 4. La cuota registra su cobranza con fecha de hoy. 5. Responde **201**.
 - **Errores**: cuota inexistente → **404**. Importe ≤ 0 → **400** de validación. Crédito anulado → **400** "El crédito x está anulado, no admite cobranzas". Cuota ya pagada → **400** "La cuota n del crédito x ya fue pagada". Importe distinto al de la cuota → **400** "El importe… no coincide con el de la cuota".
 - **Postcondición**: la cuota queda pagada y el saldo baja; si era la última, el crédito pasa a CANCELADO con saldo 0.
-- **Reglas**: las tres reglas viven en `model/Cuota.java` `registrarCobranza` (Information Expert: la cuota sabe si está paga y cuánto vale); el servicio solo busca y guarda (`service/impl/CobranzaServiceImpl.java` `registrar`).
+- **Reglas**: las tres reglas viven en `model/credito/Cuota.java` `registrarCobranza` (Information Expert: la cuota sabe si está paga y cuánto vale); el servicio solo busca y guarda (`service/impl/CobranzaServiceImpl.java` `registrar`).
 - **Endpoint**: `POST /api/cobranzas` → `controller/CobranzaController.java` `registrar`.
 - **Pantalla**: `pages/Cobranzas.jsx` (formulario).
-- **Verificación**: Test `model/CuotaTest.java` `rechazaCobrarDosVeces`, `rechazaCobrarSiElCreditoEstaAnulado`, `rechazaImporteDistintoAlDeLaCuota`, `aceptaElMismoImporteConOtraEscala`, `model/CreditoTest.java` `elSaldoBajaConCadaCuotaPagada`, `pagarTodasLasCuotasLoCancela`; Smoke "Cobrar sobre crédito anulado (M1)", "Cobrar una cuota ya pagada"; API (UC13).
+- **Verificación**: Test `model/credito/CuotaTest.java` `rechazaCobrarDosVeces`, `rechazaCobrarSiElCreditoEstaAnulado`, `rechazaImporteDistintoAlDeLaCuota`, `aceptaElMismoImporteConOtraEscala`, `model/credito/CreditoTest.java` `elSaldoBajaConCadaCuotaPagada`, `pagarTodasLasCuotasLoCancela`; Smoke "Cobrar sobre crédito anulado (M1)", "Cobrar una cuota ya pagada"; API (UC13).
 - **Evolución**: TPO-006 (importe sin validar) cerrado en V1; TPO-004 (cobrar un crédito anulado) cerrado en V3 (M1).
 - **Huecos**: la pantalla no lista las cuotas: el usuario tipea id, número e importe a mano, sacándolos de Créditos. No se registra quién cobró (ver P4).
 
@@ -173,11 +173,11 @@ Fuente: `casos-de-uso-v4.puml` (renderizado con `plantuml -tsvg` y `-tpng`). Sup
 - **Precondición**: la cobranza es del día.
 - **Flujo principal**: 1. En el listado de UC14 el usuario aprieta Anular; el botón solo aparece si la cobranza no está anulada y el usuario tiene el permiso (`pages/Cobranzas.jsx` `Cobranzas`). 2. Confirma. 3. El sistema verifica el permiso. 4. Busca la cobranza. 5. La cobranza se anula. 6. Responde **204**.
 - **Errores**: sin permiso → **403** "El usuario no tiene permiso para anular cobranzas". Inexistente → **404**. De otro día → **400** "Solo se pueden anular cobranzas del día de hoy.". Ya anulada → **400** (H1).
-- **Postcondición**: la cuota vuelve a estar impaga y se puede volver a cobrar (`model/Cuota.java` `estaPagada` ignora las anuladas); si el crédito estaba CANCELADO vuelve a VIGENTE, y si no le quedan cobranzas vigentes se puede anular.
-- **Reglas**: permiso en `service/impl/CobranzaServiceImpl.java` `anularCobranza` (M4); regla del día y doble anulación en `model/Cobranza.java` `anular(LocalDate)`; `anular()` le pasa la fecha de hoy.
+- **Postcondición**: la cuota vuelve a estar impaga y se puede volver a cobrar (`model/credito/Cuota.java` `estaPagada` ignora las anuladas); si el crédito estaba CANCELADO vuelve a VIGENTE, y si no le quedan cobranzas vigentes se puede anular.
+- **Reglas**: permiso en `service/impl/CobranzaServiceImpl.java` `anularCobranza` (M4); regla del día y doble anulación en `model/credito/Cobranza.java` `anular(LocalDate)`; `anular()` le pasa la fecha de hoy.
 - **Endpoint**: `DELETE /api/cobranzas/{id}` → `controller/CobranzaController.java` `anularCobranza`.
 - **Pantalla**: `pages/Cobranzas.jsx` (botón Anular por cobranza).
-- **Verificación**: Test `model/CobranzaTest.java` `seRegistraConFechaDeHoyYSePuedeAnularElMismoDia`, `noSePuedeAnularDosVeces`, `noSePuedeAnularUnaCobranzaDeOtroDia`, `model/CuotaTest.java` `cobranzaAnuladaDejaLaCuotaImpaga`, `model/CreditoTest.java` `permiteAnularSiLaUnicaCobranzaEstaAnulada`; Smoke "M2: anular cobranza (admin) y luego el crédito…", "M2: anular cobranza con `user` sin permiso"; API (UC15 y "recobrar cuota liberada").
+- **Verificación**: Test `model/credito/CobranzaTest.java` `seRegistraConFechaDeHoyYSePuedeAnularElMismoDia`, `noSePuedeAnularDosVeces`, `noSePuedeAnularUnaCobranzaDeOtroDia`, `model/credito/CuotaTest.java` `cobranzaAnuladaDejaLaCuotaImpaga`, `model/credito/CreditoTest.java` `permiteAnularSiLaUnicaCobranzaEstaAnulada`; Smoke "M2: anular cobranza (admin) y luego el crédito…", "M2: anular cobranza con `user` sin permiso"; API (UC15 y "recobrar cuota liberada").
 - **Evolución**: TPO-005 (la cuota quedaba trabada como pagada) cerrado en V1; permiso validado en el backend desde V3 (M4).
 - **Huecos**: anular una cobranza ya anulada respondía **204** (H1); corregido, ahora 400. El rechazo "de otro día" tenía la fecha fija en `LocalDate.now()` y no se podía probar; resuelto con `Cobranza.anular(LocalDate)`, que recibe la fecha y lo testea `noSePuedeAnularUnaCobranzaDeOtroDia`. Por API sigue sin poder provocarse.
 
@@ -209,7 +209,7 @@ Fuente: `casos-de-uso-v4.puml` (renderizado con `plantuml -tsvg` y `-tpng`). Sup
 - **Flujo principal**: 1. En el gestor de permisos el supervisor tilda o destilda "anular crédito" / "anular cobranza" de un usuario. 2. El sistema actualiza los permisos y responde **200** con el usuario. 3. La tabla se actualiza.
 - **Errores**: usuario ADMIN → **400** "No se pueden modificar los permisos de un administrador". Usuario inexistente → **404**.
 - **Postcondición**: el permiso rige desde la request siguiente del usuario afectado, sin que tenga que volver a loguearse (el backend lo relee de la base en cada request).
-- **Reglas**: `service/impl/AdminServiceImpl.java` `actualizarPermisos`; guarda del ADMIN en `model/Usuario.java` `otorgarPermisos` (O5).
+- **Reglas**: `service/impl/AdminServiceImpl.java` `actualizarPermisos`; guarda del ADMIN en `model/usuario/Usuario.java` `otorgarPermisos` (O5).
 - **Endpoint**: `PUT /api/supervisor/usuarios/{id}/permisos-anulacion` → `controller/SupervisorController.java` `actualizarPermisosAnulacion`. Gemelo para ADMIN: `PUT /api/admin/usuarios/{id}/permisos` → `controller/AdminController.java` `actualizarPermisos`, sin pantalla.
 - **Pantalla**: `pages/GestorPermisos.jsx`.
 - **Verificación**: Final "Supervisor modifica permisos del ADMIN (BS1)"; API (UC19, incluido "op1 anula con el MISMO token").
@@ -222,7 +222,7 @@ Fuente: `casos-de-uso-v4.puml` (renderizado con `plantuml -tsvg` y `-tpng`). Sup
 - **Flujo principal**: 1. En el panel de administración el admin elige USER o SUPERVISOR para un usuario. 2. El sistema cambia el rol y responde **200**. 3. La tabla se actualiza.
 - **Errores**: el usuario es ADMIN → **400** "No se puede cambiar el rol de un administrador". Se pide el rol ADMIN → **400** "No se puede otorgar el rol de administrador" (la pantalla tampoco lo ofrece). Rol inexistente → **400** "Solicitud inválida". Usuario inexistente → **404**.
 - **Postcondición**: el nuevo rol rige desde la request siguiente; los permisos de anulación no cambian (un USER promovido a SUPERVISOR conserva los suyos).
-- **Reglas**: `service/impl/AdminServiceImpl.java` `actualizarRol`; guardas en `model/Usuario.java` `asignarRol` (O5).
+- **Reglas**: `service/impl/AdminServiceImpl.java` `actualizarRol`; guardas en `model/usuario/Usuario.java` `asignarRol` (O5).
 - **Endpoint**: `PUT /api/admin/usuarios/{id}/rol` → `controller/AdminController.java` `actualizarRol`.
 - **Pantalla**: `pages/PanelAdmin.jsx`.
 - **Verificación**: API (UC20). Sin test unitario.
@@ -235,10 +235,10 @@ Fuente: `casos-de-uso-v4.puml` (renderizado con `plantuml -tsvg` y `-tpng`). Sup
 - **Flujo principal**: 1. El usuario busca un cliente por DNI (UC06). 2. El sistema arma la cartera del cliente con sus créditos y le pide saldo y monto vencido. 3. Responde **200** con DNI, saldo pendiente y monto vencido. 4. La pantalla muestra "Saldo pendiente" y "Vencido"; si hay vencido, lo resalta como aviso.
 - **Errores**: DNI inexistente → **404** "No se encontró cliente con DNI x". Sin sesión → **401**.
 - **Postcondición**: ninguna (consulta).
-- **Reglas**: `service/impl/ClienteServiceImpl.java` `deuda`: `model/Cartera.java` `de`, `saldo`, `montoVencido` (Composite, M11): la cartera suma lo que cada crédito suma de sus cuotas; la cuota de un crédito anulado no se debe (`model/Cuota.java` `saldo`) y la vencida es la impaga con vencimiento pasado (`model/Cuota.java` `montoVencido`). Es la misma consulta que usa la regla de mora de UC07 (M14).
+- **Reglas**: `service/impl/ClienteServiceImpl.java` `deuda`: `model/credito/Cartera.java` `de`, `saldo`, `montoVencido` (Composite, M11): la cartera suma lo que cada crédito suma de sus cuotas; la cuota de un crédito anulado no se debe (`model/credito/Cuota.java` `saldo`) y la vencida es la impaga con vencimiento pasado (`model/credito/Cuota.java` `montoVencido`). Es la misma consulta que usa la regla de mora de UC07 (M14).
 - **Endpoint**: `GET /api/clientes/{dni}/deuda` → `controller/ClienteController.java` `deuda`.
 - **Pantalla**: `pages/Clientes.jsx` (bloque "Buscar cliente por DNI"). Usa `api/clientes.js` `getDeudaCliente`.
-- **Verificación**: Test `service/DeudaClienteTest` (con vencida, al día, cliente inexistente), `model/CarteraTest`; API (UC21).
+- **Verificación**: Test `service/DeudaClienteTest` (con vencida, al día, cliente inexistente), `model/credito/CarteraTest`; API (UC21).
 
 ### UC22 Gestionar usuarios (alta y baja)
 
@@ -248,7 +248,7 @@ Fuente: `casos-de-uso-v4.puml` (renderizado con `plantuml -tsvg` y `-tpng`). Sup
 - **Flujo principal (baja)**: 1. En la tabla el admin aprieta Desactivar (o Reactivar). 2. El sistema cambia el estado y responde **200**. 3. La columna Estado se actualiza.
 - **Errores**: rol ADMIN → **400** "No se puede dar de alta un administrador". Usuario repetido → **400** "El usuario 'x' ya existe". Contraseña corta o rol vacío → **400** de validación. Desactivar un ADMIN → **400** "No se puede desactivar un administrador". Usuario inexistente → **404**.
 - **Postcondición**: el usuario desactivado no puede iniciar sesión (UC02 → **401**) y su token anterior deja de servir desde la request siguiente. Sus créditos y cobranzas quedan (baja lógica).
-- **Reglas**: alta en `service/impl/AuthServiceImpl.java` `registrarConRol` (Facade, M13), llamado desde `service/impl/AdminServiceImpl.java` `crearUsuario`; baja en `model/Usuario.java` `desactivar`, `reactivar` (M22); `security/UsuarioDetails.java` `isEnabled` y `security/JwtAuthFilter.java` `autenticar`.
+- **Reglas**: alta en `service/impl/AuthServiceImpl.java` `registrarConRol` (Facade, M13), llamado desde `service/impl/AdminServiceImpl.java` `crearUsuario`; baja en `model/usuario/Usuario.java` `desactivar`, `reactivar` (M22); `security/UsuarioDetails.java` `isEnabled` y `security/JwtAuthFilter.java` `autenticar`.
 - **Endpoint**: `POST /api/admin/usuarios` → `controller/AdminController.java` `crearUsuario`; `PUT /api/admin/usuarios/{id}/activo` → `controller/AdminController.java` `actualizarActivo`.
 - **Pantalla**: `pages/PanelAdmin.jsx` (bloque "Nuevo usuario" y columna Estado).
 - **Verificación**: Test `controller/GestionUsuariosTest` (alta 201, rol ADMIN 400, login de desactivado 401, token previo 401, reactivar, desactivar ADMIN 400).
@@ -294,7 +294,7 @@ Los tests de dominio están en `model/` y `model/plan/` del árbol de tests; los
 - **CU sin pantalla**: ninguno desde T33 (UC06 y UC09 tienen bloque propio en Clientes y Créditos).
 - **Endpoint sin CU**: `GET /api/creditos` (`controller/CreditoController.java` `listarTodos`). Devuelve la cartera completa, con cuotas y cobranzas ya cargadas, y ninguna pantalla ni CU lo usa. Es la base de P1.
 - **Endpoint sin pantalla**: `PUT /api/admin/usuarios/{id}/permisos` (`controller/AdminController.java` `actualizarPermisos`). Duplica a UC19 para el ADMIN; en V2 el reparto de permisos pasó al supervisor y este quedó huérfano. Para la defensa: o se asume que el ADMIN también puede repartir permisos y se le da pantalla, o se borra.
-- **CU sin test**: UC01, UC05, UC14, UC18, UC19 y UC20. `CodigosHttpTest` cubre los códigos de error de UC02, UC04, UC06, UC09 y UC16, pero con los servicios mockeados: las reglas que viven en servicios y repositorios (cálculos del dashboard, unicidad de usuario y DNI, permisos de anulación) se verifican solo por API. Las guardas de `model/Usuario.java` (`otorgarPermisos`, `asignarRol`) son dominio y tampoco tienen test.
+- **CU sin test**: UC01, UC05, UC14, UC18, UC19 y UC20. `CodigosHttpTest` cubre los códigos de error de UC02, UC04, UC06, UC09 y UC16, pero con los servicios mockeados: las reglas que viven en servicios y repositorios (cálculos del dashboard, unicidad de usuario y DNI, permisos de anulación) se verifican solo por API. Las guardas de `model/usuario/Usuario.java` (`otorgarPermisos`, `asignarRol`) son dominio y tampoco tienen test.
 - **Regla sin evidencia ejecutable**: ninguna. El rechazo de anular una cobranza de otro día (UC15) no se puede provocar por API, pero desde `Cobranza.anular(LocalDate)` tiene test.
 - **Pantalla sin CU**: ninguna. Las ocho páginas de `pages/` se mapean a algún CU.
 
@@ -345,7 +345,7 @@ Además: `mvn test`, resultado en el reporte V4, sección Verificación.
 
 ### Hallazgos
 
-- **H1 (UC15)**: anular dos veces la misma cobranza responde 204. `model/Cobranza.java` `anular` no mira si ya está anulada, mientras que `model/Credito.java` `anular` sí rechaza la doble anulación. No rompe datos, pero las dos anulaciones del sistema se comportan distinto. **Resuelto en** `model/Cobranza.java` `anular(LocalDate)`: rechaza la segunda con `BusinessException` (400), test `model/CobranzaTest.java` `noSePuedeAnularDosVeces`.
+- **H1 (UC15)**: anular dos veces la misma cobranza responde 204. `model/credito/Cobranza.java` `anular` no mira si ya está anulada, mientras que `model/credito/Credito.java` `anular` sí rechaza la doble anulación. No rompe datos, pero las dos anulaciones del sistema se comportan distinto. **Resuelto en** `model/credito/Cobranza.java` `anular(LocalDate)`: rechaza la segunda con `BusinessException` (400), test `model/credito/CobranzaTest.java` `noSePuedeAnularDosVeces`.
 - **H2 (UC14)**: `GET /api/cobranzas/credito/999` responde 200 con lista vacía; `service/impl/CobranzaServiceImpl.java` `listarPorCredito` no verifica que el crédito exista. UC10, en el mismo caso, responde 404.
 - **H3 (UC16)**: "Créditos activos" y "Monto total financiado" miden cosas distintas (cartera vigente vs. todo lo prestado y no anulado). Ver la observación de UC16.
 - **H4 (UC19, UC20)**: backend y front no ven los permisos y el rol al mismo tiempo. El backend usa el valor nuevo desde la request siguiente (`security/JwtAuthFilter.java` `autenticar`); el front sigue mostrando el que tenía al loguear. Del lado de la seguridad está bien (manda el backend); el costo es de usabilidad: el botón o el link aparece recién al volver a iniciar sesión. **Resuelto en** `GET /api/auth/me` (`controller/AuthController.java` `actual`): `components/PrivateRoute.jsx` lo llama al navegar y actualiza el usuario del front (`store/slices/authSlice.js` `refrescarUsuario`).
@@ -358,7 +358,7 @@ Solo propuesta: el código de V3 está congelado. Cada uno tapa un hueco que mue
 | # | CU propuesto | Actor | Hueco que tapa | Qué ya existe | Tamaño |
 |---|---|---|---|---|---|
 | P1 | Consultar la cartera de créditos (todos los créditos con estado y saldo, filtrables por estado) | Supervisor, Administrador | Hoy solo se ven créditos de a un cliente por vez. Un supervisor no puede ver qué está vigente, cancelado o anulado en toda la cartera, y `GET /api/creditos` existe sin CU | Endpoint completo: `controller/CreditoController.java` `listarTodos` y `service/impl/CreditoServiceImpl.java` `listarTodos`, que ya trae cuotas y cobranzas sin N+1. Falta la pantalla | S: solo front |
-| P2 | Consultar la mora (por cliente: hecho en V4 como UC21) (cuotas vencidas impagas, por cliente y en total) | Usuario; total en el dashboard para Supervisor y Administrador | Un dashboard de préstamos que no muestra la mora no sirve para decidir a quién cobrar. La mora ya se calcula por cuota y no se junta en ningún lado. De paso alinea las tarjetas del dashboard (H3) | `model/Cuota.java` `estaVencida` y el campo `vencida` de `dto/response/CuotaResponse.java` (M6). El total del dashboard ya está hecho (O7, tarjeta "monto vencido" de UC16) | S: falta el filtro por cliente sobre UC10 |
+| P2 | Consultar la mora (por cliente: hecho en V4 como UC21) (cuotas vencidas impagas, por cliente y en total) | Usuario; total en el dashboard para Supervisor y Administrador | Un dashboard de préstamos que no muestra la mora no sirve para decidir a quién cobrar. La mora ya se calcula por cuota y no se junta en ningún lado. De paso alinea las tarjetas del dashboard (H3) | `model/credito/Cuota.java` `estaVencida` y el campo `vencida` de `dto/response/CuotaResponse.java` (M6). El total del dashboard ya está hecho (O7, tarjeta "monto vencido" de UC16) | S: falta el filtro por cliente sobre UC10 |
 | P3 | Modificar el nombre de un cliente | Usuario | Un error de tipeo en el alta queda para siempre (A-09 de V0, sigue abierto). El DNI es la clave y no se toca | Nada: falta endpoint, regla y formulario | S |
 | P4 | Registrar quién cobró y quién anuló | Usuario (automático en UC11, UC13 y UC15) | Las anulaciones dependen de un permiso que se da y se quita, pero no queda registro de quién las usó; tampoco de quién cobró (ya señalado en V2). Sin eso el permiso no se puede auditar | El usuario autenticado ya llega a los servicios de anulación (`@AuthenticationPrincipal` en `controller/CreditoController.java` `anularCredito` y `controller/CobranzaController.java` `anularCobranza`). Falta guardarlo en `Cobranza` y `Credito` y mostrarlo | M: modelo, DTO y pantallas |
 

@@ -39,19 +39,19 @@ Panorama MVC: la vista (React) llama a los controladores REST, que delegan en lo
 
 ## Iteración 4: Composite, Decorator y Facade
 
-**Composite (M11).** [`Deuda`](backend/src/main/java/com/uade/tpejemplo/model/interfaces/Deuda.java) es la interfaz común: la [`Cuota`](backend/src/main/java/com/uade/tpejemplo/model/Cuota.java) contesta su saldo y su monto vencido, y el [`Credito`](backend/src/main/java/com/uade/tpejemplo/model/Credito.java) y la [`Cartera`](backend/src/main/java/com/uade/tpejemplo/model/Cartera.java) delegan en sus hijos y suman; los servicios la tipan como `Deuda`. La usan el dashboard, la regla de mora (no se otorga crédito a un cliente con cuotas vencidas, M14) y la deuda del cliente (`GET /api/clientes/{dni}/deuda`, M15).
+**Composite (M11).** [`Deuda`](backend/src/main/java/com/uade/tpejemplo/model/credito/Deuda.java) es la interfaz común: la [`Cuota`](backend/src/main/java/com/uade/tpejemplo/model/credito/Cuota.java) contesta su saldo y su monto vencido, y el [`Credito`](backend/src/main/java/com/uade/tpejemplo/model/credito/Credito.java) y la [`Cartera`](backend/src/main/java/com/uade/tpejemplo/model/credito/Cartera.java) delegan en sus hijos y suman; los servicios la tipan como `Deuda`. La usan el dashboard, la regla de mora (no se otorga crédito a un cliente con cuotas vencidas, M14) y la deuda del cliente (`GET /api/clientes/{dni}/deuda`, M15).
 
-**Decorator (M12).** Cargos opcionales sobre la cuota: [`CargoSobreCuota`](backend/src/main/java/com/uade/tpejemplo/model/plan/CargoSobreCuota.java) envuelve el `CalculoDeCuota` de la Strategy y le suma [`SeguroDeVida`](backend/src/main/java/com/uade/tpejemplo/model/plan/SeguroDeVida.java) (0,1 % del capital por cuota) o [`GastoDeAdministracion`](backend/src/main/java/com/uade/tpejemplo/model/plan/GastoDeAdministracion.java) ($500 por cuota); [`CondicionesDeCredito`](backend/src/main/java/com/uade/tpejemplo/model/CondicionesDeCredito.java) arma la pila con [`TipoCargo`](backend/src/main/java/com/uade/tpejemplo/model/TipoCargo.java). Es una expansión del dominio; en la pantalla de Créditos son dos casillas (M16).
+**Decorator (M12).** Cargos opcionales sobre la cuota: [`CargoSobreCuota`](backend/src/main/java/com/uade/tpejemplo/model/plan/CargoSobreCuota.java) envuelve el `CalculoDeCuota` de la Strategy y le suma [`SeguroDeVida`](backend/src/main/java/com/uade/tpejemplo/model/plan/SeguroDeVida.java) (0,1 % del capital por cuota) o [`GastoDeAdministracion`](backend/src/main/java/com/uade/tpejemplo/model/plan/GastoDeAdministracion.java) ($500 por cuota); [`CondicionesDeCredito`](backend/src/main/java/com/uade/tpejemplo/model/credito/CondicionesDeCredito.java) arma la pila con [`TipoCargo`](backend/src/main/java/com/uade/tpejemplo/model/plan/TipoCargo.java). Es una expansión del dominio; en la pantalla de Créditos son dos casillas (M16).
 
 **Facade (M13).** [`AuthService`](backend/src/main/java/com/uade/tpejemplo/service/AuthService.java) ofrece `registrar`, `login` y `actual` sobre Spring Security (`AuthenticationManager`, `PasswordEncoder`) y JWT (`TokenService`, el Adapter de V3). Ningún controlador usa ese subsistema. Es un patrón identificado en el código existente (estaba desde V1 sin nombre), no aplicado de cero.
 
-**Credito: Extract Class + ISP (M17).** Lo pactado al otorgar (capital, tasa, cuotas, plan y cargos) pasa a [`CondicionesDeCredito`](backend/src/main/java/com/uade/tpejemplo/model/CondicionesDeCredito.java), que calcula la cuota (Context del Strategy); `Credito.nuevo` baja de 7 a 3 parámetros e `ICredito` deja de exponer `estaCancelado` y `tieneCobranzas`. Tabla y JSON sin cambios.
+**Credito: Extract Class + ISP (M17).** Lo pactado al otorgar (capital, tasa, cuotas, plan y cargos) pasa a [`CondicionesDeCredito`](backend/src/main/java/com/uade/tpejemplo/model/credito/CondicionesDeCredito.java), que calcula la cuota (Context del Strategy); `Credito.nuevo` baja de 7 a 3 parámetros e `ICredito` deja de exponer `estaCancelado` y `tieneCobranzas`. Tabla y JSON sin cambios.
 
 ![Secuencia del Composite](docs/diagramas/archify/composite-deuda.svg)
 
 ## Iteración 3: Strategy y Adapter
 
-**Strategy (M9).** El cálculo de la cuota es intercambiable: [`CalculoDeCuota`](backend/src/main/java/com/uade/tpejemplo/model/interfaces/CalculoDeCuota.java) es la estrategia, [`InteresSimple`](backend/src/main/java/com/uade/tpejemplo/model/plan/InteresSimple.java) y [`SistemaFrances`](backend/src/main/java/com/uade/tpejemplo/model/plan/SistemaFrances.java) las concretas, [`TipoPlan`](backend/src/main/java/com/uade/tpejemplo/model/TipoPlan.java) elige cuál y [`Credito`](backend/src/main/java/com/uade/tpejemplo/model/Credito.java) es el contexto. Agregar un plan nuevo no toca `Credito` (OCP).
+**Strategy (M9).** El cálculo de la cuota es intercambiable: [`CalculoDeCuota`](backend/src/main/java/com/uade/tpejemplo/model/plan/CalculoDeCuota.java) es la estrategia, [`InteresSimple`](backend/src/main/java/com/uade/tpejemplo/model/plan/InteresSimple.java) y [`SistemaFrances`](backend/src/main/java/com/uade/tpejemplo/model/plan/SistemaFrances.java) las concretas, [`TipoPlan`](backend/src/main/java/com/uade/tpejemplo/model/plan/TipoPlan.java) elige cuál y [`Credito`](backend/src/main/java/com/uade/tpejemplo/model/credito/Credito.java) es el contexto. Agregar un plan nuevo no toca `Credito` (OCP).
 
 ![Strategy](docs/diagramas/d2/strategy.svg)
 
@@ -65,34 +65,34 @@ Detalle completo, con clase y método de cada una: [lista de mejoras](docs/entre
 
 | ID | Qué | Patrón o concepto | Código |
 |---|---|---|---|
-| M11 | Saldo y mora por cuota, crédito y cartera | Composite | [`Cartera`](backend/src/main/java/com/uade/tpejemplo/model/Cartera.java) |
+| M11 | Saldo y mora por cuota, crédito y cartera | Composite | [`Cartera`](backend/src/main/java/com/uade/tpejemplo/model/credito/Cartera.java) |
 | M12 | Seguro de vida y gastos sobre la cuota | Decorator | [`CargoSobreCuota`](backend/src/main/java/com/uade/tpejemplo/model/plan/CargoSobreCuota.java) |
 | M13 | Autenticación detrás de una interfaz simple | Facade (identificado) | [`AuthService`](backend/src/main/java/com/uade/tpejemplo/service/AuthService.java) |
 | M14, M15 | Regla de mora; deuda del cliente | Composite | [`CreditoServiceImpl`](backend/src/main/java/com/uade/tpejemplo/service/impl/CreditoServiceImpl.java), [`ClienteServiceImpl`](backend/src/main/java/com/uade/tpejemplo/service/impl/ClienteServiceImpl.java) |
-| M17 | Condiciones del crédito en su propia clase | Extract Class + ISP | [`CondicionesDeCredito`](backend/src/main/java/com/uade/tpejemplo/model/CondicionesDeCredito.java) |
-| M9 | Cuota con interés simple o sistema francés | Strategy | [`CalculoDeCuota`](backend/src/main/java/com/uade/tpejemplo/model/interfaces/CalculoDeCuota.java) |
+| M17 | Condiciones del crédito en su propia clase | Extract Class + ISP | [`CondicionesDeCredito`](backend/src/main/java/com/uade/tpejemplo/model/credito/CondicionesDeCredito.java) |
+| M9 | Cuota con interés simple o sistema francés | Strategy | [`CalculoDeCuota`](backend/src/main/java/com/uade/tpejemplo/model/plan/CalculoDeCuota.java) |
 | M7 | JWT detrás de un Target propio | Adapter | [`JwtUtil`](backend/src/main/java/com/uade/tpejemplo/security/JwtUtil.java) |
-| M1 | No se cobra una cuota de un crédito anulado (TPO-004) | Information Expert | [`Cuota`](backend/src/main/java/com/uade/tpejemplo/model/Cuota.java) |
+| M1 | No se cobra una cuota de un crédito anulado (TPO-004) | Information Expert | [`Cuota`](backend/src/main/java/com/uade/tpejemplo/model/credito/Cuota.java) |
 | M3 | Dashboard sin lo anulado, activos = VIGENTE (TPO-003) | Corrección + Expert | [`DashboardServiceImpl`](backend/src/main/java/com/uade/tpejemplo/service/impl/DashboardServiceImpl.java) |
 | M4 | Permisos de anulación validados en el backend (TPO-007) | MVC + Expert | [`CreditoServiceImpl`](backend/src/main/java/com/uade/tpejemplo/service/impl/CreditoServiceImpl.java) |
 | M5 | Respuestas 401/403/404/405 (TPO-001, TPO-002) | MVC | [`GlobalExceptionHandler`](backend/src/main/java/com/uade/tpejemplo/exception/GlobalExceptionHandler.java) |
-| M8 | Estado, saldo y anulación en el agregado `Credito` | Information Expert | [`EstadoCredito`](backend/src/main/java/com/uade/tpejemplo/model/EstadoCredito.java) |
+| M8 | Estado, saldo y anulación en el agregado `Credito` | Information Expert | [`EstadoCredito`](backend/src/main/java/com/uade/tpejemplo/model/credito/EstadoCredito.java) |
 
 <details>
 <summary>El resto</summary>
 
 | ID | Qué | Patrón o concepto | Código |
 |---|---|---|---|
-| M2 | "Tiene cobranzas" ignora las anuladas | Information Expert | [`Credito`](backend/src/main/java/com/uade/tpejemplo/model/Credito.java) |
-| M6 | Cuota vencida (mora) | Information Expert | [`Cuota`](backend/src/main/java/com/uade/tpejemplo/model/Cuota.java) |
+| M2 | "Tiene cobranzas" ignora las anuladas | Information Expert | [`Credito`](backend/src/main/java/com/uade/tpejemplo/model/credito/Credito.java) |
+| M6 | Cuota vencida (mora) | Information Expert | [`Cuota`](backend/src/main/java/com/uade/tpejemplo/model/credito/Cuota.java) |
 | M10 | Dashboard también para ADMIN (TPO-010) | Control de acceso | [`SecurityConfig`](backend/src/main/java/com/uade/tpejemplo/config/SecurityConfig.java) |
 | API | Swagger, 401 sin token, `@Valid`, `GET /api/creditos` | MVC | [`OpenApiConfig`](backend/src/main/java/com/uade/tpejemplo/config/OpenApiConfig.java) |
 | O1 | La vista usa `puedeAnularse` del modelo | MVC + Expert | [`Creditos.jsx`](frontend/src/pages/Creditos.jsx) |
-| O3 | El total sale de las cuotas emitidas | Strategy, Expert | [`Credito`](backend/src/main/java/com/uade/tpejemplo/model/Credito.java) |
-| O5 | La guarda del ADMIN vive en el modelo | MVC + Expert | [`Usuario`](backend/src/main/java/com/uade/tpejemplo/model/Usuario.java) |
-| O6 | El crédito nace con su plan de cuotas | Creator | [`Credito`](backend/src/main/java/com/uade/tpejemplo/model/Credito.java) |
+| O3 | El total sale de las cuotas emitidas | Strategy, Expert | [`Credito`](backend/src/main/java/com/uade/tpejemplo/model/credito/Credito.java) |
+| O5 | La guarda del ADMIN vive en el modelo | MVC + Expert | [`Usuario`](backend/src/main/java/com/uade/tpejemplo/model/usuario/Usuario.java) |
+| O6 | El crédito nace con su plan de cuotas | Creator | [`Credito`](backend/src/main/java/com/uade/tpejemplo/model/credito/Credito.java) |
 | O7 | Saldo pendiente y monto vencido en el dashboard | Expert | [`DashboardStatsResponse`](backend/src/main/java/com/uade/tpejemplo/dto/response/DashboardStatsResponse.java) |
-| H1 | Anular una cobranza ya anulada da 400 | Information Expert | [`Cobranza`](backend/src/main/java/com/uade/tpejemplo/model/Cobranza.java) |
+| H1 | Anular una cobranza ya anulada da 400 | Information Expert | [`Cobranza`](backend/src/main/java/com/uade/tpejemplo/model/credito/Cobranza.java) |
 | F1, F2 | 403 sin el rol; 400 ante body mal formado | MVC | [`SecurityConfig`](backend/src/main/java/com/uade/tpejemplo/config/SecurityConfig.java), [`GlobalExceptionHandler`](backend/src/main/java/com/uade/tpejemplo/exception/GlobalExceptionHandler.java) |
 | R3 | `GET /api/auth/me` y refresco de permisos | MVC + Expert | [`AuthController`](backend/src/main/java/com/uade/tpejemplo/controller/AuthController.java) |
 | S1-S5 | Transacciones, open-in-view, secreto JWT por env, 500 sin filtrar, auth provider de Spring | Prácticas de Spring | [`application.properties`](backend/src/main/resources/application.properties) |
@@ -106,7 +106,7 @@ Detalle completo, con clase y método de cada una: [lista de mejoras](docs/entre
 
 ![Diagrama de clases del modelo](docs/diagramas/clases-v4-modelo.svg)
 
-- Diagrama de clases entregable: [`clases-v4.puml`](docs/diagramas/clases-v4.puml) ([capas MVC](docs/diagramas/clases-v4-mvc.svg), [seguridad, Facade y Adapter](docs/diagramas/clases-v4-seguridad.svg), [modelo](docs/diagramas/clases-v4-modelo.svg)).
+- Diagrama de clases entregable: [`clases-v4.puml`](docs/diagramas/clases-v4.puml) ([capas MVC](docs/diagramas/clases-v4-mvc.svg), [seguridad, Facade y Adapter](docs/diagramas/clases-v4-seguridad.svg), [modelo](docs/diagramas/clases-v4-modelo.svg), [paquetes del modelo](docs/diagramas/clases-v4-paquetes.svg)).
 - Ciclo de vida del crédito: [`credito-estados.svg`](docs/diagramas/archify/credito-estados.svg); secuencias: [anular](docs/diagramas/archify/anular-credito.svg), [Composite](docs/diagramas/archify/composite-deuda.svg), [Decorator](docs/diagramas/archify/decorator-cargos.svg), [Facade](docs/diagramas/archify/facade-login.svg).
 - DER: [`der-v4.py`](docs/diagramas/der-v4.py) · [SVG](docs/diagramas/der-v4.svg) · [PNG](docs/diagramas/der-v4.png).
 
@@ -146,7 +146,7 @@ Password = usuario. Los crea [`DataInitializer`](backend/src/main/java/com/uade/
 
 | Test | Qué cubre |
 |---|---|
-| [`CreditoTest`](backend/src/test/java/com/uade/tpejemplo/model/CreditoTest.java), [`CuotaTest`](backend/src/test/java/com/uade/tpejemplo/model/CuotaTest.java), [`CobranzaTest`](backend/src/test/java/com/uade/tpejemplo/model/CobranzaTest.java), [`CarteraTest`](backend/src/test/java/com/uade/tpejemplo/model/CarteraTest.java) | Reglas del dominio y Composite |
+| [`CreditoTest`](backend/src/test/java/com/uade/tpejemplo/model/credito/CreditoTest.java), [`CuotaTest`](backend/src/test/java/com/uade/tpejemplo/model/credito/CuotaTest.java), [`CobranzaTest`](backend/src/test/java/com/uade/tpejemplo/model/credito/CobranzaTest.java), [`CarteraTest`](backend/src/test/java/com/uade/tpejemplo/model/credito/CarteraTest.java) | Reglas del dominio y Composite |
 | [`InteresSimpleTest`](backend/src/test/java/com/uade/tpejemplo/model/plan/InteresSimpleTest.java), [`SistemaFrancesTest`](backend/src/test/java/com/uade/tpejemplo/model/plan/SistemaFrancesTest.java) | Estrategias de cuota |
 | [`SeguroDeVidaTest`](backend/src/test/java/com/uade/tpejemplo/model/plan/SeguroDeVidaTest.java), [`GastoDeAdministracionTest`](backend/src/test/java/com/uade/tpejemplo/model/plan/GastoDeAdministracionTest.java), [`CargosApiladosTest`](backend/src/test/java/com/uade/tpejemplo/model/plan/CargosApiladosTest.java) | Decoradores de cargos |
 | [`CodigosHttpTest`](backend/src/test/java/com/uade/tpejemplo/controller/CodigosHttpTest.java) | 400/401/403/404/405/406/415 con JWT real |

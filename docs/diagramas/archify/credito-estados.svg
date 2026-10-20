@@ -111,8 +111,8 @@ svg .s-security{color: var(--security-stroke);}
           <text data-detail="context" x="710" y="163" class="t-muted" font-size="7" text-anchor="middle">todas las cuotas pagadas</text>
         </g>
 
-        <g id="node-anulado" data-node-id="anulado" data-node-label="ANULADO" tabindex="0" role="button" aria-label="Focus ANULADO, model/Credito.java, Anulación (único campo guardado: anulado)" aria-pressed="false" data-node-kind="failure" data-node-sublabel="model/Credito.java" data-node-context="Anulación (único campo guardado: anulado)">
-          <title>ANULADO · model/Credito.java · Anulación (único campo guardado: anulado)</title>
+        <g id="node-anulado" data-node-id="anulado" data-node-label="ANULADO" tabindex="0" role="button" aria-label="Focus ANULADO, model/credito/Credito.java, Anulación (único campo guardado: anulado)" aria-pressed="false" data-node-kind="failure" data-node-sublabel="model/credito/Credito.java" data-node-context="Anulación (único campo guardado: anulado)">
+          <title>ANULADO · model/credito/Credito.java · Anulación (único campo guardado: anulado)</title>
           <rect x="343" y="450" width="118" height="58" rx="7" class="c-mask"/>
           <rect x="343" y="450" width="118" height="58" rx="7" class="c-security" stroke-width="1.5"/>
           <g aria-hidden="true" data-semantic-sigil="failure" class="semantic-sigil s-security" transform="translate(444 456) scale(0.6875)">
@@ -120,7 +120,7 @@ svg .s-security{color: var(--security-stroke);}
             <path d="m5.7 5.7 4.6 4.6m0-4.6-4.6 4.6"/>
           </g>
           <text data-node-label="" data-detail-anchor="" x="402" y="471" class="t-primary" font-size="10" font-weight="600" text-anchor="middle">ANULADO</text>
-          <text data-detail="context" x="402" y="487" class="t-muted" font-size="7" text-anchor="middle">model/Credito.java</text>
+          <text data-detail="context" x="402" y="487" class="t-muted" font-size="7" text-anchor="middle">model/credito/Credito.java</text>
         </g>
 
         <!-- Transition labels -->

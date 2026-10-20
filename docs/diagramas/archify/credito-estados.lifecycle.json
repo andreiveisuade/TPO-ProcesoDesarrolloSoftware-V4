@@ -68,7 +68,7 @@
       "id": "anulado",
       "type": "failure",
       "label": "ANULADO",
-      "sublabel": "model/Credito.java",
+      "sublabel": "model/credito/Credito.java",
       "lane": "terminal",
       "col": 0
     }

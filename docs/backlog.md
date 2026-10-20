@@ -8,10 +8,10 @@ Junta lo que quedó abierto en las iteraciones 3 y 4 (dominio, prácticas de Spr
 
 | ID | Qué | Ruta | Tam. | Prioridad | Motivo |
 |---|---|---|---|---|---|
-| H8 | Trazabilidad de usuario en `Cobranza`: quién registró y quién anuló | `…/model/Cobranza.java`, `…/controller/CobranzaController.java`, `…/dto/response/CobranzaResponse.java` | M* | 03/11 | Modelo nuevo que toca la API. Sigue pendiente después de V4; no es un Decorator de auditoría (la exploración de V4 lo descartó) |
-| O3b | Ajustar la última cuota para que el total cierre exacto (hoy 10.000 al 3 % mensual en 6 cuotas: total 11.800,02) | `…/model/plan/InteresSimple.java`, `…/model/plan/SistemaFrances.java`, `…/model/Credito.java` | M | 03/11 | Alternativa que O3 dejó para después; hoy el centavo se explica como redondeo por cuota |
-| O8 | Pagos parciales (A-01) | `…/model/Cuota.java`, `…/model/Cobranza.java`, `…/model/Credito.java` | L | — | Cambia `Cuota.estaPagada()`, `Cobranza`, `Credito.saldo()`, el dashboard y la vista. Exigir el importe exacto (TPO-006) se defiende para este alcance; queda fuera de V3 |
-| P-M9 | Tasa con unidad declarada por plan; cuota con capital/interés separados | `…/model/TipoPlan.java`, `…/model/Cuota.java` | M* | — | Límites del Strategy actual (ver reporte V3, M9). Sin el desglose de interés tampoco se puede agregar IVA sobre intereses como decorador (M12) |
+| H8 | Trazabilidad de usuario en `Cobranza`: quién registró y quién anuló | `…/model/credito/Cobranza.java`, `…/controller/CobranzaController.java`, `…/dto/response/CobranzaResponse.java` | M* | 03/11 | Modelo nuevo que toca la API. Sigue pendiente después de V4; no es un Decorator de auditoría (la exploración de V4 lo descartó) |
+| O3b | Ajustar la última cuota para que el total cierre exacto (hoy 10.000 al 3 % mensual en 6 cuotas: total 11.800,02) | `…/model/plan/InteresSimple.java`, `…/model/plan/SistemaFrances.java`, `…/model/credito/Credito.java` | M | 03/11 | Alternativa que O3 dejó para después; hoy el centavo se explica como redondeo por cuota |
+| O8 | Pagos parciales (A-01) | `…/model/credito/Cuota.java`, `…/model/credito/Cobranza.java`, `…/model/credito/Credito.java` | L | — | Cambia `Cuota.estaPagada()`, `Cobranza`, `Credito.saldo()`, el dashboard y la vista. Exigir el importe exacto (TPO-006) se defiende para este alcance; queda fuera de V3 |
+| P-M9 | Tasa con unidad declarada por plan; cuota con capital/interés separados | `…/model/plan/TipoPlan.java`, `…/model/credito/Cuota.java` | M* | — | Límites del Strategy actual (ver reporte V3, M9). Sin el desglose de interés tampoco se puede agregar IVA sobre intereses como decorador (M12) |
 | M12b | Seguro de vida sobre el saldo deudor | `…/model/plan/SeguroDeVida.java` | M* | — | Simplificación de M12: hoy es 0,1 % del capital por cuota |
 
 ## Spring
@@ -44,8 +44,8 @@ Junta lo que quedó abierto en las iteraciones 3 y 4 (dominio, prácticas de Spr
 | O9 | `EstadoCredito` como patrón State | El estado es derivado, no se guarda y hay una sola transición con regla (`Credito.anular()`). Sobreingeniería; el apunte advierte contra confundir Strategy con State. Respuesta para la defensa |
 | O10 | Strategy para punitorios, Adapter sobre `PasswordEncoder`, Adapter sobre `fetch` | Ninguno tapa un hueco: no hay punitorios, `PasswordEncoder` ya es la abstracción de Spring y `api/apiClient.js` ya hace de pasarela |
 | S6 | Una sola fuente de autorización por rol (sacar `@PreAuthorize` o las reglas de URL) | Decisión: se mantienen las dos. Las reglas de URL de `…/config/SecurityConfig.java` cubren las tres zonas y `@PreAuthorize` en `AdminController` y `SupervisorController` repite el control en el método: defensa en profundidad, si alguien cambia una ruta el método sigue protegido |
-| D3 | Borrar `estaCancelado()`, `tieneCobranzas()` y `puedeAnularse()` de `…/model/interfaces/ICredito.java` | Revertido en parte en V4 (M17): `estaCancelado` y `tieneCobranzas` pasan a privados (ISP, sin uso externo); `puedeAnularse` queda porque lo usa `CreditoResponse` |
-| D4 | Borrar `…/model/interfaces/IRol.java` | Las interfaces de modelo se restituyeron en V2 a propósito; sacar una sola rompe la simetría del diagrama |
+| D3 | Borrar `estaCancelado()`, `tieneCobranzas()` y `puedeAnularse()` de `…/model/credito/ICredito.java` | Revertido en parte en V4 (M17): `estaCancelado` y `tieneCobranzas` pasan a privados (ISP, sin uso externo); `puedeAnularse` queda porque lo usa `CreditoResponse` |
+| D4 | Borrar `…/model/usuario/IRol.java` | Las interfaces de modelo se restituyeron en V2 a propósito; sacar una sola rompe la simetría del diagrama |
 | D5 | Sacar `GET /api/creditos` por falta de consumidor | Es API pública documentada, no código muerto |
 | BS5 | Objeto parámetro para `Credito.nuevo` (6 parámetros) | Revertido en V4 (M17): con los cargos de M12 llegó a 7, y cinco (capital, tasa, cuotas, plan, cargos) son justo lo que calcula la cuota: `CondicionesDeCredito` |
 | BS7 | Quitar `@Data` de los DTO | Un DTO es una estructura de datos por diseño; las clases de dominio ya tienen comportamiento |
