@@ -127,10 +127,11 @@ body.lb-locked{overflow:hidden}
 <ul><li>Expert y Creator</li><li>Restituye las interfaces de servicio</li></ul></div>
 <div class="hito"><div class="punto"></div><h4>V3</h4><p class="tema">MVC + Strategy + Adapter</p><p class="meta">13/10 · tag <code>v3</code></p>
 <ul><li>Cuota simple o francesa</li><li><code>TokenService</code> sobre jjwt</li><li>43 tests</li></ul></div>
-<div class="hito actual"><div class="punto"></div><h4>V4</h4><p class="tema">Composite + Decorator + Facade</p><p class="meta">27/10 · 26 commits</p>
+<div class="hito actual"><div class="punto"></div><h4>V4</h4><p class="tema">Composite + Decorator + Facade</p><p class="meta">27/10 · 27 commits</p>
 <ul><li><strong>Composite</strong>: <code>Deuda</code> (M11)</li><li><strong>Decorator</strong>: cargos (M12)</li><li><strong>Facade</strong>: <code>AuthService</code> (M13)</li><li><code>Credito</code>: Extract Class (M17)</li><li>Panel: deuda del cliente y cargos</li><li>64 tests</li></ul></div>
 </div>
-<details><summary>Commits V3 → V4 (git log v3..iteracion4)</summary><pre><code>01fbfb6 Comentario de Facade solo en la interfaz AuthService
+<details><summary>Commits V3 → V4 (git log v3..iteracion4)</summary><pre><code>6b8f53e Docs V4: M17 Credito (Extract Class + ISP), Composite con Deuda, Facade identificado y hallazgos de la revision
+01fbfb6 Comentario de Facade solo en la interfaz AuthService
 06eb1eb Rechazar cargos nulos en el alta de credito (400)
 2c60085 Servicios declaran la cartera como Deuda (Component del Composite)
 3fc5b9d Credito: extraer CondicionesDeCredito y achicar ICredito
@@ -1011,40 +1012,40 @@ svg .s-external{color: var(--external-stroke);}
         <rect x="951.5" y="395" width="10" height="40" rx="3" class="c-backend" stroke-width="1"/>
 
         <!-- Messages -->
-        <g data-edge-from="svc" data-edge-to="credito" data-edge-label="Credito.nuevo(..., SISTEMA_FRANCES, cargos)" data-edge-key="0" data-edge-id="decorator-cargos-nuevo">
-          <path data-composition-edge-from="svc" data-composition-edge-to="credito" data-composition-edge-id="decorator-cargos-nuevo" data-composition-points="152.5,190;341.25,190" d="M 152.5 190 L 341.25 190" class="a-default" stroke-width="1.4" marker-end="url(#decorator-cargos-arrowhead)"/>
+        <g data-edge-from="credito" data-edge-to="condiciones" data-edge-label="condiciones.importeCuota()" data-edge-key="0" data-edge-id="decorator-cargos-impcond">
+          <path data-composition-edge-from="credito" data-composition-edge-to="condiciones" data-composition-edge-id="decorator-cargos-impcond" data-composition-points="152.5,190;341.25,190" d="M 152.5 190 L 341.25 190" class="a-default" stroke-width="1.4" marker-end="url(#decorator-cargos-arrowhead)"/>
         <g data-detail="context">
-          <rect x="98.975" y="170" width="295.8" height="18" rx="3" class="c-mask"/>
-          <text x="246.875" y="180" class="t-muted" font-size="11" text-anchor="middle">Credito.nuevo(..., SISTEMA_FRANCES, cargos)</text>
+          <rect x="155.075" y="170" width="183.6" height="18" rx="3" class="c-mask"/>
+          <text x="246.875" y="180" class="t-muted" font-size="11" text-anchor="middle">condiciones.importeCuota()</text>
         </g>
         </g>
 
-        <g data-edge-from="credito" data-edge-to="frances" data-edge-label="TipoPlan.calculo(): SistemaFrances" data-edge-key="1" data-edge-id="decorator-cargos-plan">
-          <path data-composition-edge-from="credito" data-composition-edge-to="frances" data-composition-edge-id="decorator-cargos-plan" data-composition-points="355.25,225;949.5,225" d="M 355.25 225 L 949.5 225" class="a-default" stroke-width="1.4" marker-end="url(#decorator-cargos-arrowhead)"/>
+        <g data-edge-from="condiciones" data-edge-to="frances" data-edge-label="TipoPlan.calculo(): SistemaFrances" data-edge-key="1" data-edge-id="decorator-cargos-plan">
+          <path data-composition-edge-from="condiciones" data-composition-edge-to="frances" data-composition-edge-id="decorator-cargos-plan" data-composition-points="355.25,225;949.5,225" d="M 355.25 225 L 949.5 225" class="a-default" stroke-width="1.4" marker-end="url(#decorator-cargos-arrowhead)"/>
         <g data-detail="context">
           <rect x="534.175" y="205" width="236.39999999999998" height="18" rx="3" class="c-mask"/>
           <text x="652.375" y="215" class="t-muted" font-size="11" text-anchor="middle">TipoPlan.calculo(): SistemaFrances</text>
         </g>
         </g>
 
-        <g data-edge-from="credito" data-edge-to="seguro" data-edge-label="SEGURO_DE_VIDA.aplicarSobre(calculo)" data-edge-key="2" data-edge-id="decorator-cargos-aplseg">
-          <path data-composition-edge-from="credito" data-composition-edge-to="seguro" data-composition-edge-id="decorator-cargos-aplseg" data-composition-points="355.25,260;746.75,260" d="M 355.25 260 L 746.75 260" class="a-default" stroke-width="1.4" marker-end="url(#decorator-cargos-arrowhead)"/>
+        <g data-edge-from="condiciones" data-edge-to="seguro" data-edge-label="SEGURO_DE_VIDA.aplicarSobre(calculo)" data-edge-key="2" data-edge-id="decorator-cargos-aplseg">
+          <path data-composition-edge-from="condiciones" data-composition-edge-to="seguro" data-composition-edge-id="decorator-cargos-aplseg" data-composition-points="355.25,260;746.75,260" d="M 355.25 260 L 746.75 260" class="a-default" stroke-width="1.4" marker-end="url(#decorator-cargos-arrowhead)"/>
         <g data-detail="context">
           <rect x="426.2" y="240" width="249.6" height="18" rx="3" class="c-mask"/>
           <text x="551" y="250" class="t-muted" font-size="11" text-anchor="middle">SEGURO_DE_VIDA.aplicarSobre(calculo)</text>
         </g>
         </g>
 
-        <g data-edge-from="credito" data-edge-to="gasto" data-edge-label="GASTO_DE_ADMINISTRACION.aplicarSobre(calculo)" data-edge-key="3" data-edge-id="decorator-cargos-aplgas">
-          <path data-composition-edge-from="credito" data-composition-edge-to="gasto" data-composition-edge-id="decorator-cargos-aplgas" data-composition-points="355.25,295;544,295" d="M 355.25 295 L 544 295" class="a-default" stroke-width="1.4" marker-end="url(#decorator-cargos-arrowhead)"/>
+        <g data-edge-from="condiciones" data-edge-to="gasto" data-edge-label="GASTO_DE_ADMINISTRACION.aplicarSobre(calculo)" data-edge-key="3" data-edge-id="decorator-cargos-aplgas">
+          <path data-composition-edge-from="condiciones" data-composition-edge-to="gasto" data-composition-edge-id="decorator-cargos-aplgas" data-composition-points="355.25,295;544,295" d="M 355.25 295 L 544 295" class="a-default" stroke-width="1.4" marker-end="url(#decorator-cargos-arrowhead)"/>
         <g data-detail="context">
           <rect x="295.125" y="275" width="309" height="18" rx="3" class="c-mask"/>
           <text x="449.625" y="285" class="t-muted" font-size="11" text-anchor="middle">GASTO_DE_ADMINISTRACION.aplicarSobre(calculo)</text>
         </g>
         </g>
 
-        <g data-edge-from="credito" data-edge-to="gasto" data-edge-label="importeCuota(capital, tasa, cuotas)" data-edge-key="4" data-edge-id="decorator-cargos-imp">
-          <path data-composition-edge-from="credito" data-composition-edge-to="gasto" data-composition-edge-id="decorator-cargos-imp" data-composition-points="355.25,345;544,345" d="M 355.25 345 L 544 345" class="a-emphasis" stroke-width="1.8" marker-end="url(#decorator-cargos-arrowhead-emphasis)"/>
+        <g data-edge-from="condiciones" data-edge-to="gasto" data-edge-label="importeCuota(capital, tasa, cuotas)" data-edge-key="4" data-edge-id="decorator-cargos-imp">
+          <path data-composition-edge-from="condiciones" data-composition-edge-to="gasto" data-composition-edge-id="decorator-cargos-imp" data-composition-points="355.25,345;544,345" d="M 355.25 345 L 544 345" class="a-emphasis" stroke-width="1.8" marker-end="url(#decorator-cargos-arrowhead-emphasis)"/>
         <g data-detail="context">
           <rect x="328.125" y="325" width="243" height="18" rx="3" class="c-mask"/>
           <text x="449.625" y="335" class="t-edge-emphasis" font-size="11" text-anchor="middle">importeCuota(capital, tasa, cuotas)</text>
@@ -1083,26 +1084,26 @@ svg .s-external{color: var(--external-stroke);}
         </g>
         </g>
 
-        <g data-edge-from="gasto" data-edge-to="credito" data-edge-label="+ $500 por cuota" data-edge-key="9" data-edge-id="decorator-cargos-masgas">
-          <path data-composition-edge-from="gasto" data-composition-edge-to="credito" data-composition-edge-id="decorator-cargos-masgas" data-composition-points="544,490;355.25,490" d="M 544 490 L 355.25 490" class="a-default" stroke-width="1.4" stroke-dasharray="3,5" marker-end="url(#decorator-cargos-arrowhead)"/>
+        <g data-edge-from="gasto" data-edge-to="condiciones" data-edge-label="+ $500 por cuota" data-edge-key="9" data-edge-id="decorator-cargos-masgas">
+          <path data-composition-edge-from="gasto" data-composition-edge-to="condiciones" data-composition-edge-id="decorator-cargos-masgas" data-composition-points="544,490;355.25,490" d="M 544 490 L 355.25 490" class="a-default" stroke-width="1.4" stroke-dasharray="3,5" marker-end="url(#decorator-cargos-arrowhead)"/>
         <g data-detail="context">
           <rect x="390.825" y="470" width="117.6" height="18" rx="3" class="c-mask"/>
           <text x="449.625" y="480" class="t-muted" font-size="11" text-anchor="middle">+ $500 por cuota</text>
         </g>
         </g>
 
-        <g data-edge-from="credito" data-edge-to="svc" data-edge-label="crédito con importeCuota y su plan de cuotas" data-edge-key="10" data-edge-id="decorator-cargos-creado">
-          <path data-composition-edge-from="credito" data-composition-edge-to="svc" data-composition-edge-id="decorator-cargos-creado" data-composition-points="341.25,525;152.5,525" d="M 341.25 525 L 152.5 525" class="a-default" stroke-width="1.4" stroke-dasharray="3,5" marker-end="url(#decorator-cargos-arrowhead)"/>
+        <g data-edge-from="condiciones" data-edge-to="credito" data-edge-label="importeCuota; Credito arma su plan de cuotas" data-edge-key="10" data-edge-id="decorator-cargos-creado">
+          <path data-composition-edge-from="condiciones" data-composition-edge-to="credito" data-composition-edge-id="decorator-cargos-creado" data-composition-points="341.25,525;152.5,525" d="M 341.25 525 L 152.5 525" class="a-default" stroke-width="1.4" stroke-dasharray="3,5" marker-end="url(#decorator-cargos-arrowhead)"/>
         <g data-detail="context">
           <rect x="95.67500000000001" y="505" width="302.4" height="18" rx="3" class="c-mask"/>
-          <text x="246.875" y="515" class="t-muted" font-size="11" text-anchor="middle">crédito con importeCuota y su plan de cuotas</text>
+          <text x="246.875" y="515" class="t-muted" font-size="11" text-anchor="middle">importeCuota; Credito arma su plan de cuotas</text>
         </g>
         </g>
 
         <!-- Segment Labels -->
         <g data-graph-role="segment-label" data-segment-id="decorator-cargos-0">
-          <rect x="56" y="138" width="138.8" height="18" rx="3" class="c-mask"/>
-          <text x="62" y="151" class="t-dim" font-size="9" font-weight="600">calculo(): armar la pila</text>
+          <rect x="56" y="138" width="227.20000000000002" height="18" rx="3" class="c-mask"/>
+          <text x="62" y="151" class="t-dim" font-size="9" font-weight="600">importeCuota() → calculo(): armar la pila</text>
         </g>
         <g data-graph-role="segment-label" data-segment-id="decorator-cargos-1">
           <rect x="56" y="308" width="258.4" height="18" rx="3" class="c-mask"/>
@@ -1110,25 +1111,25 @@ svg .s-external{color: var(--external-stroke);}
         </g>
 
         <!-- Participants -->
-        <g id="decorator-cargos-node-svc" data-node-id="decorator-cargos-svc" data-node-label="CreditoServiceImpl" tabindex="0" role="button" aria-label="Focus CreditoServiceImpl, crear(), Sequence participant" aria-pressed="false" data-node-kind="backend" data-node-sublabel="crear()" data-node-context="Sequence participant">
-          <title>CreditoServiceImpl · crear() · Sequence participant</title>
+        <g id="decorator-cargos-node-credito" data-node-id="decorator-cargos-credito" data-node-label="Credito" tabindex="0" role="button" aria-label="Focus Credito, nuevo(cliente, fecha, condiciones), Sequence participant" aria-pressed="false" data-node-kind="backend" data-node-sublabel="nuevo(cliente, fecha, condiciones)" data-node-context="Sequence participant">
+          <title>Credito · nuevo(cliente, fecha, condiciones) · Sequence participant</title>
           <rect x="62" y="72" width="167" height="60" rx="6" class="c-mask"/>
           <rect x="62" y="72" width="167" height="60" rx="6" class="c-backend" stroke-width="1.5"/>
           <g aria-hidden="true" data-semantic-sigil="backend" class="semantic-sigil s-backend" transform="translate(68 78) scale(0.6875)">
             <path d="M6 3 3 8l3 5M10 3l3 5-3 5"/>
           </g>
-          <text data-node-label="" data-detail-anchor="" x="145.5" y="108" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">CreditoServiceImpl</text>
-          <text data-detail="context" x="145.5" y="122" class="t-muted" font-size="7" text-anchor="middle">crear()</text>
+          <text data-node-label="" data-detail-anchor="" x="145.5" y="108" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">Credito</text>
+          <text data-detail="context" x="145.5" y="122" class="t-muted" font-size="7" text-anchor="middle">nuevo(cliente, fecha, condiciones)</text>
         </g>
 
-        <g id="decorator-cargos-node-credito" data-node-id="decorator-cargos-credito" data-node-label="Credito" tabindex="0" role="button" aria-label="Focus Credito, Context / Client, Sequence participant" aria-pressed="false" data-node-kind="backend" data-node-sublabel="Context / Client" data-node-context="Sequence participant">
-          <title>Credito · Context / Client · Sequence participant</title>
+        <g id="decorator-cargos-node-condiciones" data-node-id="decorator-cargos-condiciones" data-node-label="CondicionesDeCredito" tabindex="0" role="button" aria-label="Focus CondicionesDeCredito, Context / Client, Sequence participant" aria-pressed="false" data-node-kind="backend" data-node-sublabel="Context / Client" data-node-context="Sequence participant">
+          <title>CondicionesDeCredito · Context / Client · Sequence participant</title>
           <rect x="264.75" y="72" width="167" height="60" rx="6" class="c-mask"/>
           <rect x="264.75" y="72" width="167" height="60" rx="6" class="c-backend" stroke-width="1.5"/>
           <g aria-hidden="true" data-semantic-sigil="backend" class="semantic-sigil s-backend" transform="translate(270.75 78) scale(0.6875)">
             <path d="M6 3 3 8l3 5M10 3l3 5-3 5"/>
           </g>
-          <text data-node-label="" data-detail-anchor="" x="348.25" y="108" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">Credito</text>
+          <text data-node-label="" data-detail-anchor="" x="348.25" y="108" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">CondicionesDeCredito</text>
           <text data-detail="context" x="348.25" y="122" class="t-muted" font-size="7" text-anchor="middle">Context / Client</text>
         </g>
 
@@ -1630,7 +1631,7 @@ TokenService &lt;|.. JwtUtil
 </article><article class="mejora" id="credito">
 <h3>M17. Credito: Extract Class + ISP <span class="badge impl">refactor</span></h3>
 <p class="ref">Commit <code>3fc5b9d</code>.</p>
-<dl class="qa"><dt>¿<code>Credito</code> es una god class?</dt><dd>No: <strong>alta cohesión</strong>, todo lo que hace usa sus propios datos (Information Expert). Pero tenía tres olores concretos.</dd></dl>
+<dl class="qa"><dt>¿<code>Credito</code> es una god class?</dt><dd>No: <strong>alta cohesión</strong>, todo lo que hace usa sus propios datos (Information Expert). Pero tenía tres olores concretos. Revierte BS5 y parte de D3, descartados en V3: con los cargos de M12 la firma llegó a 7 parámetros.</dd></dl>
 <dl class="estructura">
 <dt>Patrón</dt><dd><strong>Extract Class</strong> e <strong>Introduce Parameter Object</strong> (Fowler) + <strong>ISP</strong>.</dd>
 <dt>Problema (código antes)</dt><dd><p><strong>Long Parameter List / Data Clump</strong>: <code>nuevo</code> recibía 7 parámetros. <strong>Tres responsabilidades</strong>: precio de la cuota, suma de deuda y ciclo de vida. <code>estaCancelado</code> y <code>tieneCobranzas</code> públicos sin uso externo.</p><div class="ruta">backend/src/main/java/com/uade/tpejemplo/model/Credito.java <span class="ver">· V4 antes de M17 (06f0fc7)</span></div><pre><code>    // Unica forma de dar de alta un credito. El id lo asigna la base, las
@@ -1651,39 +1652,22 @@ TokenService &lt;|.. JwtUtil
         }
         return calculo;
     }</code></pre><div class="ruta">backend/src/main/java/com/uade/tpejemplo/model/interfaces/ICredito.java <span class="ver">· V4 antes de M17 (06f0fc7)</span></div><pre><code>public interface ICredito extends Deuda {
-
     Long getId();
-
     ICliente getCliente();
-
     BigDecimal getDeudaOriginal();
-
     LocalDate getFecha();
-
     BigDecimal getTasaInteres();
-
     TipoPlan getTipoPlan();
-
     Set&lt;TipoCargo&gt; getCargos();
-
     BigDecimal getImporteCuota();
-
     Integer getCantidadCuotas();
-
     boolean isAnulado();
-
     BigDecimal totalADevolver();
-
     List&lt;? extends ICuota&gt; getCuotas();
-
     EstadoCredito estado();
-
     boolean estaCancelado();
-
     boolean tieneCobranzas();
-
     boolean puedeAnularse();
-
     void anular();
 }</code></pre></dd>
 <dt>Solución (código después)</dt><dd><p>Lo pactado al otorgar pasa a <code>CondicionesDeCredito</code> (<code>@Embeddable</code>), que calcula la cuota: es el «Context» del Strategy. <code>Credito</code> queda con deuda y ciclo de vida.</p><div class="ruta">backend/src/main/java/com/uade/tpejemplo/model/Credito.java <span class="ver">· V4 (iteracion4)</span></div><pre><code>    // Unica forma de dar de alta un credito. El id lo asigna la base, las
@@ -1704,27 +1688,16 @@ TokenService &lt;|.. JwtUtil
         }
         return calculo;
     }</code></pre><div class="ruta">backend/src/main/java/com/uade/tpejemplo/model/interfaces/ICredito.java <span class="ver">· V4 (iteracion4)</span></div><pre><code>public interface ICredito extends Deuda {
-
     Long getId();
-
     ICliente getCliente();
-
     LocalDate getFecha();
-
     CondicionesDeCredito getCondiciones();
-
     BigDecimal getImporteCuota();
-
     boolean isAnulado();
-
     BigDecimal totalADevolver();
-
     List&lt;? extends ICuota&gt; getCuotas();
-
     EstadoCredito estado();
-
     boolean puedeAnularse();
-
     void anular();
 }</code></pre></dd>
 <dt>Por qué</dt><dd><table><thead><tr><th>Principio</th><th>Dónde</th></tr></thead><tbody><tr><td><strong>SRP</strong></td><td><code>Credito</code>: deuda y ciclo de vida; <code>CondicionesDeCredito</code>: precio de la cuota</td></tr><tr><td><strong>ISP</strong></td><td><code>ICredito</code> sin <code>estaCancelado</code> ni <code>tieneCobranzas</code>: nadie de afuera los usaba</td></tr><tr><td><strong>High Cohesion</strong></td><td>cada clase usa todos sus campos</td></tr><tr><td><strong>Information Expert</strong></td><td>las condiciones conocen plan y cargos → calculan la cuota</td></tr><tr><td><strong>Extract Class, Introduce Parameter Object</strong></td><td>cinco datos que viajaban juntos → un objeto</td></tr></tbody></table></dd>
