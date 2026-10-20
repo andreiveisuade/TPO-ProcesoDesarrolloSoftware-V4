@@ -10,7 +10,7 @@ skinparam NoteBackgroundColor #FFF8E1
 skinparam NoteBorderColor #B38600
 hide empty members
 class AuthController {
-  +actual(UserDetails)
+  +actual(principal)
 }
 interface AuthService {
   +registrar(request)
@@ -18,18 +18,16 @@ interface AuthService {
   +actual(username)
 }
 class AuthServiceImpl
-interface "UserDetails (Spring)" as UD
 interface "AuthenticationManager (Spring)" as AM
 interface "PasswordEncoder (Spring)" as PE
 interface TokenService
 AuthController --> AuthService
-AuthController ..> UD
 AuthService <|.. AuthServiceImpl
 AuthServiceImpl --> AM
 AuthServiceImpl --> PE
 AuthServiceImpl --> TokenService
-note bottom of AuthController #FFE0E0
-  patrón sin nombrar;
-  el controlador recibe un tipo de Spring
+note bottom of AuthService #FFE0E0
+  la Facade ya existía,
+  sin nombrar
 end note
 @enduml

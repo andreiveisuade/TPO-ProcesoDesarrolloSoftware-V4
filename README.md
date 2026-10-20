@@ -8,7 +8,7 @@ TPO de Proceso de Desarrollo de Software, UADE 2C 2026, grupo 7. Iteración 4: C
 ![Java 21](https://img.shields.io/badge/Java-21-007396)
 ![Spring Boot 3.4.3](https://img.shields.io/badge/Spring%20Boot-3.4.3-6DB33F)
 ![React 19](https://img.shields.io/badge/React-19-61DAFB)
-![Tests 63 OK](https://img.shields.io/badge/tests-63%20OK-brightgreen)
+![Tests 64 OK](https://img.shields.io/badge/tests-64%20OK-brightgreen)
 
 [Reporte](docs/reporte/reporte-v4.html) · [Manual](docs/manual/index.html) · [Casos de uso](docs/casos-de-uso/README.md) · [Lista de mejoras](docs/entrega/lista-mejoras.md) · [Swagger](http://localhost:8080/swagger-ui.html)
 
@@ -40,11 +40,13 @@ Panorama MVC: la vista (React) llama a los controladores REST, que delegan en lo
 
 ## Iteración 4: Composite, Decorator y Facade
 
-**Composite (M11).** [`Deuda`](backend/src/main/java/com/uade/tpejemplo/model/interfaces/Deuda.java) es la interfaz común: la [`Cuota`](backend/src/main/java/com/uade/tpejemplo/model/Cuota.java) contesta su saldo y su monto vencido, y el [`Credito`](backend/src/main/java/com/uade/tpejemplo/model/Credito.java) y la [`Cartera`](backend/src/main/java/com/uade/tpejemplo/model/Cartera.java) suman a sus hijos. La usan el dashboard, la regla de mora (no se otorga crédito a un cliente con cuotas vencidas, M14) y la deuda del cliente (`GET /api/clientes/{dni}/deuda`, M15).
+**Composite (M11).** [`Deuda`](backend/src/main/java/com/uade/tpejemplo/model/interfaces/Deuda.java) es la interfaz común: la [`Cuota`](backend/src/main/java/com/uade/tpejemplo/model/Cuota.java) contesta su saldo y su monto vencido, y el [`Credito`](backend/src/main/java/com/uade/tpejemplo/model/Credito.java) y la [`Cartera`](backend/src/main/java/com/uade/tpejemplo/model/Cartera.java) delegan en sus hijos y suman; los servicios la tipan como `Deuda`. La usan el dashboard, la regla de mora (no se otorga crédito a un cliente con cuotas vencidas, M14) y la deuda del cliente (`GET /api/clientes/{dni}/deuda`, M15).
 
-**Decorator (M12).** Cargos opcionales sobre la cuota: [`CargoSobreCuota`](backend/src/main/java/com/uade/tpejemplo/model/plan/CargoSobreCuota.java) envuelve el `CalculoDeCuota` de la Strategy y le suma [`SeguroDeVida`](backend/src/main/java/com/uade/tpejemplo/model/plan/SeguroDeVida.java) (0,1 % del capital por cuota) o [`GastoDeAdministracion`](backend/src/main/java/com/uade/tpejemplo/model/plan/GastoDeAdministracion.java) ($500 por cuota); [`TipoCargo`](backend/src/main/java/com/uade/tpejemplo/model/TipoCargo.java) arma la pila. Es una expansión del dominio; en la pantalla de Créditos son dos casillas (M16).
+**Decorator (M12).** Cargos opcionales sobre la cuota: [`CargoSobreCuota`](backend/src/main/java/com/uade/tpejemplo/model/plan/CargoSobreCuota.java) envuelve el `CalculoDeCuota` de la Strategy y le suma [`SeguroDeVida`](backend/src/main/java/com/uade/tpejemplo/model/plan/SeguroDeVida.java) (0,1 % del capital por cuota) o [`GastoDeAdministracion`](backend/src/main/java/com/uade/tpejemplo/model/plan/GastoDeAdministracion.java) ($500 por cuota); [`CondicionesDeCredito`](backend/src/main/java/com/uade/tpejemplo/model/CondicionesDeCredito.java) arma la pila con [`TipoCargo`](backend/src/main/java/com/uade/tpejemplo/model/TipoCargo.java). Es una expansión del dominio; en la pantalla de Créditos son dos casillas (M16).
 
-**Facade (M13).** [`AuthService`](backend/src/main/java/com/uade/tpejemplo/service/AuthService.java) ofrece `registrar`, `login` y `actual` sobre Spring Security (`AuthenticationManager`, `PasswordEncoder`) y JWT (`TokenService`, el Adapter de V3). Ningún controlador usa ese subsistema.
+**Facade (M13).** [`AuthService`](backend/src/main/java/com/uade/tpejemplo/service/AuthService.java) ofrece `registrar`, `login` y `actual` sobre Spring Security (`AuthenticationManager`, `PasswordEncoder`) y JWT (`TokenService`, el Adapter de V3). Ningún controlador usa ese subsistema. Es un patrón identificado en el código existente (estaba desde V1 sin nombre), no aplicado de cero.
+
+**Credito: Extract Class + ISP (M17).** Lo pactado al otorgar (capital, tasa, cuotas, plan y cargos) pasa a [`CondicionesDeCredito`](backend/src/main/java/com/uade/tpejemplo/model/CondicionesDeCredito.java), que calcula la cuota (Context del Strategy); `Credito.nuevo` baja de 7 a 3 parámetros e `ICredito` deja de exponer `estaCancelado` y `tieneCobranzas`. Tabla y JSON sin cambios.
 
 ![Secuencia del Composite](docs/diagramas/archify/composite-deuda.svg)
 
@@ -66,8 +68,9 @@ Detalle completo, con clase y método de cada una: [lista de mejoras](docs/entre
 |---|---|---|---|
 | M11 | Saldo y mora por cuota, crédito y cartera | Composite | [`Cartera`](backend/src/main/java/com/uade/tpejemplo/model/Cartera.java) |
 | M12 | Seguro de vida y gastos sobre la cuota | Decorator | [`CargoSobreCuota`](backend/src/main/java/com/uade/tpejemplo/model/plan/CargoSobreCuota.java) |
-| M13 | Autenticación detrás de una interfaz simple | Facade | [`AuthService`](backend/src/main/java/com/uade/tpejemplo/service/AuthService.java) |
+| M13 | Autenticación detrás de una interfaz simple | Facade (identificado) | [`AuthService`](backend/src/main/java/com/uade/tpejemplo/service/AuthService.java) |
 | M14, M15 | Regla de mora; deuda del cliente | Composite | [`CreditoServiceImpl`](backend/src/main/java/com/uade/tpejemplo/service/impl/CreditoServiceImpl.java), [`ClienteServiceImpl`](backend/src/main/java/com/uade/tpejemplo/service/impl/ClienteServiceImpl.java) |
+| M17 | Condiciones del crédito en su propia clase | Extract Class + ISP | [`CondicionesDeCredito`](backend/src/main/java/com/uade/tpejemplo/model/CondicionesDeCredito.java) |
 | M9 | Cuota con interés simple o sistema francés | Strategy | [`CalculoDeCuota`](backend/src/main/java/com/uade/tpejemplo/model/interfaces/CalculoDeCuota.java) |
 | M7 | JWT detrás de un Target propio | Adapter | [`JwtUtil`](backend/src/main/java/com/uade/tpejemplo/security/JwtUtil.java) |
 | M1 | No se cobra una cuota de un crédito anulado (TPO-004) | Information Expert | [`Cuota`](backend/src/main/java/com/uade/tpejemplo/model/Cuota.java) |
@@ -140,14 +143,14 @@ Password = usuario. Los crea [`DataInitializer`](backend/src/main/java/com/uade/
 
 ## Cómo se verifica
 
-`cd backend && mvn test`: **63 tests, 0 fallas** ([JUnit 5](https://junit.org/junit5/), framework de tests de Java).
+`cd backend && mvn test`: **64 tests, 0 fallas** ([JUnit 5](https://junit.org/junit5/), framework de tests de Java).
 
 | Test | Cantidad | Qué cubre |
 |---|---|---|
 | [`CreditoTest`](backend/src/test/java/com/uade/tpejemplo/model/CreditoTest.java), [`CuotaTest`](backend/src/test/java/com/uade/tpejemplo/model/CuotaTest.java), [`CobranzaTest`](backend/src/test/java/com/uade/tpejemplo/model/CobranzaTest.java), [`CarteraTest`](backend/src/test/java/com/uade/tpejemplo/model/CarteraTest.java) | 29 | Reglas del dominio y Composite |
 | [`InteresSimpleTest`](backend/src/test/java/com/uade/tpejemplo/model/plan/InteresSimpleTest.java), [`SistemaFrancesTest`](backend/src/test/java/com/uade/tpejemplo/model/plan/SistemaFrancesTest.java) | 8 | Estrategias de cuota |
 | [`SeguroDeVidaTest`](backend/src/test/java/com/uade/tpejemplo/model/plan/SeguroDeVidaTest.java), [`GastoDeAdministracionTest`](backend/src/test/java/com/uade/tpejemplo/model/plan/GastoDeAdministracionTest.java), [`CargosApiladosTest`](backend/src/test/java/com/uade/tpejemplo/model/plan/CargosApiladosTest.java) | 6 | Decoradores de cargos |
-| [`CodigosHttpTest`](backend/src/test/java/com/uade/tpejemplo/controller/CodigosHttpTest.java) | 11 | 400/401/403/404/405/406/415 con JWT real |
+| [`CodigosHttpTest`](backend/src/test/java/com/uade/tpejemplo/controller/CodigosHttpTest.java) | 12 | 400/401/403/404/405/406/415 con JWT real |
 | [`CobranzaConcurrenteTest`](backend/src/test/java/com/uade/tpejemplo/service/CobranzaConcurrenteTest.java) | 1 | Cobro concurrente de la misma cuota |
 | [`AnulacionConcurrenteTest`](backend/src/test/java/com/uade/tpejemplo/service/AnulacionConcurrenteTest.java) | 1 | Anular y cobrar el mismo crédito en paralelo |
 | [`ReglaDeMoraTest`](backend/src/test/java/com/uade/tpejemplo/service/ReglaDeMoraTest.java), [`DeudaClienteTest`](backend/src/test/java/com/uade/tpejemplo/service/DeudaClienteTest.java), [`CreditoConCargosTest`](backend/src/test/java/com/uade/tpejemplo/service/CreditoConCargosTest.java) | 6 | Regla de mora, deuda del cliente y crédito con cargos leído de la base, sobre H2 |
@@ -173,7 +176,7 @@ Además: [`verificar-cu.sh`](docs/casos-de-uso/verificar-cu.sh) (casos de uso co
 | Documento | Para qué | Link |
 |---|---|---|
 | API | Mapa de endpoints | [api.md](docs/trabajo/api.md) |
-| Guía de lectura | Por dónde empezar a leer V3 (~45 min) | [guia-de-lectura.md](docs/trabajo/guia-de-lectura.md) |
+| Guía de lectura | Por dónde empezar a leer la iteración 3 (~45 min); es de V3 y solo está en GitHub | [guia-de-lectura.md](docs/trabajo/guia-de-lectura.md) |
 | Smoke de la API | Verificación con curl | [smoke.md](docs/trabajo/smoke.md) |
 | Verificación visual | Recorrido del front | [visual.md](docs/trabajo/visual.md) |
 | Recorrido de casos de uso | Casos de uso contra el sistema | [recorrido-cu.md](docs/trabajo/recorrido-cu.md) |

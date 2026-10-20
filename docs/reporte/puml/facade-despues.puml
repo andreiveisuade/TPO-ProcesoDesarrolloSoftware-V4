@@ -10,7 +10,7 @@ skinparam NoteBackgroundColor #FFF8E1
 skinparam NoteBorderColor #B38600
 hide empty members
 class AuthController <<Client>> {
-  +actual(UsuarioDetails)
+  +actual(principal)
 }
 interface AuthService <<Facade>> {
   +registrar(request)

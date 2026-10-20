@@ -1,12 +1,12 @@
 ...@_estilo
 direction: right
-Credito: "Credito\n«Context»" {class: rol}
+Cond: "CondicionesDeCredito\n«Context»" {class: rol}
 TipoPlan: "TipoPlan (enum)\nINTERES_SIMPLE | SISTEMA_FRANCES" {class: cl}
 Calc: "CalculoDeCuota\n«Strategy»\nimporteCuota(capital, tasa, cuotas)" {class: rol}
 IS: "InteresSimple\n«ConcreteStrategy»" {class: cl}
 SF: "SistemaFrances\n«ConcreteStrategy»" {class: cl}
-Credito -> TipoPlan: "tipoPlan"
-Credito -> Calc: "calculo()" {style.stroke-dash: 4}
+Cond -> TipoPlan: "tipoPlan"
+Cond -> Calc: "calculo()" {style.stroke-dash: 4}
 TipoPlan -> Calc: "calculo()"
 IS -> Calc: "implementa" {style.stroke-dash: 4; target-arrowhead.shape: triangle; target-arrowhead.style.filled: false}
 SF -> Calc: "implementa" {style.stroke-dash: 4; target-arrowhead.shape: triangle; target-arrowhead.style.filled: false}

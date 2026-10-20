@@ -2,7 +2,7 @@
   "schema_version": 1,
   "diagram_type": "sequence",
   "meta": {
-    "title": "Composite: el dashboard pide el saldo a la cartera sin saber cuántos niveles hay",
+    "title": "Composite: el dashboard le pide el saldo a la cartera como Deuda",
     "quality_profile": "showcase",
     "viewBox": [
       1080,
@@ -18,7 +18,7 @@
           "label": "llamada a Deuda (Component)"
         },
         "dashed": {
-          "label": "misma recursión"
+          "label": "misma delegación"
         },
         "return": {
           "label": "respuesta (suma)"
@@ -67,7 +67,7 @@
     {
       "from": 290,
       "to": 475,
-      "label": "saldo(): recursión Cartera → Credito → Cuota"
+      "label": "saldo(): delegación Cartera → Credito → Cuota"
     },
     {
       "from": 505,

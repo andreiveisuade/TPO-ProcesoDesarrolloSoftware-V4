@@ -9,7 +9,7 @@ skinparam ArrowColor #2E75B6
 skinparam NoteBackgroundColor #FFF8E1
 skinparam NoteBorderColor #B38600
 hide empty members
-class Credito <<Client>> {
+class CondicionesDeCredito <<Client>> {
   -tipoPlan : TipoPlan
   -cargos : Set<TipoCargo>
   -calculo() : CalculoDeCuota
@@ -40,6 +40,6 @@ CargoSobreCuota o--> "1" CalculoDeCuota : envuelto
 CargoSobreCuota <|-- SeguroDeVida
 CargoSobreCuota <|-- GastoDeAdministracion
 TipoCargo ..> CargoSobreCuota : crea
-Credito --> "0..*" TipoCargo
-Credito ..> CalculoDeCuota : calculo()
+CondicionesDeCredito --> "0..*" TipoCargo
+CondicionesDeCredito ..> CalculoDeCuota : calculo()
 @enduml

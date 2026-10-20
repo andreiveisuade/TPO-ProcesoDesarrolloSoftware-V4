@@ -90,40 +90,40 @@ svg .s-external{color: var(--external-stroke);}
         <rect x="951.5" y="395" width="10" height="40" rx="3" class="c-backend" stroke-width="1"/>
 
         <!-- Messages -->
-        <g data-edge-from="svc" data-edge-to="credito" data-edge-label="Credito.nuevo(..., SISTEMA_FRANCES, cargos)" data-edge-key="0" data-edge-id="nuevo">
-          <path data-composition-edge-from="svc" data-composition-edge-to="credito" data-composition-edge-id="nuevo" data-composition-points="152.5,190;341.25,190" d="M 152.5 190 L 341.25 190" class="a-default" stroke-width="1.4" marker-end="url(#arrowhead)"/>
+        <g data-edge-from="credito" data-edge-to="condiciones" data-edge-label="condiciones.importeCuota()" data-edge-key="0" data-edge-id="impcond">
+          <path data-composition-edge-from="credito" data-composition-edge-to="condiciones" data-composition-edge-id="impcond" data-composition-points="152.5,190;341.25,190" d="M 152.5 190 L 341.25 190" class="a-default" stroke-width="1.4" marker-end="url(#arrowhead)"/>
         <g data-detail="context">
-          <rect x="98.975" y="170" width="295.8" height="18" rx="3" class="c-mask"/>
-          <text x="246.875" y="180" class="t-muted" font-size="11" text-anchor="middle">Credito.nuevo(..., SISTEMA_FRANCES, cargos)</text>
+          <rect x="155.075" y="170" width="183.6" height="18" rx="3" class="c-mask"/>
+          <text x="246.875" y="180" class="t-muted" font-size="11" text-anchor="middle">condiciones.importeCuota()</text>
         </g>
         </g>
 
-        <g data-edge-from="credito" data-edge-to="frances" data-edge-label="TipoPlan.calculo(): SistemaFrances" data-edge-key="1" data-edge-id="plan">
-          <path data-composition-edge-from="credito" data-composition-edge-to="frances" data-composition-edge-id="plan" data-composition-points="355.25,225;949.5,225" d="M 355.25 225 L 949.5 225" class="a-default" stroke-width="1.4" marker-end="url(#arrowhead)"/>
+        <g data-edge-from="condiciones" data-edge-to="frances" data-edge-label="TipoPlan.calculo(): SistemaFrances" data-edge-key="1" data-edge-id="plan">
+          <path data-composition-edge-from="condiciones" data-composition-edge-to="frances" data-composition-edge-id="plan" data-composition-points="355.25,225;949.5,225" d="M 355.25 225 L 949.5 225" class="a-default" stroke-width="1.4" marker-end="url(#arrowhead)"/>
         <g data-detail="context">
           <rect x="534.175" y="205" width="236.39999999999998" height="18" rx="3" class="c-mask"/>
           <text x="652.375" y="215" class="t-muted" font-size="11" text-anchor="middle">TipoPlan.calculo(): SistemaFrances</text>
         </g>
         </g>
 
-        <g data-edge-from="credito" data-edge-to="seguro" data-edge-label="SEGURO_DE_VIDA.aplicarSobre(calculo)" data-edge-key="2" data-edge-id="aplseg">
-          <path data-composition-edge-from="credito" data-composition-edge-to="seguro" data-composition-edge-id="aplseg" data-composition-points="355.25,260;746.75,260" d="M 355.25 260 L 746.75 260" class="a-default" stroke-width="1.4" marker-end="url(#arrowhead)"/>
+        <g data-edge-from="condiciones" data-edge-to="seguro" data-edge-label="SEGURO_DE_VIDA.aplicarSobre(calculo)" data-edge-key="2" data-edge-id="aplseg">
+          <path data-composition-edge-from="condiciones" data-composition-edge-to="seguro" data-composition-edge-id="aplseg" data-composition-points="355.25,260;746.75,260" d="M 355.25 260 L 746.75 260" class="a-default" stroke-width="1.4" marker-end="url(#arrowhead)"/>
         <g data-detail="context">
           <rect x="426.2" y="240" width="249.6" height="18" rx="3" class="c-mask"/>
           <text x="551" y="250" class="t-muted" font-size="11" text-anchor="middle">SEGURO_DE_VIDA.aplicarSobre(calculo)</text>
         </g>
         </g>
 
-        <g data-edge-from="credito" data-edge-to="gasto" data-edge-label="GASTO_DE_ADMINISTRACION.aplicarSobre(calculo)" data-edge-key="3" data-edge-id="aplgas">
-          <path data-composition-edge-from="credito" data-composition-edge-to="gasto" data-composition-edge-id="aplgas" data-composition-points="355.25,295;544,295" d="M 355.25 295 L 544 295" class="a-default" stroke-width="1.4" marker-end="url(#arrowhead)"/>
+        <g data-edge-from="condiciones" data-edge-to="gasto" data-edge-label="GASTO_DE_ADMINISTRACION.aplicarSobre(calculo)" data-edge-key="3" data-edge-id="aplgas">
+          <path data-composition-edge-from="condiciones" data-composition-edge-to="gasto" data-composition-edge-id="aplgas" data-composition-points="355.25,295;544,295" d="M 355.25 295 L 544 295" class="a-default" stroke-width="1.4" marker-end="url(#arrowhead)"/>
         <g data-detail="context">
           <rect x="295.125" y="275" width="309" height="18" rx="3" class="c-mask"/>
           <text x="449.625" y="285" class="t-muted" font-size="11" text-anchor="middle">GASTO_DE_ADMINISTRACION.aplicarSobre(calculo)</text>
         </g>
         </g>
 
-        <g data-edge-from="credito" data-edge-to="gasto" data-edge-label="importeCuota(capital, tasa, cuotas)" data-edge-key="4" data-edge-id="imp">
-          <path data-composition-edge-from="credito" data-composition-edge-to="gasto" data-composition-edge-id="imp" data-composition-points="355.25,345;544,345" d="M 355.25 345 L 544 345" class="a-emphasis" stroke-width="1.8" marker-end="url(#arrowhead-emphasis)"/>
+        <g data-edge-from="condiciones" data-edge-to="gasto" data-edge-label="importeCuota(capital, tasa, cuotas)" data-edge-key="4" data-edge-id="imp">
+          <path data-composition-edge-from="condiciones" data-composition-edge-to="gasto" data-composition-edge-id="imp" data-composition-points="355.25,345;544,345" d="M 355.25 345 L 544 345" class="a-emphasis" stroke-width="1.8" marker-end="url(#arrowhead-emphasis)"/>
         <g data-detail="context">
           <rect x="328.125" y="325" width="243" height="18" rx="3" class="c-mask"/>
           <text x="449.625" y="335" class="t-edge-emphasis" font-size="11" text-anchor="middle">importeCuota(capital, tasa, cuotas)</text>
@@ -162,26 +162,26 @@ svg .s-external{color: var(--external-stroke);}
         </g>
         </g>
 
-        <g data-edge-from="gasto" data-edge-to="credito" data-edge-label="+ $500 por cuota" data-edge-key="9" data-edge-id="masgas">
-          <path data-composition-edge-from="gasto" data-composition-edge-to="credito" data-composition-edge-id="masgas" data-composition-points="544,490;355.25,490" d="M 544 490 L 355.25 490" class="a-default" stroke-width="1.4" stroke-dasharray="3,5" marker-end="url(#arrowhead)"/>
+        <g data-edge-from="gasto" data-edge-to="condiciones" data-edge-label="+ $500 por cuota" data-edge-key="9" data-edge-id="masgas">
+          <path data-composition-edge-from="gasto" data-composition-edge-to="condiciones" data-composition-edge-id="masgas" data-composition-points="544,490;355.25,490" d="M 544 490 L 355.25 490" class="a-default" stroke-width="1.4" stroke-dasharray="3,5" marker-end="url(#arrowhead)"/>
         <g data-detail="context">
           <rect x="390.825" y="470" width="117.6" height="18" rx="3" class="c-mask"/>
           <text x="449.625" y="480" class="t-muted" font-size="11" text-anchor="middle">+ $500 por cuota</text>
         </g>
         </g>
 
-        <g data-edge-from="credito" data-edge-to="svc" data-edge-label="crédito con importeCuota y su plan de cuotas" data-edge-key="10" data-edge-id="creado">
-          <path data-composition-edge-from="credito" data-composition-edge-to="svc" data-composition-edge-id="creado" data-composition-points="341.25,525;152.5,525" d="M 341.25 525 L 152.5 525" class="a-default" stroke-width="1.4" stroke-dasharray="3,5" marker-end="url(#arrowhead)"/>
+        <g data-edge-from="condiciones" data-edge-to="credito" data-edge-label="importeCuota; Credito arma su plan de cuotas" data-edge-key="10" data-edge-id="creado">
+          <path data-composition-edge-from="condiciones" data-composition-edge-to="credito" data-composition-edge-id="creado" data-composition-points="341.25,525;152.5,525" d="M 341.25 525 L 152.5 525" class="a-default" stroke-width="1.4" stroke-dasharray="3,5" marker-end="url(#arrowhead)"/>
         <g data-detail="context">
           <rect x="95.67500000000001" y="505" width="302.4" height="18" rx="3" class="c-mask"/>
-          <text x="246.875" y="515" class="t-muted" font-size="11" text-anchor="middle">crédito con importeCuota y su plan de cuotas</text>
+          <text x="246.875" y="515" class="t-muted" font-size="11" text-anchor="middle">importeCuota; Credito arma su plan de cuotas</text>
         </g>
         </g>
 
         <!-- Segment Labels -->
         <g data-graph-role="segment-label" data-segment-id="0">
-          <rect x="56" y="138" width="138.8" height="18" rx="3" class="c-mask"/>
-          <text x="62" y="151" class="t-dim" font-size="9" font-weight="600">calculo(): armar la pila</text>
+          <rect x="56" y="138" width="227.20000000000002" height="18" rx="3" class="c-mask"/>
+          <text x="62" y="151" class="t-dim" font-size="9" font-weight="600">importeCuota() → calculo(): armar la pila</text>
         </g>
         <g data-graph-role="segment-label" data-segment-id="1">
           <rect x="56" y="308" width="258.4" height="18" rx="3" class="c-mask"/>
@@ -189,25 +189,25 @@ svg .s-external{color: var(--external-stroke);}
         </g>
 
         <!-- Participants -->
-        <g id="node-svc" data-node-id="svc" data-node-label="CreditoServiceImpl" tabindex="0" role="button" aria-label="Focus CreditoServiceImpl, crear(), Sequence participant" aria-pressed="false" data-node-kind="backend" data-node-sublabel="crear()" data-node-context="Sequence participant">
-          <title>CreditoServiceImpl · crear() · Sequence participant</title>
+        <g id="node-credito" data-node-id="credito" data-node-label="Credito" tabindex="0" role="button" aria-label="Focus Credito, nuevo(cliente, fecha, condiciones), Sequence participant" aria-pressed="false" data-node-kind="backend" data-node-sublabel="nuevo(cliente, fecha, condiciones)" data-node-context="Sequence participant">
+          <title>Credito · nuevo(cliente, fecha, condiciones) · Sequence participant</title>
           <rect x="62" y="72" width="167" height="60" rx="6" class="c-mask"/>
           <rect x="62" y="72" width="167" height="60" rx="6" class="c-backend" stroke-width="1.5"/>
           <g aria-hidden="true" data-semantic-sigil="backend" class="semantic-sigil s-backend" transform="translate(68 78) scale(0.6875)">
             <path d="M6 3 3 8l3 5M10 3l3 5-3 5"/>
           </g>
-          <text data-node-label="" data-detail-anchor="" x="145.5" y="108" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">CreditoServiceImpl</text>
-          <text data-detail="context" x="145.5" y="122" class="t-muted" font-size="7" text-anchor="middle">crear()</text>
+          <text data-node-label="" data-detail-anchor="" x="145.5" y="108" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">Credito</text>
+          <text data-detail="context" x="145.5" y="122" class="t-muted" font-size="7" text-anchor="middle">nuevo(cliente, fecha, condiciones)</text>
         </g>
 
-        <g id="node-credito" data-node-id="credito" data-node-label="Credito" tabindex="0" role="button" aria-label="Focus Credito, Context / Client, Sequence participant" aria-pressed="false" data-node-kind="backend" data-node-sublabel="Context / Client" data-node-context="Sequence participant">
-          <title>Credito · Context / Client · Sequence participant</title>
+        <g id="node-condiciones" data-node-id="condiciones" data-node-label="CondicionesDeCredito" tabindex="0" role="button" aria-label="Focus CondicionesDeCredito, Context / Client, Sequence participant" aria-pressed="false" data-node-kind="backend" data-node-sublabel="Context / Client" data-node-context="Sequence participant">
+          <title>CondicionesDeCredito · Context / Client · Sequence participant</title>
           <rect x="264.75" y="72" width="167" height="60" rx="6" class="c-mask"/>
           <rect x="264.75" y="72" width="167" height="60" rx="6" class="c-backend" stroke-width="1.5"/>
           <g aria-hidden="true" data-semantic-sigil="backend" class="semantic-sigil s-backend" transform="translate(270.75 78) scale(0.6875)">
             <path d="M6 3 3 8l3 5M10 3l3 5-3 5"/>
           </g>
-          <text data-node-label="" data-detail-anchor="" x="348.25" y="108" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">Credito</text>
+          <text data-node-label="" data-detail-anchor="" x="348.25" y="108" class="t-primary" font-size="11" font-weight="600" text-anchor="middle">CondicionesDeCredito</text>
           <text data-detail="context" x="348.25" y="122" class="t-muted" font-size="7" text-anchor="middle">Context / Client</text>
         </g>
 

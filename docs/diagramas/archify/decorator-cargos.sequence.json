@@ -28,15 +28,15 @@
   },
   "participants": [
     {
-      "id": "svc",
-      "type": "backend",
-      "label": "CreditoServiceImpl",
-      "sublabel": "crear()"
-    },
-    {
       "id": "credito",
       "type": "backend",
       "label": "Credito",
+      "sublabel": "nuevo(cliente, fecha, condiciones)"
+    },
+    {
+      "id": "condiciones",
+      "type": "backend",
+      "label": "CondicionesDeCredito",
       "sublabel": "Context / Client"
     },
     {
@@ -62,7 +62,7 @@
     {
       "from": 160,
       "to": 305,
-      "label": "calculo(): armar la pila"
+      "label": "importeCuota() → calculo(): armar la pila"
     },
     {
       "from": 330,
@@ -72,36 +72,36 @@
   ],
   "messages": [
     {
-      "id": "nuevo",
-      "from": "svc",
-      "to": "credito",
+      "id": "impcond",
+      "from": "credito",
+      "to": "condiciones",
       "y": 190,
-      "label": "Credito.nuevo(..., SISTEMA_FRANCES, cargos)"
+      "label": "condiciones.importeCuota()"
     },
     {
       "id": "plan",
-      "from": "credito",
+      "from": "condiciones",
       "to": "frances",
       "y": 225,
       "label": "TipoPlan.calculo(): SistemaFrances"
     },
     {
       "id": "aplseg",
-      "from": "credito",
+      "from": "condiciones",
       "to": "seguro",
       "y": 260,
       "label": "SEGURO_DE_VIDA.aplicarSobre(calculo)"
     },
     {
       "id": "aplgas",
-      "from": "credito",
+      "from": "condiciones",
       "to": "gasto",
       "y": 295,
       "label": "GASTO_DE_ADMINISTRACION.aplicarSobre(calculo)"
     },
     {
       "id": "imp",
-      "from": "credito",
+      "from": "condiciones",
       "to": "gasto",
       "y": 345,
       "label": "importeCuota(capital, tasa, cuotas)",
@@ -142,29 +142,29 @@
     {
       "id": "masgas",
       "from": "gasto",
-      "to": "credito",
+      "to": "condiciones",
       "y": 490,
       "label": "+ $500 por cuota",
       "variant": "return"
     },
     {
       "id": "creado",
-      "from": "credito",
-      "to": "svc",
+      "from": "condiciones",
+      "to": "credito",
       "y": 525,
-      "label": "crédito con importeCuota y su plan de cuotas",
+      "label": "importeCuota; Credito arma su plan de cuotas",
       "variant": "return"
     }
   ],
   "activations": [
     {
-      "participant": "svc",
+      "participant": "credito",
       "from": 185,
       "to": 530,
       "type": "backend"
     },
     {
-      "participant": "credito",
+      "participant": "condiciones",
       "from": 185,
       "to": 530,
       "type": "backend"

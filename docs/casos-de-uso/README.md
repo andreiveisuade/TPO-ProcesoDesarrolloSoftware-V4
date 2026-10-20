@@ -5,7 +5,7 @@ Casos de uso del dashboard de préstamos tal como funcionan en V4 (rama `iteraci
 Convenciones:
 
 - Rutas del backend relativas a `backend/src/main/java/com/uade/tpejemplo/`; tests relativos a `backend/src/test/java/com/uade/tpejemplo/`; front relativo a `frontend/src/`. Cada cita de código es `archivo` + método.
-- **Verificación**: *Test* = test automático (`mvn test`, 63 tests, todos pasan al 2026-10-20): de dominio en `model/` y `model/plan/`, y de códigos HTTP en `controller/CodigosHttpTest` (`@WebMvcTest` con la seguridad JWT real). *Smoke* = smoke test manual del equipo. *Final* = verificación final manual del equipo, con capturas. Smoke y Final son notas de trabajo internas que no van en la entrega. *API* = `verificar-cu.sh` de esta carpeta, corrido sobre una base limpia (resultados en la sección 6).
+- **Verificación**: *Test* = test automático (`mvn test`, 64 tests, todos pasan al 2026-10-20): de dominio en `model/` y `model/plan/`, y de códigos HTTP en `controller/CodigosHttpTest` (`@WebMvcTest` con la seguridad JWT real). *Smoke* = smoke test manual del equipo. *Final* = verificación final manual del equipo, con capturas. Smoke y Final son notas de trabajo internas que no van en la entrega. *API* = `verificar-cu.sh` de esta carpeta, corrido sobre una base limpia (resultados en la sección 6).
 - Errores: todos salen por `exception/GlobalExceptionHandler.java` con cuerpo `{status, error, mensajes[]}`: 400 regla de negocio (`handleNegocio`), 400 validación del DTO (`handleValidacion`), 400 body o parámetro mal formado (`handleSolicitudInvalida`), 401 credenciales (`handleNoAutenticado`), 403 sin permiso (`handleAccesoDenegado`), 404 no encontrado (`handleNoEncontrado`). Sin token, o con token inválido, la cadena de seguridad responde 401 sin cuerpo; con token y sin el rol, 403 sin cuerpo (`config/SecurityConfig.java` `filterChain`). Los dos casos y el 400/404/405 los cubre `controller/CodigosHttpTest`.
 
 ## 1. Actores
@@ -93,13 +93,13 @@ Fuente: `casos-de-uso-v4.puml` (renderizado con `plantuml -tsvg` y `-tpng`). Sup
 - **Actor**: Usuario. **RF V0**: RF-CR-01. Incluye UC08.
 - **Precondición**: el cliente existe.
 - **Precondición** (V4): el cliente no tiene cuotas vencidas impagas.
-- **Flujo principal**: 1. El usuario carga DNI del cliente, deuda original, fecha, tasa, cantidad de cuotas, tipo de plan (interés simple o sistema francés) y, opcionalmente, los cargos (casillas "Seguro de vida" y "Gastos de administración"). 2. El sistema valida los datos. 3. Busca el cliente. 4. Verifica que el cliente no esté en mora (`model/Cartera.java` `montoVencido` sobre sus créditos, M14). 5. Crea el crédito: el importe de cuota lo calcula la estrategia del plan elegido (`model/Credito.java` constructor, `model/TipoPlan.java` `calculo`, `model/plan/InteresSimple.java`, `model/plan/SistemaFrances.java`; M9 Strategy), envuelta por cada cargo elegido (`model/Credito.java` `calculo`, `model/TipoCargo.java` `aplicarSobre`, `model/plan/SeguroDeVida.java` 0,1 % del capital por cuota, `model/plan/GastoDeAdministracion.java` $500 por cuota; M12 Decorator). 6. Genera el plan de cuotas (UC08). 7. Responde **201** con cuotas, cargos, total a devolver, estado VIGENTE y saldo igual al total.
-- **Errores**: cliente inexistente → **404**. Cliente con cuotas vencidas → **400** "El cliente x tiene cuotas vencidas: no se le puede otorgar un crédito nuevo." (M14). Deuda ≤ 0, cuotas < 1, tasa negativa o > 999,99, algún campo vacío → **400** de validación (`dto/request/CreditoRequest.java`). Tipo de plan o cargo inexistente, o JSON mal formado → **400** "Solicitud inválida".
+- **Flujo principal**: 1. El usuario carga DNI del cliente, deuda original, fecha, tasa, cantidad de cuotas, tipo de plan (interés simple o sistema francés) y, opcionalmente, los cargos (casillas "Seguro de vida" y "Gastos de administración"). 2. El sistema valida los datos. 3. Busca el cliente. 4. Verifica que el cliente no esté en mora (`model/interfaces/Deuda.java` `tieneMora` sobre la `Cartera` de sus créditos, M14). 5. Crea el crédito: el importe de cuota lo calcula la estrategia del plan elegido (`model/CondicionesDeCredito.java` `importeCuota`, `model/TipoPlan.java` `calculo`, `model/plan/InteresSimple.java`, `model/plan/SistemaFrances.java`; M9 Strategy), envuelta por cada cargo elegido (`model/CondicionesDeCredito.java` `calculo`, `model/TipoCargo.java` `aplicarSobre`, `model/plan/SeguroDeVida.java` 0,1 % del capital por cuota, `model/plan/GastoDeAdministracion.java` $500 por cuota; M12 Decorator). 6. Genera el plan de cuotas (UC08). 7. Responde **201** con cuotas, cargos, total a devolver, estado VIGENTE y saldo igual al total.
+- **Errores**: cliente inexistente → **404**. Cliente con cuotas vencidas → **400** "El cliente x tiene cuotas vencidas: no se le puede otorgar un crédito nuevo." (M14). Deuda ≤ 0, cuotas < 1, tasa negativa o > 999,99, algún campo vacío → **400** de validación (`dto/request/CreditoRequest.java`). Tipo de plan o cargo inexistente, o JSON mal formado → **400** "Solicitud inválida". Cargo `null` en la lista → **400** de validación (H6).
 - **Postcondición**: crédito VIGENTE con su plan de cuotas y sus cargos (tabla `credito_cargos`). Sin `cargos` en el request (o vacío) el crédito no tiene cargos.
 - **Reglas**: `service/impl/CreditoServiceImpl.java` `crear` (mora y cargos opcionales); `model/Credito.java` `totalADevolver` (cuota × cantidad, O3).
 - **Endpoint**: `POST /api/creditos` → `controller/CreditoController.java` `crear`.
 - **Pantalla**: `pages/Creditos.jsx` (formulario de alta).
-- **Verificación**: Test `model/plan/InteresSimpleTest` (4), `model/plan/SistemaFrancesTest` (4), `model/plan/SeguroDeVidaTest` (2), `model/plan/GastoDeAdministracionTest` (2), `model/plan/CargosApiladosTest` (2), `model/CreditoTest.java` `nuevoEstaVigenteConSaldoIgualAlTotal`, `service/ReglaDeMoraTest` (2); Smoke "Crédito INTERES_SIMPLE… (M9)", "Crédito SISTEMA_FRANCES…"; Final captura `04-creditos.png`; API (UC07 x10).
+- **Verificación**: Test `model/plan/InteresSimpleTest` (4), `model/plan/SistemaFrancesTest` (4), `model/plan/SeguroDeVidaTest` (2), `model/plan/GastoDeAdministracionTest` (2), `model/plan/CargosApiladosTest` (2), `model/CreditoTest.java` `nuevoEstaVigenteConSaldoIgualAlTotal`, `service/ReglaDeMoraTest` (2); Smoke "Crédito INTERES_SIMPLE… (M9)", "Crédito SISTEMA_FRANCES…"; Final captura `04-creditos.png`; API (UC07 x13).
 - **Evolución**: V0 cargaba el importe de cuota a mano (B-07); V1 lo calcula con tasa; V3 lo hace intercambiable por plan (M9); V4 suma cargos opcionales (M12) y rechaza al cliente en mora (M14).
 - **Hueco**: la fecha es libre: acepta un crédito otorgado en 2030 (API) o en el pasado.
 
@@ -238,7 +238,7 @@ Fuente: `casos-de-uso-v4.puml` (renderizado con `plantuml -tsvg` y `-tpng`). Sup
 - **Reglas**: `service/impl/ClienteServiceImpl.java` `deuda`: `model/Cartera.java` `de`, `saldo`, `montoVencido` (Composite, M11): la cartera suma lo que cada crédito suma de sus cuotas; la cuota de un crédito anulado no se debe (`model/Cuota.java` `saldo`) y la vencida es la impaga con vencimiento pasado (`model/Cuota.java` `montoVencido`). Es la misma consulta que usa la regla de mora de UC07 (M14).
 - **Endpoint**: `GET /api/clientes/{dni}/deuda` → `controller/ClienteController.java` `deuda`.
 - **Pantalla**: `pages/Clientes.jsx` (bloque "Buscar cliente por DNI"). Usa `api/clientes.js` `getDeudaCliente`.
-- **Verificación**: Test `service/DeudaClienteTest` (3: con vencida, al día, cliente inexistente), `model/CarteraTest` (4); API (UC21 x4).
+- **Verificación**: Test `service/DeudaClienteTest` (3: con vencida, al día, cliente inexistente), `model/CarteraTest` (4); API (UC21 x5).
 
 ## 4. Casos de uso retirados o reclasificados
 
@@ -294,6 +294,7 @@ Los tests de dominio están en `model/` y `model/plan/` del árbol de tests; los
 |---|---|---|
 | UC04 DNI `"abc"` | 400 | BS14 |
 | UC07 cliente en mora / con seguro y gastos / cargo inexistente | 400 / 201 / 400 | 100000 en 2 cuotas: cuota 50600 (M12) |
+| UC07 cargo `null` | 400 | H6; antes 500. Corrida contra `01fbfb6` |
 | UC09, UC10, `GET /api/creditos` | 200 | Con `cargos` en la respuesta |
 | UC21 al día / en mora / inexistente / sin token | 200 / 200 / 404 / 401 | Vencido 0 y 500 |
 | UC21 y UC07 tras cobrar las cuotas vencidas | 200 / 201 | Vencido 0: se le vuelve a otorgar |

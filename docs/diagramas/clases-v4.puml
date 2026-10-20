@@ -179,7 +179,7 @@ note as Leyenda
   Cada *ServiceImpl implementa las operaciones de su interfaz.
   Las entidades del modelo (Credito, Cuota, Cartera, ...) están en clases-v4-modelo;
   JWT, Spring Security y la Facade de autenticación, en clases-v4-seguridad.
-  CreditoServiceImpl, ClienteServiceImpl y DashboardServiceImpl son Client del Composite (Cartera).
+  CreditoServiceImpl, ClienteServiceImpl y DashboardServiceImpl son Client del Composite (tipan Deuda).
   Omitidos: DTOs (estructuras sin comportamiento), excepciones,
   configuración y GlobalExceptionHandler (@RestControllerAdvice).
 end note
@@ -330,17 +330,16 @@ package "model.interfaces" {
   interface Deuda <<Component>> {
     + saldo() : BigDecimal
     + montoVencido() : BigDecimal
+    + tieneMora() : boolean
   }
   interface ICliente {
     + getDni() : String
     + getNombre() : String
   }
   interface ICredito {
-    + getCargos() : Set<TipoCargo>
+    + getCondiciones() : CondicionesDeCredito
     + totalADevolver() : BigDecimal
     + estado() : EstadoCredito
-    + estaCancelado() : boolean
-    + tieneCobranzas() : boolean
     + puedeAnularse() : boolean
     + anular() : void
   }
@@ -386,28 +385,31 @@ package "model" {
     + montoVencido() : BigDecimal
     - sumar(Function<Deuda, BigDecimal>) : BigDecimal
   }
-  class Credito <<Context / Composite>> {
+  class Credito <<Composite>> {
     - id : Long
-    - deudaOriginal : BigDecimal
     - fecha : LocalDate
-    - tasaInteres : BigDecimal
     - importeCuota : BigDecimal
-    - cantidadCuotas : Integer
-    - tipoPlan : TipoPlan
-    - cargos : Set<TipoCargo>
     - anulado : boolean
-    + {static} nuevo(Cliente, BigDecimal, LocalDate, BigDecimal, Integer, TipoPlan, Set<TipoCargo>) : Credito
-    - calculo() : CalculoDeCuota
+    + {static} nuevo(Cliente, LocalDate, CondicionesDeCredito) : Credito
     + totalADevolver() : BigDecimal
     - generarPlanDeCuotas() : void
     + estado() : EstadoCredito
     + saldo() : BigDecimal
     + montoVencido() : BigDecimal
     - sumar(Function<Cuota, BigDecimal>) : BigDecimal
-    + estaCancelado() : boolean
-    + tieneCobranzas() : boolean
+    - estaCancelado() : boolean
+    - tieneCobranzas() : boolean
     + puedeAnularse() : boolean
     + anular() : void
+  }
+  class CondicionesDeCredito <<Context / Embeddable>> {
+    - deudaOriginal : BigDecimal
+    - tasaInteres : BigDecimal
+    - cantidadCuotas : Integer
+    - tipoPlan : TipoPlan
+    - cargos : Set<TipoCargo>
+    + importeCuota() : BigDecimal
+    - calculo() : CalculoDeCuota
   }
   class Cuota <<Leaf>> {
     - id : Long
@@ -513,31 +515,34 @@ Cartera "1" o-- "0..*" Deuda : deudas
 Credito "0..*" --> "1" Cliente : cliente
 Credito "1" *-- "1..*" Cuota : cuotas\n(Creator, cascade PERSIST)
 Cuota "1" *-- "0..*" Cobranza : cobranzas
-Credito --> "1" TipoPlan : tipoPlan
-Credito --> "0..*" TipoCargo : cargos
+Credito "1" *-- "1" CondicionesDeCredito : condiciones
+CondicionesDeCredito --> "1" TipoPlan : tipoPlan
+CondicionesDeCredito --> "0..*" TipoCargo : cargos
 TipoPlan --> "1" CalculoDeCuota : calculo
 TipoCargo ..> CargoSobreCuota : crea
 CargoSobreCuota o--> "1" CalculoDeCuota : envuelto
-Credito ..> CalculoDeCuota : calculo()
+CondicionesDeCredito ..> CalculoDeCuota : calculo()
 Credito ..> EstadoCredito : estado()
 Usuario --> "1" Rol : rol
 Usuario *-- "1" Permisos : permisos
 
 note right of TipoPlan
-  Strategy: Credito delega importeCuota en
-  tipoPlan.calculo(); el total sale de las cuotas.
+  Strategy: CondicionesDeCredito delega importeCuota
+  en tipoPlan.calculo(); el total sale de las cuotas.
   El plan se fija al otorgar el crédito.
 end note
 note right of CargoSobreCuota
-  Decorator: Credito.calculo() parte de
+  Decorator: CondicionesDeCredito.calculo() parte de
   tipoPlan.calculo() y lo envuelve con cada
   cargo (TipoCargo.aplicarSobre). Cada capa
   delega en la envuelta y le suma su cargo.
 end note
 note left of Cartera
   Composite: Cartera contiene créditos, que a su
-  vez contienen cuotas. El cliente (DashboardServiceImpl,
-  CreditoServiceImpl) pide saldo() o montoVencido()
-  sin saber cuántos niveles hay abajo.
+  vez contienen cuotas. Los clientes (DashboardServiceImpl,
+  CreditoServiceImpl, ClienteServiceImpl) tipan Deuda y
+  piden saldo(), montoVencido() o tieneMora().
+  Credito solo admite Cuota como hijo (JPA):
+  la profundidad es fija.
 end note
 @enduml

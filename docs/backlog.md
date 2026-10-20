@@ -44,10 +44,10 @@ Junta lo que quedó abierto en las iteraciones 3 y 4 (dominio, prácticas de Spr
 | O9 | `EstadoCredito` como patrón State | El estado es derivado, no se guarda y hay una sola transición con regla (`Credito.anular()`). Sobreingeniería; el apunte advierte contra confundir Strategy con State. Respuesta para la defensa |
 | O10 | Strategy para punitorios, Adapter sobre `PasswordEncoder`, Adapter sobre `fetch` | Ninguno tapa un hueco: no hay punitorios, `PasswordEncoder` ya es la abstracción de Spring y `api/apiClient.js` ya hace de pasarela |
 | S6 | Una sola fuente de autorización por rol (sacar `@PreAuthorize` o las reglas de URL) | Decisión: se mantienen las dos. Las reglas de URL de `…/config/SecurityConfig.java` cubren las tres zonas y `@PreAuthorize` en `AdminController` y `SupervisorController` repite el control en el método: defensa en profundidad, si alguien cambia una ruta el método sigue protegido |
-| D3 | Borrar `estaCancelado()`, `tieneCobranzas()` y `puedeAnularse()` de `…/model/interfaces/ICredito.java` | Tira tests y una pregunta de dominio legítima; no molesta a nadie |
+| D3 | Borrar `estaCancelado()`, `tieneCobranzas()` y `puedeAnularse()` de `…/model/interfaces/ICredito.java` | Revertido en parte en V4 (M17): `estaCancelado` y `tieneCobranzas` pasan a privados (ISP, sin uso externo); `puedeAnularse` queda porque lo usa `CreditoResponse` |
 | D4 | Borrar `…/model/interfaces/IRol.java` | Las interfaces de modelo se restituyeron en V2 a propósito; sacar una sola rompe la simetría del diagrama |
 | D5 | Sacar `GET /api/creditos` por falta de consumidor | Es API pública documentada, no código muerto |
-| BS5 | Objeto parámetro para `Credito.nuevo` (6 parámetros) | Datos obligatorios de tipos distintos y un solo llamador: sobreingeniería |
+| BS5 | Objeto parámetro para `Credito.nuevo` (6 parámetros) | Revertido en V4 (M17): con los cargos de M12 llegó a 7, y cinco (capital, tasa, cuotas, plan, cargos) son justo lo que calcula la cuota: `CondicionesDeCredito` |
 | BS7 | Quitar `@Data` de los DTO | Un DTO es una estructura de datos por diseño; las clases de dominio ya tienen comportamiento |
 | BSF3 | Factorizar thunks y estilos inline del front | Boilerplate estándar de Redux Toolkit; cambia todo el front sin tapar ningún hueco |
 | A-4 | `PUT /api/clientes/{dni}` (editar nombre) | DUDOSA: ningún caso de uso ni ticket lo pide |

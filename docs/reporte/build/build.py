@@ -6,6 +6,7 @@ OUT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 REPO = os.path.abspath(os.path.join(OUT, "..", ".."))
 J = "backend/src/main/java/com/uade/tpejemplo/"
 A, D = "v3", "iteracion4"
+P = "06f0fc7"  # iteracion4 antes de M17
 e = html.escape
 
 
@@ -52,7 +53,7 @@ def body(c, path):
 
 
 def cb(c, path, *partes):
-    ver = "V3 (tag v3)" if c == A else "V4 (iteracion4)"
+    ver = {A: "V3 (tag v3)", P: "V4 antes de M17 (06f0fc7)"}.get(c, "V4 (iteracion4)")
     return f'<div class="ruta">{e(full(path))} <span class="ver">· {ver}</span></div><pre><code>{e(chr(10).join(partes))}</code></pre>'
 
 
@@ -91,10 +92,11 @@ def trampa(pregunta, respuesta):
     return f'<dl class="qa"><dt>Pregunta trampa: “{pregunta}”</dt><dd>{respuesta}</dd></dl>'
 
 
-def bloque(id_, titulo, badge, patron, problema, antes, solucion, despues, por_que, consecuencias, ref="", extra=""):
+def bloque(id_, titulo, badge, patron, problema, antes, solucion, despues, por_que, consecuencias, ref="", extra="", intro="", tit_a="Antes (V3)"):
     return f'''<article class="mejora" id="{id_}">
 <h3>{titulo} <span class="badge impl">{badge}</span></h3>
 {('<p class="ref">' + ref + '</p>') if ref else ''}
+{intro}
 <dl class="estructura">
 <dt>Patrón</dt><dd>{patron}</dd>
 <dt>Problema (código antes)</dt><dd><p>{problema}</p>{antes}</dd>
@@ -103,25 +105,25 @@ def bloque(id_, titulo, badge, patron, problema, antes, solucion, despues, por_q
 <dt>Consecuencias</dt><dd>{consecuencias}</dd>
 </dl>
 {extra}
-{diagramas(id_)}
+{diagramas(id_, tit_a)}
 </article>'''
 
 
 # ---------------- M11 Composite ----------------
-m11 = bloque("composite", "M11. Composite: saldo y mora a cualquier nivel", "implementada",
+m11 = bloque("composite", "M11. Composite: saldo y mora en cuota, crédito y cartera", "implementada",
     "<strong>Composite</strong> (GoF, estructural): el cliente trata igual a una parte y a un conjunto.",
     "La misma pregunta (¿cuánto se debe?, ¿cuánto venció?) se contestaba con <strong>código distinto en cada nivel</strong>.",
     cb(A, "model/Credito.java", method(A, "model/Credito.java", r"public BigDecimal saldo"), "", method(A, "model/Credito.java", r"private BigDecimal sumarCuotas"))
     + cb(A, "service/impl/DashboardServiceImpl.java", lines(A, "service/impl/DashboardServiceImpl.java", r"// Information Expert: el saldo", 7)),
-    "Interfaz <code>Deuda</code>: la cuota responde; crédito y cartera <strong>suman a sus hijos</strong>.",
+    "Interfaz <code>Deuda</code>: la cuota responde; crédito y cartera <strong>delegan en sus hijos y suman</strong>. Los clientes tipan <code>Deuda</code>.",
     cb(D, "model/interfaces/Deuda.java", body(D, "model/interfaces/Deuda.java"))
     + cb(D, "model/Cuota.java", method(D, "model/Cuota.java", r"public BigDecimal saldo"), "", method(D, "model/Cuota.java", r"public BigDecimal montoVencido"))
     + cb(D, "model/Credito.java", method(D, "model/Credito.java", r"public BigDecimal saldo"), "", method(D, "model/Credito.java", r"private BigDecimal sumar"))
     + cb(D, "model/Cartera.java", body(D, "model/Cartera.java"))
     + cb(D, "service/impl/DashboardServiceImpl.java", lines(D, "service/impl/DashboardServiceImpl.java", r"// Composite: la cartera suma", 4)),
     "El árbol ya existía (cartera → crédito → cuota). <strong>Polymorphism</strong>, <strong>OCP</strong>.",
-    "Gana: una sola suma, reutilizada por mora y deuda del cliente. Cuesta: <code>Credito</code> solo admite <code>Cuota</code> (JPA).",
-    ref="Commits <code>7b47ccc</code>, <code>e51bb24</code>.",
+    "Gana: una sola suma, reutilizada por mora y deuda del cliente. Cuesta: <code>Credito</code> solo admite <code>Cuota</code> como hijo (JPA) y la profundidad es fija.",
+    ref="Commits <code>7b47ccc</code>, <code>e51bb24</code>, <code>2c60085</code>.",
     extra=roles([
         ("Component", "<code>model/interfaces/Deuda.java</code>"),
         ("Leaf", "<code>model/Cuota.java</code>"),
@@ -133,24 +135,24 @@ m11 = bloque("composite", "M11. Composite: saldo y mora a cualquier nivel", "imp
 
 # ---------------- M12 Decorator ----------------
 m12 = bloque("decorator", "M12. Decorator: cargos sobre la cuota", "expansión del dominio",
-    "<strong>Decorator</strong> (GoF, estructural): agrega responsabilidades a un objeto sin herencia.",
+    "<strong>Decorator</strong> (GoF, estructural): agrega responsabilidades a un objeto por composición, en vez de una subclase por combinación.",
     "Un préstamo real suma <strong>cargos opcionales</strong> (seguro de vida, gastos). Con herencia: una subclase por plan × combinación.",
     cb(A, "model/Credito.java", method(A, "model/Credito.java", r"private CalculoDeCuota calculo")),
-    "Cada cargo <strong>envuelve</strong> el cálculo y suma lo suyo; <code>Credito</code> arma la pila.",
-    cb(D, "model/Credito.java", method(D, "model/Credito.java", r"private CalculoDeCuota calculo"))
+    "Cada cargo <strong>envuelve</strong> el cálculo y suma lo suyo; <code>CondicionesDeCredito</code> arma la pila (M17).",
+    cb(D, "model/CondicionesDeCredito.java", method(D, "model/CondicionesDeCredito.java", r"private CalculoDeCuota calculo"))
     + cb(D, "model/plan/CargoSobreCuota.java", body(D, "model/plan/CargoSobreCuota.java"))
     + cb(D, "model/plan/SeguroDeVida.java", method(D, "model/plan/SeguroDeVida.java", r"protected BigDecimal cargo"))
     + cb(D, "model/plan/GastoDeAdministracion.java", method(D, "model/plan/GastoDeAdministracion.java", r"protected BigDecimal cargo"))
     + cb(D, "model/TipoCargo.java", body(D, "model/TipoCargo.java")),
     "Se otorgan o derogan <strong>por crédito</strong>. <strong>OCP</strong>, <strong>SRP</strong>.",
     "Simplificación: el seguro se calcula sobre el <strong>capital</strong>, no sobre el saldo.",
-    ref="Commits <code>4eab370</code>, <code>54cd991</code>. Tabla nueva <code>credito_cargos</code>.",
+    ref="Commits <code>4eab370</code>, <code>54cd991</code>; <code>3fc5b9d</code> lo muda a <code>CondicionesDeCredito</code>. Tabla nueva <code>credito_cargos</code>.",
     extra=roles([
         ("Component", "<code>CalculoDeCuota</code> (la Strategy de V3)"),
         ("ConcreteComponent", "<code>InteresSimple</code>, <code>SistemaFrances</code>"),
         ("Decorator", "<code>model/plan/CargoSobreCuota.java</code>"),
         ("ConcreteDecorator", "<code>SeguroDeVida</code> (0,1 %), <code>GastoDeAdministracion</code> ($500)"),
-        ("Client", "<code>Credito.calculo()</code>"),
+        ("Client", "<code>CondicionesDeCredito.calculo()</code>"),
     ]) + trampa("¿No es otra Strategy?",
         "No: Strategy elige <strong>un</strong> algoritmo; los decoradores <strong>se apilan</strong> sobre él.")
     + figura("decorator-cargos", "Secuencia: cuota francesa con seguro y gastos"))
@@ -159,17 +161,17 @@ m12 = bloque("decorator", "M12. Decorator: cargos sobre la cuota", "expansión d
 evidencia = ('$ git grep -lE "AuthenticationManager|PasswordEncoder|TokenService|io\\.jsonwebtoken" \\\n'
              '    iteracion4 -- backend/src/main/java/com/uade/tpejemplo/controller\n'
              + (git("grep", "-lE", r"AuthenticationManager|PasswordEncoder|TokenService|io\.jsonwebtoken", D, "--", J + "controller").strip() or "(sin resultados)"))
-m13 = bloque("facade", "M13. Facade: autenticación", "reconocida y nombrada",
-    "<strong>Facade</strong> (GoF, estructural): interfaz simple sobre un componente de terceros complejo.",
-    "El patrón <strong>ya existía sin nombre</strong>; <code>AuthController.actual</code> recibía un tipo de Spring.",
-    cb(A, "controller/AuthController.java", method(A, "controller/AuthController.java", r"public ResponseEntity<AuthResponse> actual")),
-    "Rol nombrado; el controlador recibe <code>UsuarioDetails</code>, como los demás.",
+m13 = bloque("facade", "M13. Facade: autenticación", "identificado en código existente",
+    "<strong>Facade</strong> (GoF, estructural): interfaz simple sobre un subsistema de terceros complejo. <strong>Patrón identificado</strong>, no aplicado en V4.",
+    "Desde V1 la autenticación pasa por <code>AuthService</code>, pero <strong>nadie lo nombraba</strong>: no se defendía como patrón.",
+    cb(A, "service/AuthService.java", body(A, "service/AuthService.java")),
+    "Se nombra el rol en <code>AuthService</code>; <strong>el diseño no cambia</strong>.",
     cb(D, "service/AuthService.java", body(D, "service/AuthService.java"))
     + cb(D, "service/impl/AuthServiceImpl.java", lines(D, "service/impl/AuthServiceImpl.java", r"private final UsuarioRepository", 4), "", method(D, "service/impl/AuthServiceImpl.java", r"public AuthResponse login"))
     + '<p>Evidencia: ningún controlador usa el subsistema.</p><pre><code>' + e(evidencia) + '</code></pre>',
     "Esconde Spring Security y jjwt. <strong>Low Coupling</strong>, <strong>Protected Variations</strong>.",
-    "Los controladores conservan solo anotaciones de borde (<code>@AuthenticationPrincipal</code>, <code>@PreAuthorize</code>).",
-    ref="Commit <code>a0fafd3</code>.",
+    "Sin cambio de diseño: es reconocimiento. Los controladores conservan solo anotaciones de borde (<code>@AuthenticationPrincipal</code>, <code>@PreAuthorize</code>).",
+    ref="Commits <code>a0fafd3</code>, <code>01fbfb6</code>.",
     extra=roles([
         ("Facade", "<code>service/AuthService.java</code>, <code>service/impl/AuthServiceImpl.java</code>"),
         ("Subsistema", "<code>AuthenticationManager</code>, <code>PasswordEncoder</code>, <code>TokenService</code> → <code>JwtUtil</code> (Adapter M7), <code>UsuarioRepository</code>"),
@@ -178,24 +180,56 @@ m13 = bloque("facade", "M13. Facade: autenticación", "reconocida y nombrada",
         "No: los demás coordinan dominio propio (GRASP Controller); este oculta terceros.")
     + figura("facade-login", "Secuencia: login a través de la Facade"))
 
-mejoras = [m11, m12, m13]
+# ---------------- M17 Credito ----------------
+m17 = bloque("credito", "M17. Credito: Extract Class + ISP", "refactor",
+    "<strong>Extract Class</strong> e <strong>Introduce Parameter Object</strong> (Fowler) + <strong>ISP</strong>.",
+    "<strong>Long Parameter List / Data Clump</strong>: <code>nuevo</code> recibía 7 parámetros. <strong>Tres responsabilidades</strong>: precio de la cuota, suma de deuda y ciclo de vida. <code>estaCancelado</code> y <code>tieneCobranzas</code> públicos sin uso externo.",
+    cb(P, "model/Credito.java", method(P, "model/Credito.java", r"public static Credito nuevo"), "", method(P, "model/Credito.java", r"private CalculoDeCuota calculo"))
+    + cb(P, "model/interfaces/ICredito.java", body(P, "model/interfaces/ICredito.java").replace("\n\n", "\n")),
+    "Lo pactado al otorgar pasa a <code>CondicionesDeCredito</code> (<code>@Embeddable</code>), que calcula la cuota: es el «Context» del Strategy. <code>Credito</code> queda con deuda y ciclo de vida.",
+    cb(D, "model/Credito.java", method(D, "model/Credito.java", r"public static Credito nuevo"))
+    + cb(D, "model/CondicionesDeCredito.java", method(D, "model/CondicionesDeCredito.java", r"public BigDecimal importeCuota"), "", method(D, "model/CondicionesDeCredito.java", r"private CalculoDeCuota calculo"))
+    + cb(D, "model/interfaces/ICredito.java", body(D, "model/interfaces/ICredito.java").replace("\n\n", "\n")),
+    roles([
+        ("SRP", "<code>Credito</code>: deuda y ciclo de vida; <code>CondicionesDeCredito</code>: precio de la cuota"),
+        ("ISP", "<code>ICredito</code> sin <code>estaCancelado</code> ni <code>tieneCobranzas</code>: nadie de afuera los usaba"),
+        ("High Cohesion", "cada clase usa todos sus campos"),
+        ("Information Expert", "las condiciones conocen plan y cargos → calculan la cuota"),
+        ("Extract Class, Introduce Parameter Object", "cinco datos que viajaban juntos → un objeto"),
+    ]).replace("<th>Rol</th><th>Clase</th>", "<th>Principio</th><th>Dónde</th>"),
+    "Gana: una firma que se lee. Cuesta: un nivel más (<code>credito.getCondiciones()</code>).",
+    ref="Commit <code>3fc5b9d</code>.",
+    intro='<dl class="qa"><dt>¿<code>Credito</code> es una god class?</dt><dd>No: <strong>alta cohesión</strong>, todo lo que hace usa sus propios datos (Information Expert). Pero tenía tres olores concretos. Revierte BS5 y parte de D3, descartados en V3: con los cargos de M12 la firma llegó a 7 parámetros.</dd></dl>',
+    tit_a="Antes (06f0fc7)",
+    extra='<h4>Qué no cambió</h4>' + roles([
+        ("Tablas <code>creditos</code>, <code>credito_cargos</code>", "DDL de Hibernate antes y después: idéntico byte a byte"),
+        ("JSON de <code>CreditoResponse</code>", "mismos campos; sigue plano"),
+        ("<code>check (cantidad_cuotas&gt;=1)</code>", "lo mantiene <code>@Valid</code> sobre <code>condiciones</code>"),
+    ]).replace("<th>Rol</th><th>Clase</th>", "<th>Qué</th><th>Evidencia</th>")
+    + '<h4>Descartado</h4>' + roles([
+        ("State para el estado", "3 estados y un <code>if</code>: es un valor derivado (O9)"),
+        ("Extraer el plan de cuotas", "<strong>Creator</strong>: <code>Credito</code> contiene y registra sus cuotas"),
+    ]).replace("<th>Rol</th><th>Clase</th>", "<th>Idea</th><th>Por qué no</th>"))
+
+mejoras = [m11, m12, m13, m17]
 
 indice = [
  ("composite", "M11", "Saldo y mora por cuota, crédito y cartera", "<strong>Composite</strong>", "sumas repetidas"),
  ("decorator", "M12", "Seguro de vida y gastos sobre la cuota", "<strong>Decorator</strong>", "expansión del dominio"),
- ("facade", "M13", "Autenticación detrás de <code>AuthService</code>", "<strong>Facade</strong>", "patrón sin nombrar"),
+ ("facade", "M13", "Autenticación detrás de <code>AuthService</code>", "<strong>Facade</strong> (identificado)", "patrón sin nombrar"),
+ ("credito", "M17", "Condiciones del crédito en su propia clase", "Extract Class + ISP", "7 parámetros, 3 responsabilidades"),
  ("panel", "M14-M16", "Regla de mora, deuda del cliente, cargos en el alta", "Composite, Decorator", "panel"),
 ]
 tabla_indice = "".join(f'<tr><td><a href="#{k}">{i}</a></td><td>{a}</td><td>{b}</td><td>{c}</td></tr>' for k, i, a, b, c in indice)
 
 # ---------------- panel ----------------
 panel = [
- ("M14", "Regla de mora", "Composite", "<code>CreditoServiceImpl.crear</code>: cliente con cuotas vencidas → 400."),
+ ("M14", "Regla de mora", "Composite", "<code>CreditoServiceImpl.crear</code>: <code>cartera.tieneMora()</code> → 400."),
  ("M15", "Deuda del cliente", "Composite", "<code>GET /api/clientes/{dni}/deuda</code>; Clientes muestra saldo y vencido."),
  ("M16", "Cargos al otorgar", "Decorator", "Casillas en Créditos; la ficha lista los cargos."),
 ]
 panel_html = '<table><thead><tr><th>ID</th><th>Funcionalidad</th><th>Usa</th><th>Dónde</th></tr></thead><tbody>' + "".join(f'<tr><td>{i}</td><td><strong>{f}</strong></td><td>{u}</td><td>{d}</td></tr>' for i, f, u, d in panel) + '</tbody></table>'
-panel_codigo = (cb(D, "service/impl/CreditoServiceImpl.java", lines(D, "service/impl/CreditoServiceImpl.java", r"// Composite: la cartera del cliente", 6))
+panel_codigo = (cb(D, "service/impl/CreditoServiceImpl.java", lines(D, "service/impl/CreditoServiceImpl.java", r"// Composite: la cartera del cliente", 7))
     + cb(D, "service/impl/ClienteServiceImpl.java", method(D, "service/impl/ClienteServiceImpl.java", r"public DeudaClienteResponse deuda")))
 
 # ---------------- revisión ----------------
@@ -203,6 +237,7 @@ rev = [
  ("BS14", "a989edd", "DNI <code>\"sdfg\"</code> aceptado.", "Solo 7 u 8 dígitos (<code>@Pattern</code>)."),
  ("BS11b", "7b47ccc", "<code>Credito.saldo</code> repetía la regla del anulado.", "La sabe la cuota; <code>sumar(Function)</code>."),
  ("DER", "b6ad026", "Sin <code>credito_cargos</code>.", "<code>der-v4</code>: PK compuesta, <code>rol</code> enum."),
+ ("H6", "06eb1eb", "<code>\"cargos\":[null]</code> daba 500.", "<code>Set&lt;@NotNull TipoCargo&gt;</code>: 400."),
 ]
 rev_html = '<table><thead><tr><th>ID · commit</th><th>Problema</th><th>Cambio</th></tr></thead><tbody>' + "".join(f'<tr><td><strong>{i}</strong><br><span class="ref"><code>{c}</code></span></td><td>{p}</td><td>{s}</td></tr>' for i, c, p, s in rev) + '</tbody></table>'
 
@@ -216,15 +251,15 @@ convenciones = """<p>Convención: <strong><code>I&lt;Clase&gt;</code></strong> p
 </tbody></table>"""
 
 matriz = [
- ("Information Expert", "<code>Cuota</code> sabe su saldo y su mora; <code>Credito</code>, su estado"),
- ("Creator", "<code>Credito</code> crea sus cuotas; <code>TipoCargo</code>, su decorador"),
+ ("Information Expert", "<code>Cuota</code> sabe su saldo y su mora; <code>Credito</code>, su estado; <code>CondicionesDeCredito</code>, su cuota"),
+ ("Creator", "<code>Credito</code> crea sus cuotas"),
  ("Controller", "<code>controller/*Controller</code> delegan en <code>XService</code>"),
  ("Polymorphism", "<code>Deuda</code> y <code>CalculoDeCuota</code>, sin <code>if</code> por tipo"),
  ("Low Coupling / Indirection", "<code>AuthService</code> (Facade), <code>TokenService</code> (Adapter)"),
  ("Protected Variations", "fórmula, cargos, librería JWT"),
- ("SRP / OCP", "un cargo o una fórmula por clase; agregar uno no toca <code>Credito</code>"),
- ("LSP / ISP", "cualquier <code>Deuda</code> sirve donde se pide una; <code>Deuda</code> sin <code>agregar/quitar</code>"),
- ("DIP", "<code>Credito</code> → <code>CalculoDeCuota</code>; controladores → interfaces de servicio"),
+ ("SRP / OCP", "un cargo o una fórmula por clase; agregar uno no toca <code>Credito</code> (M17)"),
+ ("LSP / ISP", "cualquier <code>Deuda</code> sirve donde se pide una; <code>ICredito</code> sin métodos internos (M17)"),
+ ("DIP", "<code>CondicionesDeCredito</code> → <code>CalculoDeCuota</code>; clientes → <code>Deuda</code>; controladores → interfaces de servicio"),
 ]
 matriz_html = "<table><thead><tr><th>Principio</th><th>Dónde</th></tr></thead><tbody>" + "".join(f"<tr><td><strong>{a}</strong></td><td>{b}</td></tr>" for a, b in matriz) + "</tbody></table>"
 
@@ -242,7 +277,7 @@ timeline = f'''<div class="timeline">
 <div class="hito"><div class="punto"></div><h4>V3</h4><p class="tema">MVC + Strategy + Adapter</p><p class="meta">13/10 · tag <code>v3</code></p>
 <ul><li>Cuota simple o francesa</li><li><code>TokenService</code> sobre jjwt</li><li>43 tests</li></ul></div>
 <div class="hito actual"><div class="punto"></div><h4>V4</h4><p class="tema">Composite + Decorator + Facade</p><p class="meta">27/10 · {n_v4} commits</p>
-<ul><li><strong>Composite</strong>: <code>Deuda</code> (M11)</li><li><strong>Decorator</strong>: cargos (M12)</li><li><strong>Facade</strong>: <code>AuthService</code> (M13)</li><li>Panel: deuda del cliente y cargos</li><li>63 tests</li></ul></div>
+<ul><li><strong>Composite</strong>: <code>Deuda</code> (M11)</li><li><strong>Decorator</strong>: cargos (M12)</li><li><strong>Facade</strong>: <code>AuthService</code> (M13)</li><li><code>Credito</code>: Extract Class (M17)</li><li>Panel: deuda del cliente y cargos</li><li>64 tests</li></ul></div>
 </div>
 <details><summary>Commits V3 → V4 (git log v3..iteracion4)</summary><pre><code>{e(log_v4)}</code></pre></details>'''
 
@@ -352,7 +387,7 @@ doc = f'''<!doctype html>
 <title>Reporte V4 — TPO Grupo 7</title><style>{CSS}</style></head>
 <body>
 <div id="barra"><strong style="color:var(--navy)">Reporte V4</strong>
-<nav><a href="#portada">Portada</a><a href="#timeline">Timeline</a><a href="#tecnologias">Tecnologías</a><a href="#mvc">MVC</a><a href="#mejoras">Mejoras</a><a href="#composite">Composite</a><a href="#decorator">Decorator</a><a href="#facade">Facade</a><a href="#panel">Panel</a><a href="#convenciones">Convenciones</a><a href="#matriz">GRASP/SOLID</a><a href="#revision">Revisión</a><a href="#verificacion">Verificación</a><a href="#casos-de-uso">Casos de uso</a><a href="#clases">Diagramas</a><a href="#pendientes">Pendientes</a></nav>
+<nav><a href="#portada">Portada</a><a href="#timeline">Timeline</a><a href="#tecnologias">Tecnologías</a><a href="#mvc">MVC</a><a href="#mejoras">Mejoras</a><a href="#composite">Composite</a><a href="#decorator">Decorator</a><a href="#facade">Facade</a><a href="#credito">Credito</a><a href="#panel">Panel</a><a href="#convenciones">Convenciones</a><a href="#matriz">GRASP/SOLID</a><a href="#revision">Revisión</a><a href="#verificacion">Verificación</a><a href="#casos-de-uso">Casos de uso</a><a href="#clases">Diagramas</a><a href="#pendientes">Pendientes</a></nav>
 <button class="sec" onclick="document.querySelectorAll('details.detalle').forEach(d=>d.open=true);window.print()">Exportar PDF</button></div>
 <main>
 
@@ -403,9 +438,10 @@ doc = f'''<!doctype html>
 
 <section id="verificacion"><h2>Verificación</h2>
 <ul>
-<li><strong>63 tests, 0 fallas</strong> (<code>mvn test</code>; V3: 43): 29 de dominio, 14 de cálculo de cuota, 11 HTTP, 8 de integración, <code>contextLoads</code>.</li>
+<li><strong>64 tests, 0 fallas</strong> (<code>mvn test</code>; V3: 43): 29 de dominio, 14 de cálculo de cuota, 12 HTTP, 8 de integración, <code>contextLoads</code>.</li>
 <li><strong>Casos de uso por API</strong>: <code>docs/casos-de-uso/verificar-cu.sh</code>, incluida la mora (400).</li>
 <li><strong>Hallazgo H5, corregido</strong>: <code>verificar-cu.sh</code> detectó 500 al consultar créditos (<code>Credito.cargos</code> lazy fuera de la transacción); fix: <code>CreditoResponse.desde</code> copia los cargos (<code>6286109</code>), test <code>CreditoConCargosTest</code>.</li>
+<li><strong>Hallazgo H6, corregido</strong>: <code>"cargos":[null]</code> daba 500; ahora 400 (<code>06eb1eb</code>, test <code>cargoNuloDa400</code>, <code>verificar-cu.sh</code>).</li>
 </ul>
 </section>
 

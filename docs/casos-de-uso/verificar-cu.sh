@@ -44,6 +44,7 @@ c "UC07 tasa 1000" POST /creditos $U '{"dniCliente":"30111222","deudaOriginal":1
 c "UC07 cliente en mora" POST /creditos $U '{"dniCliente":"30999888","deudaOriginal":100,"fecha":"2026-10-06","tasaInteres":0,"cantidadCuotas":1,"tipoPlan":"INTERES_SIMPLE"}'
 c "UC07 con seguro y gastos (cuota 50600)" POST /creditos $U '{"dniCliente":"30111222","deudaOriginal":100000,"fecha":"2026-10-06","tasaInteres":0,"cantidadCuotas":2,"tipoPlan":"INTERES_SIMPLE","cargos":["SEGURO_DE_VIDA","GASTO_DE_ADMINISTRACION"]}'
 c "UC07 cargo invalido" POST /creditos $U '{"dniCliente":"30111222","deudaOriginal":1,"fecha":"2026-10-06","tasaInteres":0,"cantidadCuotas":1,"tipoPlan":"INTERES_SIMPLE","cargos":["IVA"]}'
+c "UC07 cargo nulo (H6)" POST /creditos $U '{"dniCliente":"30111222","deudaOriginal":1,"fecha":"2026-10-06","tasaInteres":0,"cantidadCuotas":1,"tipoPlan":"INTERES_SIMPLE","cargos":["SEGURO_DE_VIDA",null]}'
 echo "== UC21"
 c "UC21 deuda al dia" GET /clientes/30111222/deuda $U
 c "UC21 deuda en mora" GET /clientes/30999888/deuda $U

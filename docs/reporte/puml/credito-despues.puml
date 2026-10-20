@@ -1,0 +1,37 @@
+@startuml
+skinparam shadowing false
+skinparam defaultFontName Calibri
+skinparam defaultFontSize 12
+skinparam ClassBackgroundColor #FFFFFF
+skinparam ClassBorderColor #1D2B4F
+skinparam ClassHeaderBackgroundColor #FFFFFF
+skinparam ArrowColor #2E75B6
+skinparam NoteBackgroundColor #FFF8E1
+skinparam NoteBorderColor #B38600
+hide empty members
+class Credito <<Composite>> {
+  -fecha : LocalDate
+  -condiciones : CondicionesDeCredito
+  -importeCuota : BigDecimal
+  -anulado : boolean
+  +{static} nuevo(cliente, fecha, condiciones)
+  +saldo() / montoVencido()
+  +estado() / anular() / puedeAnularse()
+  -estaCancelado() : boolean
+  -tieneCobranzas() : boolean
+}
+class CondicionesDeCredito <<Context / Embeddable>> {
+  -deudaOriginal : BigDecimal
+  -tasaInteres : BigDecimal
+  -cantidadCuotas : Integer
+  -tipoPlan : TipoPlan
+  -cargos : Set<TipoCargo>
+  +importeCuota() : BigDecimal
+  -calculo() : CalculoDeCuota
+}
+interface CalculoDeCuota <<Strategy>>
+class Cuota <<Leaf>>
+Credito *-- "1" CondicionesDeCredito
+CondicionesDeCredito ..> CalculoDeCuota : calculo()
+Credito *-- "1..*" Cuota
+@enduml

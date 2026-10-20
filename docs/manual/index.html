@@ -430,7 +430,7 @@ body.lightbox-locked { overflow: hidden; }
         <li><a href="#correr" data-target="correr">Cómo levantarlo</a></li>
         <li><a href="#verificar" data-target="verificar">Cómo se verifica</a></li>
         <li><a href="#decisiones" data-target="decisiones">Decisiones de diseño</a></li>
-        <li><a href="#historia" data-target="historia">Historia V0 → V3</a></li>
+        <li><a href="#historia" data-target="historia">Historia V0 → V4</a></li>
         <li><a href="#pendientes" data-target="pendientes">Pendientes y bugs</a></li>
       </ol>
     </nav>
@@ -1304,7 +1304,7 @@ svg .s-security{color: var(--security-stroke);}
       <div class="table-wrap"><table>
         <thead><tr><th>Rol</th><th>Clase</th></tr></thead>
         <tbody>
-          <tr><td>Context</td><td><code>model/Credito.java</code> (el constructor delega; <code>totalADevolver</code> sale de las cuotas, O3)</td></tr>
+          <tr><td>Context</td><td><code>model/CondicionesDeCredito.java</code> (<code>importeCuota</code> delega, M17); <code>Credito.totalADevolver</code> sale de las cuotas (O3)</td></tr>
           <tr><td>Strategy</td><td><code>model/interfaces/CalculoDeCuota.java</code></td></tr>
           <tr><td>ConcreteStrategy</td><td><code>model/plan/InteresSimple.java</code>, <code>model/plan/SistemaFrances.java</code></td></tr>
           <tr><td>Selección</td><td><code>model/TipoPlan.java</code> (enum persistido, <code>calculo()</code>); viene en <code>CreditoRequest.tipoPlan</code></td></tr>
@@ -1419,10 +1419,10 @@ SELECT * FROM COBRANZAS WHERE ANULADA = FALSE;  -- cobranzas vigentes</code></pr
     <section class="doc-section" id="verificar">
       <h2>Cómo se verifica</h2>
       <ul>
-        <li><strong>Tests</strong>: <code>cd backend &amp;&amp; mvn test</code>: 63 tests, 0 fallas. JUnit 5 (el framework de tests de Java) con AssertJ (aserciones encadenadas legibles):
+        <li><strong>Tests</strong>: <code>cd backend &amp;&amp; mvn test</code>: 64 tests, 0 fallas. JUnit 5 (el framework de tests de Java) con AssertJ (aserciones encadenadas legibles):
           <ul>
             <li>43 unitarios de dominio, sin Spring, en <code>backend/src/test/java/com/uade/tpejemplo/model/</code>: <code>CreditoTest</code> 10, <code>CuotaTest</code> 12, <code>CarteraTest</code> 4, <code>CobranzaTest</code> 3, <code>plan/InteresSimpleTest</code> 4, <code>plan/SistemaFrancesTest</code> 4, <code>plan/SeguroDeVidaTest</code> 2, <code>plan/GastoDeAdministracionTest</code> 2, <code>plan/CargosApiladosTest</code> 2. La fecha de hoy entra por parámetro (<code>model/Cobranza.java</code> <code>anular(LocalDate)</code>, <code>model/Cuota.java</code> <code>estaVencida(LocalDate)</code>), así se prueba el rechazo de anular una cobranza de otro día y el vencimiento sin depender del reloj.</li>
-            <li>11 de códigos HTTP en <code>backend/src/test/java/com/uade/tpejemplo/controller/CodigosHttpTest.java</code>: <code>@WebMvcTest</code> levanta solo la capa web (controllers, <code>SecurityConfig</code>, el filtro JWT y el <code>GlobalExceptionHandler</code>) con los servicios simulados por <code>@MockitoBean</code>. Cubre 400 (DNI con letras, JSON roto, parámetro de tipo incorrecto, permisos sin campos), 401 (sin token y token inválido), 403 (rol incorrecto), 404, 405, 406 y 415.</li>
+            <li>12 de códigos HTTP en <code>backend/src/test/java/com/uade/tpejemplo/controller/CodigosHttpTest.java</code>: <code>@WebMvcTest</code> levanta solo la capa web (controllers, <code>SecurityConfig</code>, el filtro JWT y el <code>GlobalExceptionHandler</code>) con los servicios simulados por <code>@MockitoBean</code>. Cubre 400 (DNI con letras, cargo nulo, JSON roto, parámetro de tipo incorrecto, permisos sin campos), 401 (sin token y token inválido), 403 (rol incorrecto), 404, 405, 406 y 415.</li>
             <li>2 de concurrencia con <code>@SpringBootTest</code> en <code>backend/src/test/java/com/uade/tpejemplo/service/</code>: <code>CobranzaConcurrenteTest</code>, 20 hilos cobrando la misma cuota, espera una sola cobranza vigente (I-1; sin el bloqueo falla con 10); <code>AnulacionConcurrenteTest</code>, anular y cobrar en paralelo, nunca queda un crédito anulado con cobranza vigente.</li>
             <li>6 de integración sobre H2 en <code>backend/src/test/java/com/uade/tpejemplo/service/</code>: <code>ReglaDeMoraTest</code> 2 (no se otorga a un cliente con cuotas vencidas), <code>DeudaClienteTest</code> 3 (saldo y vencido del cliente) y <code>CreditoConCargosTest</code> 1 (un crédito con cargos leído de la base se serializa).</li>
             <li><code>TpEjemploApplicationTests</code> (<code>contextLoads</code>): 1, levanta la aplicación entera.</li>
@@ -1463,13 +1463,13 @@ SELECT * FROM COBRANZAS WHERE ANULADA = FALSE;  -- cobranzas vigentes</code></pr
     </section>
 
     <section class="doc-section" id="historia">
-      <h2>Historia V0 → V3</h2>
+      <h2>Historia V0 → V4</h2>
       <ul>
         <li><strong>V0</strong> (<code>main@2a90af8</code>): proyecto inicial con docs PlantUML, requerimientos y CU.</li>
         <li><strong>V1</strong> (<code>andrei-iteracion1@86c75cc</code>, 08/09): bad smells; <code>Permisos</code>, <code>Cuota</code> con importe y su cobranza, tasa de interés, panel de supervisor.</li>
         <li><strong>V2</strong> (<code>main@45e228c</code>, tag <code>v2</code>, 15/09): GRASP + interfaces de modelo y de servicio.</li>
         <li><strong>V3</strong> (tag <code>v3</code>, entrega 13/10): MVC + Strategy + Adapter; bugs TPO-001..004, 007, 008, 009, 010, 012 cerrados; Creator del plan de cuotas y dashboard con saldo y vencido; 43 tests (dominio, códigos HTTP y concurrencia); perfiles dev y prod; Swagger; <code>GET /api/auth/me</code>; pantallas de UC06 y UC09; UI con formato es-AR y dark theme; casos de uso documentados.</li>
-        <li><strong>V4</strong> (rama <code>iteracion4</code>, entrega 27/10): Composite (<code>Deuda</code>, <code>Cartera</code>), Decorator (seguro de vida y gastos sobre la cuota) y Facade (<code>AuthService</code>); regla de mora, deuda del cliente en Clientes y cargos en Créditos; 63 tests.</li>
+        <li><strong>V4</strong> (rama <code>iteracion4</code>, entrega 27/10): Composite (<code>Deuda</code>, <code>Cartera</code>), Decorator (seguro de vida y gastos sobre la cuota) y Facade (<code>AuthService</code>); regla de mora, deuda del cliente en Clientes y cargos en Créditos; condiciones del crédito en su propia clase (M17); 64 tests.</li>
       </ul>
     </section>
 
