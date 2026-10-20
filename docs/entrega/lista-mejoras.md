@@ -1,6 +1,21 @@
-# Lista de mejoras — Iteración 3 (TPO Grupo 7, Dashboard de préstamos)
+# Lista de mejoras — Iteraciones 3 y 4 (TPO Grupo 7, Dashboard de préstamos)
 
-Rutas Java relativas a `backend/src/main/java/com/uade/tpejemplo/`. Reporte completo: `docs/reporte/reporte-v3.html`. Casos de uso: `docs/casos-de-uso/README.md`. Diagrama de clases: `docs/diagramas/clases-v3-mvc.svg` (capas MVC), `clases-v3-seguridad.svg` (seguridad y Adapter) y `clases-v3-modelo.svg` (modelo y Strategy) (fuente `clases-v3.puml`).
+Rutas Java relativas a `backend/src/main/java/com/uade/tpejemplo/`. Reporte completo: `docs/reporte/reporte-v4.html` (el de V3 está en el tag `v3`). Casos de uso: `docs/casos-de-uso/README.md`. Diagrama de clases: `docs/diagramas/clases-v4-mvc.svg` (capas MVC), `clases-v4-seguridad.svg` (seguridad, Facade y Adapter) y `clases-v4-modelo.svg` (modelo, Composite, Strategy y Decorator) (fuente `clases-v4.puml`). DER: `docs/diagramas/der-v4.svg`.
+
+## Iteración 4: Composite, Decorator y Facade
+
+| ID | Qué | Clase y método | Patrón / concepto |
+|---|---|---|---|
+| M11 | Saldo y monto vencido con la misma interfaz en cuota, crédito y cartera. La cuota responde (hoja); el crédito y la cartera suman a sus hijos. El `if (anulado)` de `Credito.saldo` pasa a la cuota y `sumarCuotas(Predicate)` pasa a `sumar(Function)` | `model/interfaces/Deuda.java`; `model/Cuota.java` `saldo`, `montoVencido`; `model/Credito.java` `saldo`, `montoVencido`, `sumar`; `model/Cartera.java` `de`, `saldo`, `montoVencido`; `service/impl/DashboardServiceImpl.java` `obtenerEstadisticasGenerales` | **Composite** (+ Polymorphism, OCP) |
+| M12 | Cargos opcionales sobre la cuota: seguro de vida (0,1 % del capital por cuota; simplificación: el real va sobre el saldo) y gasto de administración ($500 por cuota). Cada cargo envuelve el cálculo de la Strategy y le suma lo suyo; se otorgan o no por crédito. Expansión del dominio, no corrección de un bug | `model/plan/CargoSobreCuota.java` `importeCuota`; `model/plan/SeguroDeVida.java`, `model/plan/GastoDeAdministracion.java` `cargo`; `model/TipoCargo.java` `aplicarSobre`; `model/Credito.java` `calculo`, `nuevo`; `dto/request/CreditoRequest.java`, `dto/response/CreditoResponse.java` (`cargos`) | **Decorator** (sobre la Strategy de M9; + OCP, SRP) |
+| M13 | La autenticación se reconoce y nombra como Facade: `AuthService` ofrece `registrar`, `login` y `actual` sobre `AuthenticationManager`, `PasswordEncoder`, `TokenService` (Adapter M7) y `UsuarioRepository`. Ningún controlador usa ese subsistema (`git grep` en `controller/`). `AuthController.actual` recibe `UsuarioDetails` como los demás | `service/AuthService.java`; `service/impl/AuthServiceImpl.java`; `controller/AuthController.java` `actual` | **Facade** (+ Low Coupling, Protected Variations) |
+| M14 | Regla de mora: no se otorga un crédito a un cliente con cuotas vencidas (400) | `service/impl/CreditoServiceImpl.java` `crear`; test `backend/src/test/java/com/uade/tpejemplo/service/ReglaDeMoraTest.java` | Composite (segundo cliente) |
+| M15 | Deuda del cliente: `GET /api/clientes/{dni}/deuda` y saldo/vencido en la búsqueda por DNI (UC21) | `controller/ClienteController.java` `deuda`; `service/impl/ClienteServiceImpl.java` `deuda`; `dto/response/DeudaClienteResponse.java`; `frontend/src/pages/Clientes.jsx`, `frontend/src/api/clientes.js` `getDeudaCliente`; test `backend/src/test/java/com/uade/tpejemplo/service/DeudaClienteTest.java` | Composite (tercer cliente), MVC |
+| M16 | Cargos en el alta de crédito (casillas) y en la ficha | `frontend/src/pages/Creditos.jsx`; `frontend/src/utils/cargos.js` | Decorator (vista) |
+| DER4 | DER v4: tabla `credito_cargos` (PK compuesta `id_credito`, `tipo_cargo`) y `rol` como enum | `docs/diagramas/der-v4.py` | Documentación |
+| CU4 | UC07 con cargos y error 400 por mora; UC21 Consultar deuda del cliente; `verificar-cu.sh` con el caso de mora | `docs/casos-de-uso/README.md`, `docs/casos-de-uso/verificar-cu.sh`, `docs/casos-de-uso/casos-de-uso-v4.puml` | Documentación |
+
+Convenciones nuevas: `Deuda` va sin prefijo `I` porque nombra un rol de patrón (como `CalculoDeCuota`); `Cartera` no tiene `ICartera` porque no es entidad y su interfaz es `Deuda`; `TipoCargo` es, como `TipoPlan`, un enum registro (de decoradores).
 
 ## Foco de la consigna: Strategy y Adapter
 
@@ -63,19 +78,25 @@ Rutas Java relativas a `backend/src/main/java/com/uade/tpejemplo/`. Reporte comp
 | I-2 | Largo y escala acotados en los request: lo que no entra en la columna da 400 y no 500 ni un redondeo silencioso | `dto/request/ClienteRequest.java`, `CreditoRequest.java`, `CobranzaRequest.java`, `RegisterRequest.java` (`@Size`, `@Digits`) | Validación en el controlador (MVC) |
 | T-1 | Tests de los códigos HTTP 400/401/403/404/405 con la seguridad JWT real y los servicios simulados | `backend/src/test/java/com/uade/tpejemplo/controller/CodigosHttpTest.java` (`@WebMvcTest`) | Tests |
 | T-5 | La fecha de hoy entra por parámetro: se testea anular una cobranza de otro día y el vencimiento sin depender del reloj | `model/Cobranza.java` `anular(LocalDate)`; `model/Cuota.java` `estaVencida(LocalDate)` | Tests |
-| DER | Diagrama entidad-relación de la base, con claves y restricciones | `docs/diagramas/der-v3.py` (genera `.svg` y `.png`) | Documentación |
-| Tests | 43 tests, 0 fallas | `backend/src/test/java/com/uade/tpejemplo/` | JUnit 5 + AssertJ, `@WebMvcTest` |
+| DER | Diagrama entidad-relación de la base, con claves y restricciones | `docs/diagramas/der-v3.py` en V3; hoy `docs/diagramas/der-v4.py` (genera `.svg` y `.png`) | Documentación |
+| Tests | 62 tests, 0 fallas (43 en V3) | `backend/src/test/java/com/uade/tpejemplo/` | JUnit 5 + AssertJ, `@WebMvcTest` |
 
-Desglose de los 43 tests:
+Desglose de los 62 tests:
 
-- `model/CreditoTest`: 9
-- `model/CuotaTest`: 9
+- `model/CreditoTest`: 10
+- `model/CuotaTest`: 12
+- `model/CarteraTest`: 4 (M11)
+- `model/CobranzaTest`: 3
 - `model/plan/InteresSimpleTest`: 4
 - `model/plan/SistemaFrancesTest`: 4
-- `model/CobranzaTest`: 3
+- `model/plan/SeguroDeVidaTest`: 2 (M12)
+- `model/plan/GastoDeAdministracionTest`: 2 (M12)
+- `model/plan/CargosApiladosTest`: 2 (M12)
 - `controller/CodigosHttpTest`: 11
 - `service/CobranzaConcurrenteTest`: 1 (I-1)
 - `service/AnulacionConcurrenteTest`: 1 (I1)
+- `service/ReglaDeMoraTest`: 2 (M14)
+- `service/DeudaClienteTest`: 3 (M15)
 - `TpEjemploApplicationTests` (`contextLoads`): 1
 
 Decisión S6: el control de roles queda doble a propósito, reglas de URL en `config/SecurityConfig.java` `filterChain` y `@PreAuthorize` en `controller/AdminController.java` y `controller/SupervisorController.java`. Es defensa en profundidad: si una ruta cambia y la regla de URL deja de cubrirla, el método sigue protegido.
@@ -91,9 +112,9 @@ Decisión S6: el control de roles queda doble a propósito, reglas de URL en `co
 | BS8 | Los permisos son `Boolean` con `@NotNull`: un body `{}` da 400 en vez de borrar los dos permisos con 200 | `dto/request/PermisosRequest.java`; `service/impl/AdminServiceImpl.java` `actualizarPermisos`; test `backend/src/test/java/com/uade/tpejemplo/controller/CodigosHttpTest.java` | Primitive obsession |
 | BS9 | Comentarios que narraban código que ya no existe (builder, `findByDni`) o repetían en prosa la línea del patrón | `model/Usuario.java` `nuevo`; `repository/ClienteRepository.java`; `model/Cobranza.java` `anular`; `model/Cuota.java` `estaPagada`, `registrarCobranza` | Comentarios |
 | BS10 | El 404 se lee bien: "No se encontró crédito con id 5" en vez de "Crédito no encontrado con id: '5'" (y "Cobranza no encontrado"); la cuota se busca por "crédito/cuota", no por el nombre técnico de los campos | `exception/ResourceNotFoundException.java`; `service/impl/CobranzaServiceImpl.java` `registrar` y los demás llamadores en `service/impl/` | Mensajes de error (como R2) |
-| BS11 | `saldo` y `montoVencido` repetían el mismo filtrar-y-sumar importes de cuotas; queda un solo `sumarCuotas(filtro)` | `model/Credito.java` `saldo`, `montoVencido`, `sumarCuotas`; `docs/diagramas/clases-v3.puml` | Código duplicado |
-| BS12 | Código muerto: `esValido` era tautológico (comparaba el usuario del token con el que se sacó de ese mismo token); el parseo ya valida firma y vencimiento | `service/TokenService.java`; `security/JwtUtil.java`; `security/JwtAuthFilter.java` `autenticar`; `docs/diagramas/clases-v3.puml`, `docs/diagramas/archify/adapter-jwt.sequence.json`, `docs/reporte/puml/m7-despues.puml` | Código muerto (Adapter: Target más chico) |
-| BS13 | Precarga por efecto lateral: consultas cuyo resultado se descartaba; ahora lazy loading dentro de la transacción | `service/impl/CreditoServiceImpl.java` `listarTodos`, `listarPorCliente`, `anularCredito`, `buscarCredito`; `service/impl/DashboardServiceImpl.java` `obtenerEstadisticasGenerales`; `repository/CreditoRepository.java`; `repository/CuotaRepository.java`; `docs/diagramas/clases-v3.puml`, `docs/diagramas/archify/anular-credito.sequence.json`, `docs/reporte/puml/m3-despues.puml`, `docs/reporte/puml/m8-despues.puml` | Código muerto (efecto lateral oculto) |
+| BS11 | `saldo` y `montoVencido` repetían el mismo filtrar-y-sumar importes de cuotas; queda un solo `sumarCuotas(filtro)` | `model/Credito.java` `saldo`, `montoVencido`, `sumarCuotas`; `docs/diagramas/clases-v4.puml` | Código duplicado |
+| BS12 | Código muerto: `esValido` era tautológico (comparaba el usuario del token con el que se sacó de ese mismo token); el parseo ya valida firma y vencimiento | `service/TokenService.java`; `security/JwtUtil.java`; `security/JwtAuthFilter.java` `autenticar`; `docs/diagramas/clases-v4.puml`, `docs/diagramas/archify/adapter-jwt.sequence.json`, `docs/reporte/puml/m7-despues.puml` | Código muerto (Adapter: Target más chico) |
+| BS13 | Precarga por efecto lateral: consultas cuyo resultado se descartaba; ahora lazy loading dentro de la transacción | `service/impl/CreditoServiceImpl.java` `listarTodos`, `listarPorCliente`, `anularCredito`, `buscarCredito`; `service/impl/DashboardServiceImpl.java` `obtenerEstadisticasGenerales`; `repository/CreditoRepository.java`; `repository/CuotaRepository.java`; `docs/diagramas/clases-v4.puml`, `docs/diagramas/archify/anular-credito.sequence.json`, `docs/reporte/puml/m3-despues.puml`, `docs/reporte/puml/m8-despues.puml` | Código muerto (efecto lateral oculto) |
 | BS14 | El DNI acepta solo 7 u 8 dígitos: antes se podía registrar un cliente con DNI "sdfg" (UC04, DNI sin formato) | `dto/request/ClienteRequest.java`, `dto/request/CreditoRequest.java` (`@Pattern`); test `backend/src/test/java/com/uade/tpejemplo/controller/CodigosHttpTest.java` `dniConLetrasDa400` | Validación en el borde (MVC) |
 | I1 | Anular y cobrar en paralelo ya no deja un crédito ANULADO con cobranza vigente: los dos caminos bloquean primero el crédito; cobrar además bloquea la cuota | `repository/CreditoRepository.java` (`@Lock(PESSIMISTIC_WRITE)`), `service/impl/CreditoServiceImpl.java` `anularCredito`, `service/impl/CobranzaServiceImpl.java` `registrar`; test `backend/src/test/java/com/uade/tpejemplo/service/AnulacionConcurrenteTest.java` | Concurrencia (bloqueo pesimista) |
 | I3 | `Content-Type` no JSON → 415; `Accept` no JSON → 406, con `ErrorResponse` (antes 500) | `exception/GlobalExceptionHandler.java`; test `backend/src/test/java/com/uade/tpejemplo/controller/CodigosHttpTest.java` | Error del cliente = 4xx |
@@ -145,11 +166,14 @@ Salen de recorrer cada caso de uso por la UI (incluido H4).
 
 | ID | Qué | Dónde | Por qué queda |
 |---|---|---|---|
-| O8 | Pagos parciales | `model/Cuota.java` `estaPagada` y todo lo que depende | Tamaño L, fuera de alcance de V3 |
+| H5 | `GET /api/creditos/{id}`, `/api/creditos/cliente/{dni}` y `/api/creditos` dan 500: `LazyInitializationException` sobre `Credito.cargos` al serializar | `dto/response/CreditoResponse.java` `desde` | Bug de M12 hallado con `verificar-cu.sh`; fix en el backend |
+| O8 | Pagos parciales | `model/Cuota.java` `estaPagada` y todo lo que depende | Tamaño L, fuera de alcance de V3 y V4 |
+| O3b | Ajustar la última cuota para que el total cierre exacto | `model/plan/InteresSimple.java`, `model/plan/SistemaFrances.java` | Hoy el centavo se explica como redondeo por cuota |
 | S10 | Renombrar paquete `com.uade.tpejemplo` (TPO-014) | todo el backend | Diff ruidoso; evaluar para el 17/11 |
 | T-2, T-3 | `@DataJpaTest` del dashboard, `Permisos` | `backend/src/test` | Siguiente iteración |
 | H8 | Trazabilidad: qué usuario cobró o anuló | `model/Cobranza.java`, `model/Credito.java` | Modelo nuevo y cambio de API |
 | Base prod | Prod sigue con H2 en memoria: sin persistencia ni alta de admin | `application-prod.properties` | Falta base real (PostgreSQL) y migraciones |
-| P-M9 | Tasa con unidad declarada por plan; cuota con capital/interés separados | `model/TipoPlan.java`, `model/Cuota.java` | Límites del Strategy actual (ver reporte) |
+| P-M9 | Tasa con unidad declarada por plan; cuota con capital/interés separados | `model/TipoPlan.java`, `model/Cuota.java` | Límites del Strategy actual; sin el desglose tampoco hay IVA sobre intereses como decorador |
+| M12b | Seguro de vida sobre el saldo deudor | `model/plan/SeguroDeVida.java` | Simplificación de M12: hoy se calcula sobre el capital |
 
 Descartados con motivo: `EstadoCredito` como State (O9: es un valor derivado) y Strategy/Adapter "para mostrar" (O10: no tapan huecos).

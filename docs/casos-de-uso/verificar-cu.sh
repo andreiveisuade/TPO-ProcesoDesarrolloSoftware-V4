@@ -1,7 +1,7 @@
 #!/bin/bash
 # Recorre por API el flujo principal y los alternativos de cada caso de uso (docs/casos-de-uso/README.md, sección 6).
 # Asume una base recién levantada: los ids de créditos, cobranzas y usuarios salen del orden de creación.
-# Uso: ./verificar-cu.sh  (o API=http://localhost:8097/api ./verificar-cu.sh)
+# Uso: ./verificar-cu.sh  (o API=http://localhost:8093/api ./verificar-cu.sh)
 H=${API:-http://localhost:8080/api}
 tok() { curl -s -X POST $H/auth/login -H 'Content-Type: application/json' -d "{\"username\":\"$1\",\"password\":\"$2\"}" | sed -E 's/.*"token":"([^"]+)".*/\1/'; }
 TMP=$(mktemp)
@@ -27,19 +27,28 @@ c "sin token" GET /clientes ""
 c "UC04 crear cliente" POST /clientes $U '{"dni":"30111222","nombre":"Ana Perez"}'
 c "UC04 DNI repetido" POST /clientes $U '{"dni":"30111222","nombre":"Otra"}'
 c "UC04 sin nombre" POST /clientes $U '{"dni":"1","nombre":""}'
-c "UC04 DNI no numerico (sin validar formato)" POST /clientes $U '{"dni":"abc","nombre":"X"}'
+c "UC04 DNI no numerico (BS14)" POST /clientes $U '{"dni":"abc","nombre":"X"}'
+c "UC04 cliente que va a quedar en mora" POST /clientes $U '{"dni":"30999888","nombre":"Beto Mora"}'
 c "UC05 listar" GET /clientes $U
 c "UC06 buscar ok" GET /clientes/30111222 $U
 c "UC06 inexistente" GET /clientes/999 $U
 echo "== UC07-10"
 c "UC07 credito simple" POST /creditos $U '{"dniCliente":"30111222","deudaOriginal":1200,"fecha":"2026-10-06","tasaInteres":10,"cantidadCuotas":3,"tipoPlan":"INTERES_SIMPLE"}'
 c "UC07 credito frances" POST /creditos $U '{"dniCliente":"30111222","deudaOriginal":1200,"fecha":"2026-10-06","tasaInteres":10,"cantidadCuotas":3,"tipoPlan":"SISTEMA_FRANCES"}'
-c "UC07 credito vencido (fecha pasada)" POST /creditos $U '{"dniCliente":"30111222","deudaOriginal":500,"fecha":"2025-01-01","tasaInteres":0,"cantidadCuotas":2,"tipoPlan":"INTERES_SIMPLE"}'
+c "UC07 credito vencido (fecha pasada, otro cliente)" POST /creditos $U '{"dniCliente":"30999888","deudaOriginal":500,"fecha":"2025-01-01","tasaInteres":0,"cantidadCuotas":2,"tipoPlan":"INTERES_SIMPLE"}'
 c "UC07 fecha futura (aceptada)" POST /creditos $U '{"dniCliente":"30111222","deudaOriginal":100,"fecha":"2030-01-01","tasaInteres":0,"cantidadCuotas":1,"tipoPlan":"INTERES_SIMPLE"}'
-c "UC07 cliente inexistente" POST /creditos $U '{"dniCliente":"999","deudaOriginal":1,"fecha":"2026-10-06","tasaInteres":1,"cantidadCuotas":1,"tipoPlan":"INTERES_SIMPLE"}'
+c "UC07 cliente inexistente" POST /creditos $U '{"dniCliente":"99999999","deudaOriginal":1,"fecha":"2026-10-06","tasaInteres":1,"cantidadCuotas":1,"tipoPlan":"INTERES_SIMPLE"}'
 c "UC07 deuda 0 y cuotas 0" POST /creditos $U '{"dniCliente":"30111222","deudaOriginal":0,"fecha":"2026-10-06","tasaInteres":1,"cantidadCuotas":0,"tipoPlan":"INTERES_SIMPLE"}'
 c "UC07 tipoPlan invalido" POST /creditos $U '{"dniCliente":"30111222","deudaOriginal":1,"fecha":"2026-10-06","tasaInteres":1,"cantidadCuotas":1,"tipoPlan":"OTRO"}'
 c "UC07 tasa 1000" POST /creditos $U '{"dniCliente":"30111222","deudaOriginal":1,"fecha":"2026-10-06","tasaInteres":1000,"cantidadCuotas":1,"tipoPlan":"INTERES_SIMPLE"}'
+c "UC07 cliente en mora" POST /creditos $U '{"dniCliente":"30999888","deudaOriginal":100,"fecha":"2026-10-06","tasaInteres":0,"cantidadCuotas":1,"tipoPlan":"INTERES_SIMPLE"}'
+c "UC07 con seguro y gastos (cuota 50600)" POST /creditos $U '{"dniCliente":"30111222","deudaOriginal":100000,"fecha":"2026-10-06","tasaInteres":0,"cantidadCuotas":2,"tipoPlan":"INTERES_SIMPLE","cargos":["SEGURO_DE_VIDA","GASTO_DE_ADMINISTRACION"]}'
+c "UC07 cargo invalido" POST /creditos $U '{"dniCliente":"30111222","deudaOriginal":1,"fecha":"2026-10-06","tasaInteres":0,"cantidadCuotas":1,"tipoPlan":"INTERES_SIMPLE","cargos":["IVA"]}'
+echo "== UC21"
+c "UC21 deuda al dia" GET /clientes/30111222/deuda $U
+c "UC21 deuda en mora" GET /clientes/30999888/deuda $U
+c "UC21 cliente inexistente" GET /clientes/99999999/deuda $U
+c "UC21 sin token" GET /clientes/30111222/deuda ""
 c "UC09 consultar 1" GET /creditos/1 $U
 c "UC09 inexistente" GET /creditos/999 $U
 c "UC09 id no numerico" GET /creditos/abc $U
@@ -90,3 +99,5 @@ echo "== UC16 con un crédito cancelado"
 for n in 1 2; do c "UC13 cobrar cuota $n del crédito 3 (vencido)" POST /cobranzas $U "{\"idCredito\":3,\"numeroCuota\":$n,\"importe\":250}"; done
 c "UC09 crédito 3 queda CANCELADO" GET /creditos/3 $U
 c "UC16 activos baja, financiado no" GET /dashboard/stats $S
+c "UC21 el cliente ya no esta en mora" GET /clientes/30999888/deuda $U
+c "UC07 al dia, se le vuelve a otorgar" POST /creditos $U '{"dniCliente":"30999888","deudaOriginal":100,"fecha":"2026-10-06","tasaInteres":0,"cantidadCuotas":1,"tipoPlan":"INTERES_SIMPLE"}'

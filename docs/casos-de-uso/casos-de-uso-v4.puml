@@ -1,9 +1,9 @@
-@startuml casos-de-uso-v3
+@startuml casos-de-uso-v4
 left to right direction
 skinparam packageStyle rectangle
 skinparam actorStyle awesome
 
-title Dashboard de préstamos - Casos de uso V3
+title Dashboard de préstamos - Casos de uso V4
 
 actor "Visitante" as Vis
 actor "Usuario\n(USER)" as User
@@ -20,6 +20,7 @@ rectangle "Dashboard de préstamos" {
   usecase "UC04 Registrar cliente" as UC04
   usecase "UC05 Listar clientes" as UC05
   usecase "UC06 Buscar cliente por DNI" as UC06
+  usecase "UC21 Consultar deuda del cliente" as UC21
 
   usecase "UC07 Otorgar crédito" as UC07
   usecase "UC08 Generar plan de cuotas" as UC08
@@ -43,6 +44,7 @@ Vis --> UC02
 User --> UC04
 User --> UC05
 User --> UC06
+User --> UC21
 User --> UC07
 User --> UC09
 User --> UC10
@@ -64,6 +66,10 @@ note right of UC11
   Requiere el permiso
   puedeAnularCredito
   (no el rol)
+end note
+note right of UC07
+  400 si el cliente
+  tiene cuotas vencidas
 end note
 note right of UC15
   Requiere el permiso

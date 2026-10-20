@@ -1,11 +1,11 @@
-# Casos de uso V3 y trazabilidad
+# Casos de uso V4 y trazabilidad
 
-Casos de uso del dashboard de préstamos tal como funcionan en V3 (main), con la numeración de V0 (`docs-v0/docs/03-casos-de-uso.puml`) para poder seguir cada uno desde el punto 0. Cada ficha dice qué hace el actor, qué responde el sistema (con el código HTTP real), qué regla de negocio se aplica y dónde, y con qué se verificó.
+Casos de uso del dashboard de préstamos tal como funcionan en V4 (rama `iteracion4`), con la numeración de V0 (`docs-v0/docs/03-casos-de-uso.puml`) para poder seguir cada uno desde el punto 0. Cada ficha dice qué hace el actor, qué responde el sistema (con el código HTTP real), qué regla de negocio se aplica y dónde, y con qué se verificó.
 
 Convenciones:
 
 - Rutas del backend relativas a `backend/src/main/java/com/uade/tpejemplo/`; tests relativos a `backend/src/test/java/com/uade/tpejemplo/`; front relativo a `frontend/src/`. Cada cita de código es `archivo` + método.
-- **Verificación**: *Test* = test automático (`mvn test`, 43 tests, todos pasan al 2026-10-11): de dominio en `model/` y `model/plan/`, y de códigos HTTP en `controller/CodigosHttpTest` (`@WebMvcTest` con la seguridad JWT real). *Smoke* = smoke test manual del equipo. *Final* = verificación final manual del equipo, con capturas. Smoke y Final son notas de trabajo internas que no van en la entrega. *API* = `verificar-cu.sh` de esta carpeta, corrido sobre una base limpia (resultados en la sección 6).
+- **Verificación**: *Test* = test automático (`mvn test`, 62 tests, todos pasan al 2026-10-20): de dominio en `model/` y `model/plan/`, y de códigos HTTP en `controller/CodigosHttpTest` (`@WebMvcTest` con la seguridad JWT real). *Smoke* = smoke test manual del equipo. *Final* = verificación final manual del equipo, con capturas. Smoke y Final son notas de trabajo internas que no van en la entrega. *API* = `verificar-cu.sh` de esta carpeta, corrido sobre una base limpia (resultados en la sección 6).
 - Errores: todos salen por `exception/GlobalExceptionHandler.java` con cuerpo `{status, error, mensajes[]}`: 400 regla de negocio (`handleNegocio`), 400 validación del DTO (`handleValidacion`), 400 body o parámetro mal formado (`handleSolicitudInvalida`), 401 credenciales (`handleNoAutenticado`), 403 sin permiso (`handleAccesoDenegado`), 404 no encontrado (`handleNoEncontrado`). Sin token, o con token inválido, la cadena de seguridad responde 401 sin cuerpo; con token y sin el rol, 403 sin cuerpo (`config/SecurityConfig.java` `filterChain`). Los dos casos y el 400/404/405 los cubre `controller/CodigosHttpTest`.
 
 ## 1. Actores
@@ -24,9 +24,9 @@ Dos aclaraciones que cambian respecto de V0 y de los diagramas de la clase 3:
 
 ## 2. Diagrama
 
-![Casos de uso V3](casos-de-uso-v3.svg)
+![Casos de uso V4](casos-de-uso-v4.svg)
 
-Fuente: `casos-de-uso-v3.puml` (renderizado con `plantuml -tsvg` y `-tpng`). Supervisor y Administrador heredan de Usuario: todo lo que hace un USER lo pueden hacer ellos.
+Fuente: `casos-de-uso-v4.puml` (renderizado con `plantuml -tsvg` y `-tpng`). Supervisor y Administrador heredan de Usuario: todo lo que hace un USER lo pueden hacer ellos.
 
 ## 3. Fichas de los casos de uso vigentes
 
@@ -66,7 +66,7 @@ Fuente: `casos-de-uso-v3.puml` (renderizado con `plantuml -tsvg` y `-tpng`). Sup
 - **Endpoint**: `POST /api/clientes` → `controller/ClienteController.java` `crear`.
 - **Pantalla**: `pages/Clientes.jsx` (formulario).
 - **Verificación**: Smoke "Crear cliente 111"; Final "Crear cliente"; API (UC04 x4); Test `controller/CodigosHttpTest.java` `dniConLetrasDa400`, `sinTokenDa401`.
-- **Hueco**: el DNI tiene largo máximo (15, I-2) pero no formato; `"abc"` se acepta con 201 (API). No hay modificación ni baja de clientes (A-09 de V0, ver P3).
+- **Hueco**: no hay modificación ni baja de clientes (A-09 de V0, ver P3). El DNI sin formato (`"abc"` daba 201) se cerró con BS14.
 
 ### UC05 Listar clientes
 
@@ -85,21 +85,22 @@ Fuente: `casos-de-uso-v3.puml` (renderizado con `plantuml -tsvg` y `-tpng`). Sup
 - **Errores**: DNI inexistente → **404** "No se encontró cliente con DNI x".
 - **Reglas**: `service/impl/ClienteServiceImpl.java` `buscarPorDni`.
 - **Endpoint**: `GET /api/clientes/{dni}` → `controller/ClienteController.java` `buscarPorDni`.
-- **Pantalla**: `pages/Clientes.jsx` (bloque "Buscar cliente por DNI"): muestra nombre y DNI, o el 404 del back en el mismo bloque. Usa `api/clientes.js` `getCliente`.
+- **Pantalla**: `pages/Clientes.jsx` (bloque "Buscar cliente por DNI"): muestra nombre y DNI, o el 404 del back en el mismo bloque. Usa `api/clientes.js` `getCliente`. Desde V4 muestra además la deuda del cliente (UC21).
 - **Verificación**: API (UC06 x2); Test `controller/CodigosHttpTest.java` `clienteInexistenteDa404`; captura de la pantalla en la verificación del equipo.
 
 ### UC07 Otorgar crédito
 
 - **Actor**: Usuario. **RF V0**: RF-CR-01. Incluye UC08.
 - **Precondición**: el cliente existe.
-- **Flujo principal**: 1. El usuario carga DNI del cliente, deuda original, fecha, tasa, cantidad de cuotas y tipo de plan (interés simple o sistema francés). 2. El sistema valida los datos. 3. Busca el cliente. 4. Crea el crédito: el importe de cuota lo calcula la estrategia del plan elegido (`model/Credito.java` constructor, `model/TipoPlan.java` `calculo`, `model/plan/InteresSimple.java`, `model/plan/SistemaFrances.java`; M9 Strategy). 5. Genera el plan de cuotas (UC08). 6. Responde **201** con cuotas, total a devolver, estado VIGENTE y saldo igual al total.
-- **Errores**: cliente inexistente → **404**. Deuda ≤ 0, cuotas < 1, tasa negativa o > 999,99, algún campo vacío → **400** de validación (`dto/request/CreditoRequest.java`). Tipo de plan inexistente o JSON mal formado → **400** "Solicitud inválida".
-- **Postcondición**: crédito VIGENTE con su plan de cuotas.
-- **Reglas**: `service/impl/CreditoServiceImpl.java` `crear`; `model/Credito.java` `totalADevolver` (cuota × cantidad, O3).
+- **Precondición** (V4): el cliente no tiene cuotas vencidas impagas.
+- **Flujo principal**: 1. El usuario carga DNI del cliente, deuda original, fecha, tasa, cantidad de cuotas, tipo de plan (interés simple o sistema francés) y, opcionalmente, los cargos (casillas "Seguro de vida" y "Gastos de administración"). 2. El sistema valida los datos. 3. Busca el cliente. 4. Verifica que el cliente no esté en mora (`model/Cartera.java` `montoVencido` sobre sus créditos, M14). 5. Crea el crédito: el importe de cuota lo calcula la estrategia del plan elegido (`model/Credito.java` constructor, `model/TipoPlan.java` `calculo`, `model/plan/InteresSimple.java`, `model/plan/SistemaFrances.java`; M9 Strategy), envuelta por cada cargo elegido (`model/Credito.java` `calculo`, `model/TipoCargo.java` `aplicarSobre`, `model/plan/SeguroDeVida.java` 0,1 % del capital por cuota, `model/plan/GastoDeAdministracion.java` $500 por cuota; M12 Decorator). 6. Genera el plan de cuotas (UC08). 7. Responde **201** con cuotas, cargos, total a devolver, estado VIGENTE y saldo igual al total.
+- **Errores**: cliente inexistente → **404**. Cliente con cuotas vencidas → **400** "El cliente x tiene cuotas vencidas: no se le puede otorgar un crédito nuevo." (M14). Deuda ≤ 0, cuotas < 1, tasa negativa o > 999,99, algún campo vacío → **400** de validación (`dto/request/CreditoRequest.java`). Tipo de plan o cargo inexistente, o JSON mal formado → **400** "Solicitud inválida".
+- **Postcondición**: crédito VIGENTE con su plan de cuotas y sus cargos (tabla `credito_cargos`). Sin `cargos` en el request (o vacío) el crédito no tiene cargos.
+- **Reglas**: `service/impl/CreditoServiceImpl.java` `crear` (mora y cargos opcionales); `model/Credito.java` `totalADevolver` (cuota × cantidad, O3).
 - **Endpoint**: `POST /api/creditos` → `controller/CreditoController.java` `crear`.
 - **Pantalla**: `pages/Creditos.jsx` (formulario de alta).
-- **Verificación**: Test `model/plan/InteresSimpleTest` (4), `model/plan/SistemaFrancesTest` (4), `model/CreditoTest.java` `nuevoEstaVigenteConSaldoIgualAlTotal`; Smoke "Crédito INTERES_SIMPLE… (M9)", "Crédito SISTEMA_FRANCES…"; Final captura `04-creditos.png`; API (UC07 x8).
-- **Evolución**: V0 cargaba el importe de cuota a mano (B-07); V1 lo calcula con tasa; V3 lo hace intercambiable por plan (M9).
+- **Verificación**: Test `model/plan/InteresSimpleTest` (4), `model/plan/SistemaFrancesTest` (4), `model/plan/SeguroDeVidaTest` (2), `model/plan/GastoDeAdministracionTest` (2), `model/plan/CargosApiladosTest` (2), `model/CreditoTest.java` `nuevoEstaVigenteConSaldoIgualAlTotal`, `service/ReglaDeMoraTest` (2); Smoke "Crédito INTERES_SIMPLE… (M9)", "Crédito SISTEMA_FRANCES…"; Final captura `04-creditos.png`; API (UC07 x10).
+- **Evolución**: V0 cargaba el importe de cuota a mano (B-07); V1 lo calcula con tasa; V3 lo hace intercambiable por plan (M9); V4 suma cargos opcionales (M12) y rechaza al cliente en mora (M14).
 - **Hueco**: la fecha es libre: acepta un crédito otorgado en 2030 (API) o en el pasado.
 
 ### UC08 Generar plan de cuotas (`<<include>>` de UC07)
@@ -227,6 +228,18 @@ Fuente: `casos-de-uso-v3.puml` (renderizado con `plantuml -tsvg` y `-tpng`). Sup
 - **Verificación**: API (UC20 x5). Sin test unitario.
 - **Hueco resuelto (H4)**: igual que UC19, el usuario promovido ve los links nuevos del Navbar al navegar, sin volver a loguearse.
 
+### UC21 Consultar deuda del cliente
+
+- **Actor**: Usuario. **RF V0**: no existía; se agregó en V4 (P2 de la sección 7, por cliente).
+- **Precondición**: el cliente existe.
+- **Flujo principal**: 1. El usuario busca un cliente por DNI (UC06). 2. El sistema arma la cartera del cliente con sus créditos y le pide saldo y monto vencido. 3. Responde **200** con DNI, saldo pendiente y monto vencido. 4. La pantalla muestra "Saldo pendiente" y "Vencido"; si hay vencido, lo resalta como aviso.
+- **Errores**: DNI inexistente → **404** "No se encontró cliente con DNI x". Sin sesión → **401**.
+- **Postcondición**: ninguna (consulta).
+- **Reglas**: `service/impl/ClienteServiceImpl.java` `deuda`: `model/Cartera.java` `de`, `saldo`, `montoVencido` (Composite, M11): la cartera suma lo que cada crédito suma de sus cuotas; la cuota de un crédito anulado no se debe (`model/Cuota.java` `saldo`) y la vencida es la impaga con vencimiento pasado (`model/Cuota.java` `montoVencido`). Es la misma consulta que usa la regla de mora de UC07 (M14).
+- **Endpoint**: `GET /api/clientes/{dni}/deuda` → `controller/ClienteController.java` `deuda`.
+- **Pantalla**: `pages/Clientes.jsx` (bloque "Buscar cliente por DNI"). Usa `api/clientes.js` `getDeudaCliente`.
+- **Verificación**: Test `service/DeudaClienteTest` (3: con vencida, al día, cliente inexistente), `model/CarteraTest` (4); API (UC21 x4).
+
 ## 4. Casos de uso retirados o reclasificados
 
 | CU V0 | Qué era | Estado en V3 | Motivo |
@@ -246,7 +259,7 @@ Fuente: `casos-de-uso-v3.puml` (renderizado con `plantuml -tsvg` y `-tpng`). Sup
 | UC04 | `POST /api/clientes` | `pages/Clientes.jsx` | `CodigosHttpTest` (400 DNI > 15, JSON roto) | Smoke, Final, API |
 | UC05 | `GET /api/clientes` | `pages/Clientes.jsx` | **—** | API |
 | UC06 | `GET /api/clientes/{dni}` | `pages/Clientes.jsx` (buscar) | `CodigosHttpTest` (404) | API |
-| UC07 | `POST /api/creditos` | `pages/Creditos.jsx` | `InteresSimpleTest`, `SistemaFrancesTest`, `CreditoTest` | Smoke, Final (captura 04), API |
+| UC07 | `POST /api/creditos` | `pages/Creditos.jsx` (con casillas de cargos) | `InteresSimpleTest`, `SistemaFrancesTest`, `SeguroDeVidaTest`, `GastoDeAdministracionTest`, `CargosApiladosTest`, `CreditoTest`, `ReglaDeMoraTest` | Smoke, Final (captura 04), API |
 | UC08 | (dentro de UC07) | (dentro de UC07) | `CreditoTest` | Smoke |
 | UC09 | `GET /api/creditos/{id}` | `pages/Creditos.jsx` (consultar) | `CreditoTest` (estado, saldo), `CodigosHttpTest` (400 id no numérico) | Smoke, API |
 | UC10 | `GET /api/creditos/cliente/{dni}` | `pages/Creditos.jsx` | `CuotaTest` (vencida) | Smoke, Final (captura 05), API |
@@ -258,6 +271,7 @@ Fuente: `casos-de-uso-v3.puml` (renderizado con `plantuml -tsvg` y `-tpng`). Sup
 | UC18 | `GET /api/supervisor/usuarios`, `GET /api/admin/usuarios` | `pages/GestorPermisos.jsx`, `pages/PanelAdmin.jsx` | **—** | Final, API |
 | UC19 | `PUT /api/supervisor/usuarios/{id}/permisos-anulacion` (+ `PUT /api/admin/usuarios/{id}/permisos`) | `pages/GestorPermisos.jsx` (el de ADMIN, **—**) | **—** | Final, API |
 | UC20 | `PUT /api/admin/usuarios/{id}/rol` | `pages/PanelAdmin.jsx` | **—** | API |
+| UC21 | `GET /api/clientes/{dni}/deuda` | `pages/Clientes.jsx` (buscar) | `DeudaClienteTest`, `CarteraTest` | API |
 
 Los tests de dominio están en `model/` y `model/plan/` del árbol de tests; los de códigos HTTP en `controller/CodigosHttpTest`, que además cubre el 405 de cualquier endpoint.
 
@@ -270,7 +284,23 @@ Los tests de dominio están en `model/` y `model/plan/` del árbol de tests; los
 - **Regla sin evidencia ejecutable**: ninguna. El rechazo de anular una cobranza de otro día (UC15) no se puede provocar por API, pero desde `Cobranza.anular(LocalDate)` tiene test.
 - **Pantalla sin CU**: ninguna. Las ocho páginas de `pages/` se mapean a algún CU.
 
-## 6. Verificación por API (2026-10-06)
+## 6. Verificación por API
+
+### Corrida V4 (2026-10-20)
+
+`verificar-cu.sh` corrido contra `iteracion4` (`a46793e`) en el puerto 8093, base H2 limpia. El crédito vencido pasa a otro cliente (30999888) para que la regla de mora no bloquee las altas de 30111222. Todo lo de V3 da igual que en la corrida de abajo (con H1 y BS14 ya resueltos: 400), salvo el hallazgo H5.
+
+| Caso | HTTP | Nota |
+|---|---|---|
+| UC04 DNI `"abc"` | 400 | BS14 |
+| UC07 cliente en mora / con seguro y gastos / cargo inexistente | 400 / 201 / 400 | 100000 en 2 cuotas: cuota 50600 (M12) |
+| UC21 al día / en mora / inexistente / sin token | 200 / 200 / 404 / 401 | Vencido 0 y 500 |
+| UC21 y UC07 tras cobrar las cuotas vencidas | 200 / 201 | Vencido 0: se le vuelve a otorgar |
+| **UC09, UC10 y `GET /api/creditos`** | **500** | **H5** |
+
+**H5 (UC09, UC10)**: toda respuesta que lista o consulta créditos ya guardados da 500 (`LazyInitializationException` sobre `Credito.cargos`). `dto/response/CreditoResponse.java` `desde` pasa `credito.getCargos()`, una vista sobre la colección lazy de Hibernate, y Jackson la recorre después de cerrar la transacción (`open-in-view=false`). El alta (UC07) no falla porque el set recién creado no es un proxy. Ningún test pasa por esos endpoints con la base real. Pendiente de corrección en el backend (copiar el set dentro de la transacción).
+
+### Corrida V3 (2026-10-06)
 
 `verificar-cu.sh` corrido contra una copia de `main` (`0582508`) levantada en el puerto 8097 con base H2 limpia y los tres usuarios semilla. Los commits siguientes hasta `3478af6` solo cambian comentarios (comprobado con `git diff` sin líneas de comentario), así que el resultado vale para ese commit. Se registra además `op1` (UC01), que después recibe permisos (UC19) y rol (UC20). Todo coincide con lo esperado salvo lo marcado como hallazgo.
 
@@ -314,7 +344,7 @@ Solo propuesta: el código de V3 está congelado. Cada uno tapa un hueco que mue
 | # | CU propuesto | Actor | Hueco que tapa | Qué ya existe | Tamaño |
 |---|---|---|---|---|---|
 | P1 | Consultar la cartera de créditos (todos los créditos con estado y saldo, filtrables por estado) | Supervisor, Administrador | Hoy solo se ven créditos de a un cliente por vez. Un supervisor no puede ver qué está vigente, cancelado o anulado en toda la cartera, y `GET /api/creditos` existe sin CU | Endpoint completo: `controller/CreditoController.java` `listarTodos` y `service/impl/CreditoServiceImpl.java` `listarTodos`, que ya trae cuotas y cobranzas sin N+1. Falta la pantalla | S: solo front |
-| P2 | Consultar la mora (cuotas vencidas impagas, por cliente y en total) | Usuario; total en el dashboard para Supervisor y Administrador | Un dashboard de préstamos que no muestra la mora no sirve para decidir a quién cobrar. La mora ya se calcula por cuota y no se junta en ningún lado. De paso alinea las tarjetas del dashboard (H3) | `model/Cuota.java` `estaVencida` y el campo `vencida` de `dto/response/CuotaResponse.java` (M6). El total del dashboard ya está hecho (O7, tarjeta "monto vencido" de UC16) | S: falta el filtro por cliente sobre UC10 |
+| P2 | Consultar la mora (por cliente: hecho en V4 como UC21) (cuotas vencidas impagas, por cliente y en total) | Usuario; total en el dashboard para Supervisor y Administrador | Un dashboard de préstamos que no muestra la mora no sirve para decidir a quién cobrar. La mora ya se calcula por cuota y no se junta en ningún lado. De paso alinea las tarjetas del dashboard (H3) | `model/Cuota.java` `estaVencida` y el campo `vencida` de `dto/response/CuotaResponse.java` (M6). El total del dashboard ya está hecho (O7, tarjeta "monto vencido" de UC16) | S: falta el filtro por cliente sobre UC10 |
 | P3 | Modificar el nombre de un cliente | Usuario | Un error de tipeo en el alta queda para siempre (A-09 de V0, sigue abierto). El DNI es la clave y no se toca | Nada: falta endpoint, regla y formulario | S |
 | P4 | Registrar quién cobró y quién anuló | Usuario (automático en UC11, UC13 y UC15) | Las anulaciones dependen de un permiso que se da y se quita, pero no queda registro de quién las usó; tampoco de quién cobró (ya señalado en V2). Sin eso el permiso no se puede auditar | El usuario autenticado ya llega a los servicios de anulación (`@AuthenticationPrincipal` en `controller/CreditoController.java` `anularCredito` y `controller/CobranzaController.java` `anularCobranza`). Falta guardarlo en `Cobranza` y `Credito` y mostrarlo | M: modelo, DTO y pantallas |
 
