@@ -19,7 +19,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 // Login y registro: autentica contra Spring Security y emite el token.
-// Facade: interfaz simple (registrar, login, actual) sobre Spring Security (AuthenticationManager, PasswordEncoder) y JWT (TokenService)
 @Service
 @RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
