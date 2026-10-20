@@ -3,6 +3,7 @@ package com.uade.tpejemplo.model;
 import com.uade.tpejemplo.exception.BusinessException;
 import com.uade.tpejemplo.model.interfaces.CalculoDeCuota;
 import com.uade.tpejemplo.model.interfaces.ICondicionesDeCredito;
+import com.uade.tpejemplo.model.plan.Renglon;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
@@ -13,6 +14,7 @@ import lombok.NoArgsConstructor;
 import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.EnumSet;
+import java.util.List;
 import java.util.Set;
 
 // Lo que se pacta al otorgar un credito (capital, tasa mensual, cuotas, plan y cargos)
@@ -71,6 +73,11 @@ public class CondicionesDeCredito implements ICondicionesDeCredito {
     // Solo para que Credito genere su plan: despues el importe vive en cada cuota
     BigDecimal importeCuota() {
         return calculo().importeCuota(deudaOriginal, tasaInteres, cantidadCuotas);
+    }
+
+    // Explica la cuota renglon por renglon; el importe guardado en cada cuota sigue siendo el hecho
+    public List<Renglon> desglose() {
+        return calculo().desglose(deudaOriginal, tasaInteres, cantidadCuotas);
     }
 
     // Strategy: el contexto delega el cálculo de la cuota en la estrategia elegida al otorgar (no cambia después)

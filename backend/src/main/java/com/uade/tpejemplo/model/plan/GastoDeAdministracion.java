@@ -15,6 +15,11 @@ public class GastoDeAdministracion extends CargoSobreCuota {
     }
 
     @Override
+    protected String nombre() {
+        return "Gastos de administración";
+    }
+
+    @Override
     protected BigDecimal cargo(BigDecimal capital, int cantidadCuotas) {
         return MONTO_POR_CUOTA;
     }

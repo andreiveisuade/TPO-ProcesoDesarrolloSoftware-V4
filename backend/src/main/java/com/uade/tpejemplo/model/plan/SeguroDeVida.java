@@ -17,6 +17,11 @@ public class SeguroDeVida extends CargoSobreCuota {
     }
 
     @Override
+    protected String nombre() {
+        return "Seguro de vida";
+    }
+
+    @Override
     protected BigDecimal cargo(BigDecimal capital, int cantidadCuotas) {
         return capital.multiply(PORCENTAJE_POR_CUOTA).setScale(2, RoundingMode.HALF_UP);
     }

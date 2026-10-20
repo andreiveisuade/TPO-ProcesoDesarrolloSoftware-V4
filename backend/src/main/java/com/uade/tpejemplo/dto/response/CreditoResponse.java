@@ -5,6 +5,7 @@ import com.uade.tpejemplo.model.TipoCargo;
 import com.uade.tpejemplo.model.TipoPlan;
 import com.uade.tpejemplo.model.interfaces.ICondicionesDeCredito;
 import com.uade.tpejemplo.model.interfaces.ICredito;
+import com.uade.tpejemplo.model.plan.Renglon;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -30,6 +31,7 @@ public class CreditoResponse {
     private Set<TipoCargo> cargos;
     private BigDecimal totalADevolver;
     private BigDecimal importeCuota;
+    private List<Renglon> desgloseCuota;
     private Integer cantidadCuotas;
     private List<CuotaResponse> cuotas;
     private boolean anulado;
@@ -50,6 +52,7 @@ public class CreditoResponse {
             .cargos(Set.copyOf(condiciones.getCargos()))
             .totalADevolver(credito.totalADevolver())
             .importeCuota(credito.importeCuota())
+            .desgloseCuota(condiciones.desglose())
             .cantidadCuotas(condiciones.getCantidadCuotas())
             .cuotas(credito.getCuotas().stream().map(CuotaResponse::desde).toList())
             .anulado(credito.isAnulado())

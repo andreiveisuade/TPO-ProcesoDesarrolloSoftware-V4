@@ -4,6 +4,7 @@ import com.uade.tpejemplo.model.interfaces.CalculoDeCuota;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.List;
 
 // La tasa es mensual sobre el capital: total = C * (1 + i * n), con i = tasa mensual
 // y n = cantidad de cuotas. 10.000 al 3% mensual se devuelven 11.800 en 6 cuotas y 17.200 en 24.
@@ -21,5 +22,10 @@ public class InteresSimple implements CalculoDeCuota {
     public BigDecimal importeCuota(BigDecimal capital, BigDecimal tasaInteres, int cantidadCuotas) {
         return totalADevolver(capital, tasaInteres, cantidadCuotas)
             .divide(BigDecimal.valueOf(cantidadCuotas), 2, RoundingMode.HALF_UP);
+    }
+
+    @Override
+    public List<Renglon> desglose(BigDecimal capital, BigDecimal tasaInteres, int cantidadCuotas) {
+        return List.of(new Renglon("Interés simple", importeCuota(capital, tasaInteres, cantidadCuotas)));
     }
 }
