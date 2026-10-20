@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchClientes, addCliente } from '../store/slices/clientesSlice';
-import { getCliente } from '../api/clientes';
+import { getCliente, getDeudaCliente } from '../api/clientes';
+import { formatMoneda } from '../utils/formato';
 import Aviso from '../components/Aviso';
 
 const FORM_VACIO = { dni: '', nombre: '' };
@@ -13,14 +14,17 @@ export default function Clientes() {
   const [form, setForm] = useState(FORM_VACIO);
   const [dniBuscado, setDniBuscado] = useState('');
   const [encontrado, setEncontrado] = useState(null);
+  const [deuda, setDeuda] = useState(null);
   const [errorBusqueda, setErrorBusqueda] = useState(null);
 
   const buscar = async (e) => {
     e.preventDefault();
     setEncontrado(null);
+    setDeuda(null);
     setErrorBusqueda(null);
     try {
       setEncontrado(await getCliente(dniBuscado));
+      setDeuda(await getDeudaCliente(dniBuscado));
     } catch (err) {
       setErrorBusqueda(err.message);
     }
@@ -46,6 +50,14 @@ export default function Clientes() {
         </form>
         {errorBusqueda && <div style={{ marginTop: '12px' }}><Aviso>{errorBusqueda}</Aviso></div>}
         {encontrado && <p style={{ marginTop: '12px' }}><strong>{encontrado.nombre}</strong> · DNI {encontrado.dni}</p>}
+        {deuda && (
+          <>
+            <p>Saldo pendiente: <strong>{formatMoneda(deuda.saldo)}</strong></p>
+            {Number(deuda.montoVencido) > 0
+              ? <Aviso>Vencido: <strong>{formatMoneda(deuda.montoVencido)}</strong></Aviso>
+              : <p>Vencido: {formatMoneda(deuda.montoVencido)}</p>}
+          </>
+        )}
       </div>
 
       <div style={styles.card}>
