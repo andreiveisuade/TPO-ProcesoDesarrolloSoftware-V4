@@ -50,6 +50,7 @@ TABLAS = {
         ("rol", [], "enum ADMIN/SUPERVISOR/USER"),
         ("puede_anular_credito", [], "boolean"),
         ("puede_anular_cobranza", [], "boolean"),
+        ("activo", [], "boolean default true"),
     ], None),
 }
 # Ancho propio solo donde el tipo no entra en W
@@ -60,7 +61,7 @@ FKS = [("credito_cargos", "id_credito", "creditos", "id", "1 : 0..N"),
        ("creditos", "dni_cliente", "clientes", "dni", "1 : 0..N"),
        ("cuotas", "id_credito", "creditos", "id", "1 : 1..N"),
        ("cobranzas", "id_cuota", "cuotas", "id", "1 : 0..N")]
-VB_W, VB_H = 1336, 430
+VB_W, VB_H = 1336, 460
 
 
 def fila_y(tabla, col):
