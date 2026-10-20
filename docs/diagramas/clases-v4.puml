@@ -1,5 +1,5 @@
-@startuml clases-v3-mvc
-title Dashboard de préstamos V3 — capas MVC
+@startuml clases-v4-mvc
+title Dashboard de préstamos V4 — capas MVC
 skinparam classAttributeIconSize 0
 skinparam packageStyle rectangle
 skinparam shadowing false
@@ -23,7 +23,7 @@ package "Controlador (controller)" as Controlador {
     - authService : AuthService
     + registrar(RegisterRequest) : AuthResponse
     + login(LoginRequest) : AuthResponse
-    + actual(UserDetails) : AuthResponse
+    + actual(UsuarioDetails) : AuthResponse
   }
   class ClienteController <<RestController>> {
     - clienteService : ClienteService
@@ -63,7 +63,7 @@ package "Controlador (controller)" as Controlador {
 }
 
 package "Modelo: servicios (service)" as Servicios {
-  interface AuthService {
+  interface AuthService <<Facade>> {
     + registrar(RegisterRequest) : AuthResponse
     + login(LoginRequest) : AuthResponse
     + actual(String) : AuthResponse
@@ -93,7 +93,7 @@ package "Modelo: servicios (service)" as Servicios {
   interface DashboardService {
     + obtenerEstadisticasGenerales() : DashboardStatsResponse
   }
-  class AuthServiceImpl {
+  class AuthServiceImpl <<Facade>> {
     - usuarioRepository : UsuarioRepository
     - passwordEncoder : PasswordEncoder
     - authenticationManager : AuthenticationManager
@@ -174,15 +174,16 @@ Servicios ..down.> Repos : cada *ServiceImpl usa los\nrepositories de sus atribu
 note as Leyenda
   Cada módulo de frontend/src/api llama por HTTP a /api/<recurso>.
   Cada *ServiceImpl implementa las operaciones de su interfaz.
-  Las entidades del modelo (Credito, Cuota, ...) están en clases-v3-modelo;
-  JWT y Spring Security, en clases-v3-seguridad.
+  Las entidades del modelo (Credito, Cuota, Cartera, ...) están en clases-v4-modelo;
+  JWT, Spring Security y la Facade de autenticación, en clases-v4-seguridad.
+  CreditoServiceImpl y DashboardServiceImpl son Client del Composite (Cartera).
   Omitidos: DTOs (estructuras sin comportamiento), excepciones,
   configuración y GlobalExceptionHandler (@RestControllerAdvice).
 end note
 @enduml
 
-@startuml clases-v3-seguridad
-title Dashboard de préstamos V3 — seguridad y Adapter
+@startuml clases-v4-seguridad
+title Dashboard de préstamos V4 — seguridad, Facade y Adapter
 skinparam classAttributeIconSize 0
 skinparam packageStyle rectangle
 skinparam shadowing false
@@ -190,34 +191,67 @@ skinparam linetype ortho
 skinparam nodesep 40
 skinparam ranksep 60
 
-package "Adapter 1: JWT (jjwt)" {
-  class AuthServiceImpl <<Client>> {
-    - tokenService : TokenService
+package "Facade: autenticación" {
+  class AuthController <<Client>> {
+    - authService : AuthService
+    + registrar(RegisterRequest) : AuthResponse
     + login(LoginRequest) : AuthResponse
+    + actual(UsuarioDetails) : AuthResponse
   }
-  class JwtAuthFilter <<Client>> {
+  interface AuthService <<Facade>> {
+    + registrar(RegisterRequest) : AuthResponse
+    + login(LoginRequest) : AuthResponse
+    + actual(String) : AuthResponse
+  }
+  class AuthServiceImpl <<Facade>> {
+    - usuarioRepository : UsuarioRepository
+    - passwordEncoder : PasswordEncoder
+    - authenticationManager : AuthenticationManager
     - tokenService : TokenService
-    - userDetailsService : UserDetailsService
-    # doFilterInternal(HttpServletRequest, HttpServletResponse, FilterChain) : void
+    + registrar(RegisterRequest) : AuthResponse
+    + login(LoginRequest) : AuthResponse
+    + actual(String) : AuthResponse
+    - buscar(String) : Usuario
   }
-  interface TokenService <<Target>> {
-    + generarToken(String) : String
-    + extraerUsername(String) : Optional<String>
+}
+
+package "Subsistema (no conoce a la Facade)" {
+  interface "AuthenticationManager (Spring)" as AuthenticationManager {
+    + authenticate(Authentication) : Authentication
   }
-  class JwtUtil <<Adapter>> {
-    - key : SecretKey
-    - parser : JwtParser
-    - expirationMs : long
-    + generarToken(String) : String
-    + extraerUsername(String) : Optional<String>
+  interface "PasswordEncoder (Spring)" as PasswordEncoder {
+    + encode(CharSequence) : String
   }
-  interface "JwtParser (jjwt)" as JwtParser <<Adaptee>> {
-    + parseSignedClaims(CharSequence) : Jws<Claims>
+  interface UsuarioRepository <<JpaRepository<Usuario, Long>>> {
+    + findByUsername(String) : Optional<Usuario>
+    + existsByUsername(String) : boolean
   }
-  interface "SecretKey (javax.crypto)" as SecretKey {
-    + getAlgorithm() : String
-    + getEncoded() : byte[]
+  package "Adapter 1: JWT (jjwt)" {
+    interface TokenService <<Target>> {
+      + generarToken(String) : String
+      + extraerUsername(String) : Optional<String>
+    }
+    class JwtUtil <<Adapter>> {
+      - key : SecretKey
+      - parser : JwtParser
+      - expirationMs : long
+      + generarToken(String) : String
+      + extraerUsername(String) : Optional<String>
+    }
+    interface "JwtParser (jjwt)" as JwtParser <<Adaptee>> {
+      + parseSignedClaims(CharSequence) : Jws<Claims>
+    }
+    interface "SecretKey (javax.crypto)" as SecretKey {
+      + getAlgorithm() : String
+      + getEncoded() : byte[]
+    }
   }
+}
+
+class JwtAuthFilter <<Client>> {
+  - tokenService : TokenService
+  - userDetailsService : UserDetailsService
+  # doFilterInternal(HttpServletRequest, HttpServletResponse, FilterChain) : void
 }
 
 package "Adapter 2: usuario para Spring Security" {
@@ -246,7 +280,13 @@ package "Adapter 2: usuario para Spring Security" {
   }
 }
 
+AuthController --> "1" AuthService : authService
+AuthService <|.. AuthServiceImpl
+AuthServiceImpl --> "1" AuthenticationManager
+AuthServiceImpl --> "1" PasswordEncoder
+AuthServiceImpl --> "1" UsuarioRepository
 AuthServiceImpl --> "1" TokenService
+
 JwtAuthFilter --> "1" TokenService
 TokenService <|.. JwtUtil
 JwtUtil *-- "1" JwtParser : parser
@@ -254,37 +294,48 @@ JwtUtil *-- "1" SecretKey : key
 
 JwtAuthFilter --> "1" UserDetailsService
 UserDetailsService <|.. UserDetailsServiceImpl
+UserDetailsServiceImpl --> "1" UsuarioRepository
 UserDetailsServiceImpl ..> UsuarioDetails : crea
 UserDetails <|.. UsuarioDetails
 UsuarioDetails --> "1" IUsuario : usuario
 
-note left of JwtUtil
+note right of AuthServiceImpl
+  Facade: tres operaciones de negocio sobre
+  Spring Security, BCrypt, el repositorio y JWT.
+  Ningún controlador importa el subsistema.
+  También es Client del Adapter 1.
+end note
+note bottom of JwtUtil
   Object Adapter: implementa el Target
   y compone el JwtParser de jjwt.
   Única clase que importa jjwt.
 end note
-note right of UsuarioDetails
+note left of IUsuario
   Object Adapter: Spring Security pide
   UserDetails; envuelve al IUsuario
   del dominio.
 end note
 @enduml
 
-@startuml clases-v3-modelo
-title Dashboard de préstamos V3 — detalle del Modelo
+@startuml clases-v4-modelo
+title Dashboard de préstamos V4 — detalle del Modelo
 skinparam classAttributeIconSize 0
 skinparam shadowing false
+left to right direction
 
 package "model.interfaces" {
+  interface Deuda <<Component>> {
+    + saldo() : BigDecimal
+    + montoVencido() : BigDecimal
+  }
   interface ICliente {
     + getDni() : String
     + getNombre() : String
   }
   interface ICredito {
+    + getCargos() : Set<TipoCargo>
     + totalADevolver() : BigDecimal
     + estado() : EstadoCredito
-    + saldo() : BigDecimal
-    + montoVencido() : BigDecimal
     + estaCancelado() : boolean
     + tieneCobranzas() : boolean
     + puedeAnularse() : boolean
@@ -314,7 +365,7 @@ package "model.interfaces" {
   interface IRol {
     + autoridad() : String
   }
-  interface CalculoDeCuota <<Strategy>> {
+  interface CalculoDeCuota <<Strategy / Component>> {
     + importeCuota(BigDecimal capital, BigDecimal tasa, int cuotas) : BigDecimal
   }
 }
@@ -325,7 +376,14 @@ package "model" {
     - nombre : String
     + {static} nuevo(String, String) : Cliente
   }
-  class Credito <<Context>> {
+  class Cartera <<Composite>> {
+    - deudas : List<Deuda>
+    + {static} de(List<? extends Deuda>) : Cartera
+    + saldo() : BigDecimal
+    + montoVencido() : BigDecimal
+    - sumar(Function<Deuda, BigDecimal>) : BigDecimal
+  }
+  class Credito <<Context / Composite>> {
     - id : Long
     - deudaOriginal : BigDecimal
     - fecha : LocalDate
@@ -333,21 +391,22 @@ package "model" {
     - importeCuota : BigDecimal
     - cantidadCuotas : Integer
     - tipoPlan : TipoPlan
+    - cargos : Set<TipoCargo>
     - anulado : boolean
-    + {static} nuevo(Cliente, BigDecimal, LocalDate, BigDecimal, Integer, TipoPlan) : Credito
+    + {static} nuevo(Cliente, BigDecimal, LocalDate, BigDecimal, Integer, TipoPlan, Set<TipoCargo>) : Credito
     - calculo() : CalculoDeCuota
     + totalADevolver() : BigDecimal
     - generarPlanDeCuotas() : void
     + estado() : EstadoCredito
     + saldo() : BigDecimal
     + montoVencido() : BigDecimal
-    - sumarCuotas(Predicate<Cuota>) : BigDecimal
+    - sumar(Function<Cuota, BigDecimal>) : BigDecimal
     + estaCancelado() : boolean
     + tieneCobranzas() : boolean
     + puedeAnularse() : boolean
     + anular() : void
   }
-  class Cuota {
+  class Cuota <<Leaf>> {
     - id : Long
     - numero : Integer
     - importe : BigDecimal
@@ -355,6 +414,8 @@ package "model" {
     + estaPagada() : boolean
     + estaVencida() : boolean
     + estaVencida(LocalDate) : boolean
+    + saldo() : BigDecimal
+    + montoVencido() : BigDecimal
     + registrarCobranza(BigDecimal) : Cobranza
   }
   class Cobranza {
@@ -399,17 +460,39 @@ package "model" {
     - calculo : CalculoDeCuota
     + calculo() : CalculoDeCuota
   }
+  enum TipoCargo {
+    SEGURO_DE_VIDA
+    GASTO_DE_ADMINISTRACION
+    - decorador : UnaryOperator<CalculoDeCuota>
+    + aplicarSobre(CalculoDeCuota) : CalculoDeCuota
+  }
 }
 
 package "model.plan" {
-  class InteresSimple <<ConcreteStrategy>> {
+  class InteresSimple <<ConcreteStrategy / ConcreteComponent>> {
     + importeCuota(BigDecimal, BigDecimal, int) : BigDecimal
   }
-  class SistemaFrances <<ConcreteStrategy>> {
+  class SistemaFrances <<ConcreteStrategy / ConcreteComponent>> {
     + importeCuota(BigDecimal, BigDecimal, int) : BigDecimal
+  }
+  abstract class CargoSobreCuota <<Decorator>> {
+    - envuelto : CalculoDeCuota
+    + importeCuota(BigDecimal, BigDecimal, int) : BigDecimal
+    # {abstract} cargo(BigDecimal, int) : BigDecimal
+  }
+  class SeguroDeVida <<ConcreteDecorator>> {
+    - {static} PORCENTAJE_POR_CUOTA : BigDecimal
+    # cargo(BigDecimal, int) : BigDecimal
+  }
+  class GastoDeAdministracion <<ConcreteDecorator>> {
+    - {static} MONTO_POR_CUOTA : BigDecimal
+    # cargo(BigDecimal, int) : BigDecimal
   }
 }
 
+Deuda <|-- ICredito
+Deuda <|-- ICuota
+Deuda <|.. Cartera
 ICliente <|.. Cliente
 ICredito <|.. Credito
 ICuota <|.. Cuota
@@ -419,12 +502,19 @@ IPermisos <|.. Permisos
 IRol <|.. Rol
 CalculoDeCuota <|.. InteresSimple
 CalculoDeCuota <|.. SistemaFrances
+CalculoDeCuota <|.. CargoSobreCuota
+CargoSobreCuota <|-- SeguroDeVida
+CargoSobreCuota <|-- GastoDeAdministracion
 
+Cartera "1" o-- "0..*" Deuda : deudas
 Credito "0..*" --> "1" Cliente : cliente
 Credito "1" *-- "1..*" Cuota : cuotas\n(Creator, cascade PERSIST)
 Cuota "1" *-- "0..*" Cobranza : cobranzas
 Credito --> "1" TipoPlan : tipoPlan
+Credito --> "0..*" TipoCargo : cargos
 TipoPlan --> "1" CalculoDeCuota : calculo
+TipoCargo ..> CargoSobreCuota : crea
+CargoSobreCuota o--> "1" CalculoDeCuota : envuelto
 Credito ..> CalculoDeCuota : calculo()
 Credito ..> EstadoCredito : estado()
 Usuario --> "1" Rol : rol
@@ -434,5 +524,17 @@ note right of TipoPlan
   Strategy: Credito delega importeCuota en
   tipoPlan.calculo(); el total sale de las cuotas.
   El plan se fija al otorgar el crédito.
+end note
+note right of CargoSobreCuota
+  Decorator: Credito.calculo() parte de
+  tipoPlan.calculo() y lo envuelve con cada
+  cargo (TipoCargo.aplicarSobre). Cada capa
+  delega en la envuelta y le suma su cargo.
+end note
+note left of Cartera
+  Composite: Cartera contiene créditos, que a su
+  vez contienen cuotas. El cliente (DashboardServiceImpl,
+  CreditoServiceImpl) pide saldo() o montoVencido()
+  sin saber cuántos niveles hay abajo.
 end note
 @enduml
