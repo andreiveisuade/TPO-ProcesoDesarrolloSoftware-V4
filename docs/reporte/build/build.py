@@ -10,6 +10,7 @@ P = "06f0fc7"  # iteracion4 antes de M17
 P18 = "521b37e"  # iteracion4 antes de M18
 P19 = "6609cd4"  # iteracion4 antes de M19 y M20
 P21 = "691ed32"  # iteracion4 antes de M21
+P22 = "b5b94bb"  # iteracion4 antes de M22 y del segundo cliente de M13
 e = html.escape
 
 
@@ -56,7 +57,7 @@ def body(c, path):
 
 
 def cb(c, path, *partes):
-    ver = {A: "V3 (tag v3)", P: "V4 antes de M17 (06f0fc7)", P18: "V4 antes de M18 (521b37e)", P19: "V4 antes de M19 (6609cd4)", P21: "V4 antes de M21 (691ed32)"}.get(c, "V4 (iteracion4)")
+    ver = {A: "V3 (tag v3)", P: "V4 antes de M17 (06f0fc7)", P18: "V4 antes de M18 (521b37e)", P19: "V4 antes de M19 (6609cd4)", P21: "V4 antes de M21 (691ed32)", P22: "V4 antes del alta por admin (b5b94bb)"}.get(c, "V4 (iteracion4)")
     return f'<div class="ruta">{e(full(path))} <span class="ver">· {ver}</span></div><pre><code>{e(chr(10).join(partes))}</code></pre>'
 
 
@@ -170,25 +171,23 @@ m12 = bloque("decorator", "M12. Decorator: cargos sobre la cuota", "expansión d
 evidencia = ('$ git grep -lE "AuthenticationManager|PasswordEncoder|TokenService|io\\.jsonwebtoken" \\\n'
              '    iteracion4 -- backend/src/main/java/com/uade/tpejemplo/controller\n'
              + (git("grep", "-lE", r"AuthenticationManager|PasswordEncoder|TokenService|io\.jsonwebtoken", D, "--", J + "controller").strip() or "(sin resultados)"))
-m13 = bloque("facade", "M13. Facade: autenticación", "identificado en código existente",
-    "<strong>Facade</strong> (GoF, estructural): interfaz simple sobre un subsistema de terceros complejo. <strong>Patrón identificado</strong>, no aplicado en V4.",
-    "Desde V1 la autenticación pasa por <code>AuthService</code>, pero <strong>nadie lo nombraba</strong>: no se defendía como patrón.",
-    cb(A, "service/AuthService.java", body(A, "service/AuthService.java")),
-    "Se nombra el rol en <code>AuthService</code>; <strong>el diseño no cambia</strong>.",
-    cb(D, "service/AuthService.java", body(D, "service/AuthService.java"))
-    + cb(D, "service/impl/AuthServiceImpl.java", lines(D, "service/impl/AuthServiceImpl.java", r"private final UsuarioRepository", 4), "", method(D, "service/impl/AuthServiceImpl.java", r"public AuthResponse login"))
-    + '<p>Evidencia: ningún controlador usa el subsistema.</p><pre><code>' + e(evidencia) + '</code></pre>',
-    "Esconde Spring Security y jjwt. <strong>Low Coupling</strong>, <strong>Protected Variations</strong>.",
-    "Gana: los controllers no conocen Spring Security ni jjwt. Cuesta: un salto más; <code>DataInitializer</code> y <code>JwtAuthFilter</code> usan el subsistema directo. "
-    "Sin cambio de diseño: es reconocimiento. Los controladores conservan solo anotaciones de borde (<code>@AuthenticationPrincipal</code>, <code>@PreAuthorize</code>).",
-    ref="Commits <code>a0fafd3</code>, <code>01fbfb6</code>.",
+m13 = bloque("facade", "M13. Facade: dos clientes", "segundo cliente",
+    "<strong>Facade</strong> (GoF): interfaz simple sobre un subsistema de terceros.",
+    "El admin <strong>no podía dar de alta usuarios</strong> sin conocer <code>PasswordEncoder</code> y el repositorio.",
+    cb(P22, "service/AuthService.java", body(P22, "service/AuthService.java")),
+    "<code>registrarConRol</code> en la Facade; <strong>un único <code>crear()</code></strong> privado.",
+    cb(D, "service/impl/AuthServiceImpl.java", method(D, "service/impl/AuthServiceImpl.java", r"public UsuarioResponse registrarConRol"), "", method(D, "service/impl/AuthServiceImpl.java", r"private Usuario crear"))
+    + cb(D, "service/impl/AdminServiceImpl.java", method(D, "service/impl/AdminServiceImpl.java", r"public UsuarioResponse crearUsuario"))
+    + '<p>Ningún controlador usa el subsistema:</p><pre><code>' + e(evidencia) + '</code></pre>',
+    "Oculta Spring Security y jjwt: <strong>Low Coupling</strong>, <strong>Protected Variations</strong>.",
+    "Gana: simplifica el uso para varios clientes (C12 s.21); un solo hasheo. Cuesta: un salto más; <code>DataInitializer</code> y <code>JwtAuthFilter</code> usan el subsistema directo.",
+    ref="Commits <code>a0fafd3</code>, <code>01fbfb6</code>, <code>7c2f3ac</code>.",
+    tit_a="Antes (b5b94bb)",
     extra=roles([
         ("Facade", "<code>service/AuthService.java</code>, <code>service/impl/AuthServiceImpl.java</code>"),
-        ("Subsistema", "<code>AuthenticationManager</code>, <code>PasswordEncoder</code>, <code>TokenService</code> → <code>JwtUtil</code> (Adapter M7), <code>UsuarioRepository</code>"),
-        ("Client", "<code>controller/AuthController.java</code>"),
-    ]) + trampa("¿Entonces todos los services son Facade?",
-        "No: los demás coordinan dominio propio (GRASP Controller); este oculta terceros.")
-    + figura("facade-login", "Secuencia: login a través de la Facade"))
+        ("Subsistema", "<code>AuthenticationManager</code>, <code>PasswordEncoder</code>, <code>TokenService</code> (M7), <code>UsuarioRepository</code>"),
+        ("Client", "<code>controller/AuthController.java</code>, <code>service/impl/AdminServiceImpl.java</code>"),
+    ]) + figura("facade-login", "Secuencia: login a través de la Facade"))
 
 # ---------------- M17 Credito ----------------
 m17 = bloque("credito", "M17. Credito: Extract Class + ISP", "refactor",
@@ -279,17 +278,31 @@ m21 = bloque("adapter", "M21. Adapter: el controller no conoce al adaptador", "c
     "Gana: el Adapter queda en <code>security/</code>. Cuesta: el nombre del campo viaja como texto en la anotación.",
     ref="Commit <code>e66a282</code>.")
 
-mejoras = [m11, m12, m13, m17, m18, m19, m20, m21]
+# ---------------- M22 baja logica ----------------
+m22 = bloque("baja", "M22. Baja lógica de usuarios", "expansión del dominio",
+    "<strong>Adapter</strong> + <strong>Information Expert</strong>.",
+    "Sin baja: un usuario que se iba <strong>seguía entrando</strong>.",
+    cb(P22, "security/UsuarioDetails.java", lines(P22, "security/UsuarioDetails.java", r"// Expone el Usuario", 3)),
+    "<code>Usuario.desactivar</code> (nunca un ADMIN); <code>isEnabled()</code> <strong>traduce</strong> la baja al contrato de Spring (C10 p.25).",
+    cb(D, "security/UsuarioDetails.java", method(D, "security/UsuarioDetails.java", r"public boolean isEnabled"))
+    + cb(D, "model/Usuario.java", method(D, "model/Usuario.java", r"public void desactivar")),
+    "Login inactivo: 401; <code>JwtAuthFilter</code> descarta <strong>tokens previos</strong>.",
+    "Gana: baja sin perder historial.",
+    ref="Commit <code>7c2f3ac</code>.",
+    tit_a="Antes (b5b94bb)")
+
+mejoras = [m11, m12, m13, m17, m18, m19, m20, m21, m22]
 
 indice = [
  ("composite", "M11", "Saldo y mora por cuota, crédito y cartera", "<strong>Composite</strong>", "sumas repetidas"),
  ("decorator", "M12", "Seguro de vida y gastos sobre la cuota", "<strong>Decorator</strong>", "expansión del dominio"),
- ("facade", "M13", "Autenticación detrás de <code>AuthService</code>", "<strong>Facade</strong> (identificado)", "patrón sin nombrar"),
+ ("facade", "M13", "Alta del admin por <code>AuthService</code>", "<strong>Facade</strong>", "admin sin alta de usuarios"),
  ("credito", "M17", "Condiciones del crédito en su propia clase", "Extract Class + ISP", "7 parámetros, 3 responsabilidades"),
  ("usuario", "M18", "<code>IUsuario</code> recibe <code>IPermisos</code>", "DIP", "interfaz atada a una clase concreta"),
  ("tasa", "M19", "Interés simple real, tasa siempre mensual", "Lenguaje ubicuo (Strategy)", "una tasa con dos unidades"),
  ("importe", "M20", "El importe vive en la cuota; el crédito suma", "Information Expert", "tres fuentes del importe"),
  ("adapter", "M21", "Los controllers reciben <code>IUsuario</code>", "<strong>Adapter</strong>", "el controller desadaptaba"),
+ ("baja", "M22", "Desactivar usuarios", "<strong>Adapter</strong>", "sin baja"),
  ("panel", "M14-M16", "Regla de mora, deuda del cliente, cargos en el alta", "Composite, Decorator", "panel"),
 ]
 tabla_indice = "".join(f'<tr><td><a href="#{k}">{i}</a></td><td>{a}</td><td>{b}</td><td>{c}</td></tr>' for k, i, a, b, c in indice)
@@ -349,7 +362,7 @@ timeline = f'''<div class="timeline">
 <div class="hito"><div class="punto"></div><h4>V3</h4><p class="tema">MVC + Strategy + Adapter</p><p class="meta">13/10 · tag <code>v3</code></p>
 <ul><li>Cuota simple o francesa</li><li><code>TokenService</code> sobre jjwt</li><li>43 tests</li></ul></div>
 <div class="hito actual"><div class="punto"></div><h4>V4</h4><p class="tema">Composite + Decorator + Facade</p><p class="meta">27/10 · {n_v4} commits</p>
-<ul><li><strong>Composite</strong>: <code>Deuda</code> (M11)</li><li><strong>Decorator</strong>: cargos (M12)</li><li><strong>Facade</strong>: <code>AuthService</code> (M13)</li><li><code>Credito</code>: Extract Class (M17)</li><li>Interés simple real (M19)</li><li>Panel: deuda del cliente y cargos</li><li>67 tests</li></ul></div>
+<ul><li><strong>Composite</strong>: <code>Deuda</code> (M11)</li><li><strong>Decorator</strong>: cargos (M12)</li><li><strong>Facade</strong>: <code>AuthService</code> (M13)</li><li><code>Credito</code>: Extract Class (M17)</li><li>Interés simple real (M19)</li><li>Panel: deuda del cliente y cargos</li><li>73 tests</li></ul></div>
 </div>
 <details><summary>Commits V3 → V4 (git log v3..iteracion4)</summary><pre><code>{e(log_v4)}</code></pre></details>'''
 
@@ -459,7 +472,7 @@ doc = f'''<!doctype html>
 <title>Reporte V4 — TPO Grupo 7</title><style>{CSS}</style></head>
 <body>
 <div id="barra"><strong style="color:var(--navy)">Reporte V4</strong>
-<nav><a href="#portada">Portada</a><a href="#timeline">Timeline</a><a href="#tecnologias">Tecnologías</a><a href="#mvc">MVC</a><a href="#mejoras">Mejoras</a><a href="#composite">Composite</a><a href="#decorator">Decorator</a><a href="#facade">Facade</a><a href="#credito">Credito</a><a href="#tasa">Tasa</a><a href="#importe">Importe</a><a href="#adapter">Adapter</a><a href="#panel">Panel</a><a href="#convenciones">Convenciones</a><a href="#matriz">GRASP/SOLID</a><a href="#revision">Revisión</a><a href="#verificacion">Verificación</a><a href="#casos-de-uso">Casos de uso</a><a href="#clases">Diagramas</a><a href="#pendientes">Pendientes</a></nav>
+<nav><a href="#portada">Portada</a><a href="#timeline">Timeline</a><a href="#tecnologias">Tecnologías</a><a href="#mvc">MVC</a><a href="#mejoras">Mejoras</a><a href="#composite">Composite</a><a href="#decorator">Decorator</a><a href="#facade">Facade</a><a href="#credito">Credito</a><a href="#tasa">Tasa</a><a href="#importe">Importe</a><a href="#adapter">Adapter</a><a href="#baja">Baja</a><a href="#panel">Panel</a><a href="#convenciones">Convenciones</a><a href="#matriz">GRASP/SOLID</a><a href="#revision">Revisión</a><a href="#verificacion">Verificación</a><a href="#casos-de-uso">Casos de uso</a><a href="#clases">Diagramas</a><a href="#pendientes">Pendientes</a></nav>
 <button class="sec" onclick="document.querySelectorAll('details.detalle').forEach(d=>d.open=true);window.print()">Exportar PDF</button></div>
 <main>
 
@@ -510,7 +523,7 @@ doc = f'''<!doctype html>
 
 <section id="verificacion"><h2>Verificación</h2>
 <ul>
-<li><strong>67 tests, 0 fallas</strong> (<code>mvn test</code>; V3: 43): 31 de dominio, 15 de cálculo de cuota, 12 HTTP, 8 de integración, <code>contextLoads</code>.</li>
+<li><strong>73 tests, 0 fallas</strong> (<code>mvn test</code>; V3: 43): 31 de dominio, 15 de cálculo de cuota, 18 HTTP, 8 de integración, <code>contextLoads</code>.</li>
 <li><strong>Casos de uso por API</strong>: <code>docs/casos-de-uso/verificar-cu.sh</code>, incluida la mora (400).</li>
 <li><strong>Hallazgo H5, corregido</strong>: <code>verificar-cu.sh</code> detectó 500 al consultar créditos (<code>Credito.cargos</code> lazy fuera de la transacción); fix: <code>CreditoResponse.desde</code> copia los cargos (<code>6286109</code>), test <code>CreditoConCargosTest</code>.</li>
 <li><strong>Hallazgo H6, corregido</strong>: <code>"cargos":[null]</code> daba 500; ahora 400 (<code>06eb1eb</code>, test <code>cargoNuloDa400</code>, <code>verificar-cu.sh</code>).</li>
@@ -518,7 +531,7 @@ doc = f'''<!doctype html>
 </section>
 
 <section id="casos-de-uso"><h2>Casos de uso</h2>
-<p>Fichas y trazabilidad: <a href="../casos-de-uso/README.md"><code>docs/casos-de-uso/README.md</code></a>. Nuevo: UC21; cambia UC07.</p>
+<p>Fichas y trazabilidad: <a href="../casos-de-uso/README.md"><code>docs/casos-de-uso/README.md</code></a>. Nuevos: UC21, UC22; cambian UC02, UC07.</p>
 <p><a href="../casos-de-uso/casos-de-uso-v4.svg"><img src="../casos-de-uso/casos-de-uso-v4.svg" alt="Diagrama de casos de uso V4" style="width:100%;background:#fff;border:1px solid var(--linea);border-radius:4px"></a></p>
 </section>
 

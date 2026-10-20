@@ -10,14 +10,20 @@ skinparam NoteBackgroundColor #FFF8E1
 skinparam NoteBorderColor #B38600
 hide empty members
 class AuthController <<Client>> {
-  +actual(principal)
+  +registrar(request)
+}
+class AdminServiceImpl <<Client>> {
+  +crearUsuario(request)
 }
 interface AuthService <<Facade>> {
   +registrar(request)
+  +registrarConRol(request, rol)
   +login(request)
   +actual(username)
 }
-class AuthServiceImpl <<Facade>>
+class AuthServiceImpl <<Facade>> {
+  -crear(request, rol)
+}
 package "Subsistema: Spring Security + JWT (no conoce a la Facade)" {
   interface "AuthenticationManager (Spring)" as AM
   interface "PasswordEncoder (Spring)" as PE
@@ -26,6 +32,7 @@ package "Subsistema: Spring Security + JWT (no conoce a la Facade)" {
   interface UsuarioRepository
 }
 AuthController --> AuthService
+AdminServiceImpl --> AuthService
 AuthService <|.. AuthServiceImpl
 AuthServiceImpl --> AM
 AuthServiceImpl --> PE

@@ -18,6 +18,11 @@ interface AuthService {
   +actual(username)
 }
 class AuthServiceImpl
+class AdminServiceImpl {
+  +listarUsuarios()
+  +actualizarRol(id, request)
+}
+interface UsuarioRepository
 interface "AuthenticationManager (Spring)" as AM
 interface "PasswordEncoder (Spring)" as PE
 interface TokenService
@@ -26,8 +31,9 @@ AuthService <|.. AuthServiceImpl
 AuthServiceImpl --> AM
 AuthServiceImpl --> PE
 AuthServiceImpl --> TokenService
-note bottom of AuthService #FFE0E0
-  la Facade ya existía,
-  sin nombrar
+AdminServiceImpl --> UsuarioRepository
+note right of AdminServiceImpl #FFE0E0
+  sin alta de usuarios:
+  un solo cliente de la Facade
 end note
 @enduml
