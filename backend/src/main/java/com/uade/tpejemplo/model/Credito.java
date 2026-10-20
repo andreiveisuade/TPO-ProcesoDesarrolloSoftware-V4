@@ -14,7 +14,9 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.EnumSet;
 import java.util.List;
+import java.util.Set;
 import java.util.function.Predicate;
 
 // Credito otorgado a un cliente: genera sus cuotas, calcula saldo y estado
@@ -62,6 +64,13 @@ public class Credito implements ICredito {
     @Column(name = "tipo_plan", nullable = false, columnDefinition = "varchar(20) default 'INTERES_SIMPLE'")
     private TipoPlan tipoPlan;
 
+    // EnumSet: al otorgar, los cargos se aplican siempre en el orden del enum
+    @ElementCollection
+    @CollectionTable(name = "credito_cargos", joinColumns = @JoinColumn(name = "id_credito"))
+    @Enumerated(EnumType.STRING)
+    @Column(name = "tipo_cargo", nullable = false, length = 30)
+    private Set<TipoCargo> cargos = EnumSet.noneOf(TipoCargo.class);
+
     @Column(name = "anulado", nullable = false)
     private boolean anulado = false;
 
@@ -71,13 +80,14 @@ public class Credito implements ICredito {
     private List<Cuota> cuotas = new ArrayList<>();
 
     private Credito(Cliente cliente, BigDecimal deudaOriginal, LocalDate fecha,
-                    BigDecimal tasaInteres, Integer cantidadCuotas, TipoPlan tipoPlan) {
+                    BigDecimal tasaInteres, Integer cantidadCuotas, TipoPlan tipoPlan, Set<TipoCargo> cargos) {
         this.cliente = cliente;
         this.deudaOriginal = deudaOriginal;
         this.fecha = fecha;
         this.tasaInteres = tasaInteres;
         this.cantidadCuotas = cantidadCuotas;
         this.tipoPlan = tipoPlan;
+        this.cargos.addAll(cargos);
         this.importeCuota = calculo().importeCuota(deudaOriginal, tasaInteres, cantidadCuotas);
         // Creator: el credito nace con su plan de cuotas
         generarPlanDeCuotas();
@@ -87,13 +97,19 @@ public class Credito implements ICredito {
     // cuotas las genera el propio credito y el importe de cuota lo calcula
     // el, asi que ninguno de los tres se recibe desde afuera.
     public static Credito nuevo(Cliente cliente, BigDecimal deudaOriginal, LocalDate fecha,
-                                BigDecimal tasaInteres, Integer cantidadCuotas, TipoPlan tipoPlan) {
-        return new Credito(cliente, deudaOriginal, fecha, tasaInteres, cantidadCuotas, tipoPlan);
+                                BigDecimal tasaInteres, Integer cantidadCuotas, TipoPlan tipoPlan,
+                                Set<TipoCargo> cargos) {
+        return new Credito(cliente, deudaOriginal, fecha, tasaInteres, cantidadCuotas, tipoPlan, cargos);
     }
 
     // Strategy: el contexto delega el cálculo de la cuota en la estrategia elegida al otorgar (no cambia después)
+    // Decorator: cada cargo del credito envuelve a la estrategia y le suma lo suyo
     private CalculoDeCuota calculo() {
-        return tipoPlan.calculo();
+        CalculoDeCuota calculo = tipoPlan.calculo();
+        for (TipoCargo cargo : cargos) {
+            calculo = cargo.aplicarSobre(calculo);
+        }
+        return calculo;
     }
 
     public BigDecimal totalADevolver() {
@@ -106,6 +122,10 @@ public class Credito implements ICredito {
         for (int numeroCuota = 1; numeroCuota <= cantidadCuotas; numeroCuota++) {
             cuotas.add(new Cuota(this, numeroCuota, importeCuota, fecha.plusMonths(numeroCuota)));
         }
+    }
+
+    public Set<TipoCargo> getCargos() {
+        return Collections.unmodifiableSet(cargos);
     }
 
     public List<Cuota> getCuotas() {

@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -13,7 +14,7 @@ class CuotaTest {
 
     private Credito creditoOtorgado(LocalDate fecha) {
         Credito credito = Credito.nuevo(Cliente.nuevo("30111222", "Ana"), new BigDecimal("200"),
-            fecha, BigDecimal.ZERO, 2, TipoPlan.INTERES_SIMPLE);
+            fecha, BigDecimal.ZERO, 2, TipoPlan.INTERES_SIMPLE, Set.of());
         return credito;
     }
 

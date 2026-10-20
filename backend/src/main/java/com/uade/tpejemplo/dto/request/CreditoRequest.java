@@ -6,6 +6,7 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
+import com.uade.tpejemplo.model.TipoCargo;
 import com.uade.tpejemplo.model.TipoPlan;
 import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.Pattern;
@@ -13,6 +14,7 @@ import lombok.Data;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.Set;
 
 @Data
 public class CreditoRequest {
@@ -42,4 +44,7 @@ public class CreditoRequest {
 
     @NotNull(message = "El tipo de plan es obligatorio")
     private TipoPlan tipoPlan;
+
+    // Opcional: sin cargos si no viene o viene vacio.
+    private Set<TipoCargo> cargos;
 }

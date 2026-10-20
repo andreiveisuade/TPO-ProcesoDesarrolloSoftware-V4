@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Set;
 
 // Casos de uso de creditos: otorgar, consultar y anular. Las reglas las decide el modelo.
 @Service
@@ -36,7 +37,8 @@ public class CreditoServiceImpl implements CreditoService {
             request.getFecha(),
             request.getTasaInteres(),
             request.getCantidadCuotas(),
-            request.getTipoPlan()
+            request.getTipoPlan(),
+            request.getCargos() == null ? Set.of() : request.getCargos()
         ));
 
         return CreditoResponse.desde(credito);
