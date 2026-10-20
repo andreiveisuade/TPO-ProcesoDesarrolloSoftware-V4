@@ -19,9 +19,7 @@ const estadoCuota = (c) => {
 
 const FORM_VACIO = { dniCliente:'', deudaOriginal:'', fecha:'', tasaInteres:'', cantidadCuotas:'', tipoPlan:'INTERES_SIMPLE', cargos:[] };
 
-const descripcionPlan = (cr) => cr.tipoPlan === 'SISTEMA_FRANCES'
-  ? `Sistema francés · ${cr.tasaInteres}% mensual`
-  : `Interés simple · ${cr.tasaInteres}% total`;
+const descripcionPlan = (cr) => `${cr.tipoPlan === 'SISTEMA_FRANCES' ? 'Sistema francés' : 'Interés simple'} · ${cr.tasaInteres}% mensual`;
 
 const descripcionCargos = (cr) => {
   const etiquetas = Object.keys(CARGOS).filter(c => cr.cargos?.includes(c)).map(c => CARGOS[c].etiqueta);
@@ -192,11 +190,11 @@ export default function Creditos() {
           <input style={styles.input} placeholder="DNI cliente" value={form.dniCliente} onChange={e => setForm({...form, dniCliente: e.target.value})} required />
           <input style={styles.input} placeholder="Deuda original" value={form.deudaOriginal} onChange={e => setForm({...form, deudaOriginal: e.target.value})} type="number" required />
           <input style={styles.input} placeholder="Fecha" value={form.fecha} onChange={e => setForm({...form, fecha: e.target.value})} type="date" required />
-          <input style={styles.input} placeholder="Interés % (ej: 45)" value={form.tasaInteres} onChange={e => setForm({...form, tasaInteres: e.target.value})} type="number" min="0" step="0.01" required />
+          <input style={styles.input} placeholder="Interés % mensual (ej: 3)" value={form.tasaInteres} onChange={e => setForm({...form, tasaInteres: e.target.value})} type="number" min="0" step="0.01" required />
           <input style={styles.input} placeholder="Cant. cuotas" value={form.cantidadCuotas} onChange={e => setForm({...form, cantidadCuotas: e.target.value})} type="number" min="1" required />
           <select style={styles.input} value={form.tipoPlan} onChange={e => setForm({...form, tipoPlan: e.target.value})}>
-            <option value="INTERES_SIMPLE">Interés simple (% total)</option>
-            <option value="SISTEMA_FRANCES">Sistema francés (% mensual)</option>
+            <option value="INTERES_SIMPLE">Interés simple</option>
+            <option value="SISTEMA_FRANCES">Sistema francés</option>
           </select>
           {Object.entries(CARGOS).map(([cargo, { etiqueta, detalle }]) => (
             <label key={cargo} style={styles.casilla}>
