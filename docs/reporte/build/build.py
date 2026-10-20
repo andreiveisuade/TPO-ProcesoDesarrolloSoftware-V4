@@ -157,6 +157,9 @@ m12 = bloque("decorator", "M12. Decorator: cargos sobre la cuota", "expansión d
         ("Client", "<code>CondicionesDeCredito.calculo()</code>"),
     ]) + trampa("¿No es otra Strategy?",
         "No: Strategy elige <strong>un</strong> algoritmo; los decoradores <strong>se apilan</strong> sobre él.")
+    + trampa("¿Para qué está <code>TipoCargo</code>?",
+        "Un decorador no se guarda ni viaja en el JSON: se guarda el <strong>nombre</strong> del cargo (<code>credito_cargos</code>) y con él se rearma la pila. "
+        "Cada constante sobrescribe <code>aplicarSobre</code> con su decorador: <strong>Polymorphism</strong> en vez de un <code>switch</code> por tipo.")
     + figura("decorator-cargos", "Secuencia: cuota francesa con seguro y gastos"))
 
 # ---------------- M13 Facade ----------------
