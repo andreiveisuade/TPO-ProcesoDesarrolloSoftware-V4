@@ -71,18 +71,16 @@ const styles = {
     fontSize: '1.2rem'
   },
   tarjetasMetricas: {
-    display: 'flex',
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(min(240px, 100%), 1fr))',
     gap: '20px',
-    justifyContent: 'center',
-    flexWrap: 'wrap',
   },
   tarjeta: {
     backgroundColor: 'var(--color-surface)',
-    padding: '20px 40px',
+    padding: '20px',
     borderRadius: '12px',
     boxShadow: '0 4px 6px var(--color-shadow)',
     textAlign: 'center',
-    minWidth: '150px',
   },
   valor: {
     fontSize: '2rem',

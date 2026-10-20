@@ -113,11 +113,30 @@ export default function Creditos() {
         </span>
       </div>
       <dl style={styles.datos}>
-        <div><dt style={styles.dt}>Deuda original</dt><dd style={styles.dd}>{formatMoneda(cr.deudaOriginal)}</dd></div>
+        <div><dt style={styles.dt}>Capital prestado</dt><dd style={styles.dd}>{formatMoneda(cr.deudaOriginal)}</dd></div>
         <div><dt style={styles.dt}>Plan</dt><dd style={styles.dd}>{descripcionPlan(cr)}</dd></div>
         <div><dt style={styles.dt}>Otorgado</dt><dd style={styles.dd}>{formatFecha(cr.fecha)}</dd></div>
         <div><dt style={styles.dt}>Total a devolver</dt><dd style={styles.dd}>{formatMoneda(cr.totalADevolver)}</dd></div>
-        <div><dt style={styles.dt}>Cuota</dt><dd style={styles.dd}>{cr.cantidadCuotas} × {formatMoneda(cr.importeCuota)}</dd></div>
+        <div>
+          <dt style={styles.dt}>Cuota</dt>
+          <dd style={styles.dd}>{cr.cantidadCuotas} × {formatMoneda(cr.importeCuota)}</dd>
+          <table style={styles.desglose}>
+            <tbody>
+              {cr.desgloseCuota.map((r, i) => (
+                <tr key={r.concepto}>
+                  <td style={styles.renglon}>{i > 0 && '+'}</td>
+                  <td style={{ ...styles.renglon, textAlign:'right' }}>{formatMoneda(r.importe)}</td>
+                  <td style={styles.renglon}>{r.concepto}</td>
+                </tr>
+              ))}
+              <tr>
+                <td style={styles.totalDesglose}>=</td>
+                <td style={{ ...styles.totalDesglose, textAlign:'right' }}>{formatMoneda(cr.importeCuota)}</td>
+                <td style={styles.totalDesglose}></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
         <div><dt style={styles.dt}>Cargos</dt><dd style={styles.dd}>{descripcionCargos(cr)}</dd></div>
         <div><dt style={styles.dt}>Saldo</dt><dd style={{ ...styles.dd, fontWeight: 'bold' }}>{formatMoneda(cr.saldo)}</dd></div>
       </dl>
@@ -188,7 +207,7 @@ export default function Creditos() {
         <Aviso tipo="exito">{exito}</Aviso>
         <form onSubmit={handleSubmit} style={styles.grid}>
           <input style={styles.input} placeholder="DNI cliente" value={form.dniCliente} onChange={e => setForm({...form, dniCliente: e.target.value})} required />
-          <input style={styles.input} placeholder="Deuda original" value={form.deudaOriginal} onChange={e => setForm({...form, deudaOriginal: e.target.value})} type="number" required />
+          <input style={styles.input} placeholder="Capital prestado" value={form.deudaOriginal} onChange={e => setForm({...form, deudaOriginal: e.target.value})} type="number" required />
           <input style={styles.input} placeholder="Fecha" value={form.fecha} onChange={e => setForm({...form, fecha: e.target.value})} type="date" required />
           <input style={styles.input} placeholder="Interés % mensual (ej: 3)" value={form.tasaInteres} onChange={e => setForm({...form, tasaInteres: e.target.value})} type="number" min="0" step="0.01" required />
           <input style={styles.input} placeholder="Cant. cuotas" value={form.cantidadCuotas} onChange={e => setForm({...form, cantidadCuotas: e.target.value})} type="number" min="1" required />
@@ -241,6 +260,9 @@ const styles = {
   datos:        { display:'grid', gridTemplateColumns:'repeat(3, 1fr)', gap:'12px 24px', margin:'0 0 16px 0' },
   dt:           { color:'var(--color-text-muted)', fontSize:'0.8em', marginBottom:'2px' },
   dd:           { margin:0 },
+  desglose:     { borderCollapse:'collapse', marginTop:'4px', fontSize:'0.8em', color:'var(--color-text-muted)' },
+  renglon:      { padding:'1px 6px 1px 0', border:'none', whiteSpace:'nowrap' },
+  totalDesglose: { padding:'2px 6px 1px 0', border:'none', borderTop:'1px solid var(--color-border)', fontWeight:'bold', whiteSpace:'nowrap' },
 };
 
 const estadoColores = {

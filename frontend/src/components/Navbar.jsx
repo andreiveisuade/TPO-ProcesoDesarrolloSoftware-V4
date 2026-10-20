@@ -48,9 +48,9 @@ export default function Navbar() {
 }
 
 const styles = {
-  nav: { display:'flex', justifyContent:'space-between', alignItems:'center', padding:'12px 24px', backgroundColor:'var(--color-nav-bg)', color:'var(--color-on-primary)' },
-  brand: { fontWeight:'bold', fontSize:'1.2rem' },
-  links: { display:'flex', alignItems:'center', gap:'20px' },
+  nav: { display:'flex', justifyContent:'space-between', alignItems:'center', gap:'24px', padding:'12px 24px', backgroundColor:'var(--color-nav-bg)', color:'var(--color-on-primary)' },
+  brand: { fontWeight:'bold', fontSize:'1.2rem', whiteSpace:'nowrap' },
+  links: { display:'flex', flexWrap:'wrap', justifyContent:'flex-end', alignItems:'center', gap:'8px 16px', whiteSpace:'nowrap' },
   link: { color:'var(--color-nav-link)', textDecoration:'none', fontWeight:'500' },
   adminLink: { color: 'var(--color-nav-admin)', textDecoration:'none', fontWeight:'bold' }, 
   supervisorLink: { color: 'var(--color-nav-supervisor)', textDecoration:'none', fontWeight:'bold' }, 
