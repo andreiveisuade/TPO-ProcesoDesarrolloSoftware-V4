@@ -95,7 +95,7 @@
       "from": "am",
       "to": "facade",
       "y": 335,
-      "label": "ok, o 401 si no coincide",
+      "label": "ok, o 401 si falla o inactivo",
       "variant": "return"
     },
     {
