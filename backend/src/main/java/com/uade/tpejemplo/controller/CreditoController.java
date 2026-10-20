@@ -2,7 +2,7 @@ package com.uade.tpejemplo.controller;
 
 import com.uade.tpejemplo.dto.request.CreditoRequest;
 import com.uade.tpejemplo.dto.response.CreditoResponse;
-import com.uade.tpejemplo.security.UsuarioDetails;
+import com.uade.tpejemplo.model.interfaces.IUsuario;
 import com.uade.tpejemplo.service.CreditoService;
 import jakarta.validation.Valid;
 import io.swagger.v3.oas.annotations.Operation;
@@ -69,8 +69,8 @@ public class CreditoController {
     @ApiResponse(responseCode = "403", description = "Sin rol o permiso")
     @ApiResponse(responseCode = "404", description = "No encontrado")
     @DeleteMapping("/anular/{id}")
-    public ResponseEntity<Void> anularCredito(@PathVariable Long id, @AuthenticationPrincipal UsuarioDetails principal) {
-        creditoService.anularCredito(id, principal.getUsuario());
+    public ResponseEntity<Void> anularCredito(@PathVariable Long id, @AuthenticationPrincipal(expression = "usuario") IUsuario usuario) {
+        creditoService.anularCredito(id, usuario);
         return ResponseEntity.noContent().build();
     }
 }

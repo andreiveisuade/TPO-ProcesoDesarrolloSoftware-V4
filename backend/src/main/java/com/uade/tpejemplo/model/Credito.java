@@ -65,7 +65,7 @@ public class Credito implements ICredito {
         return new Credito(cliente, fecha, condiciones);
     }
 
-    // Composite: el total, como el saldo, es la suma de sus cuotas
+    // Information Expert: el total es la suma de sus cuotas
     public BigDecimal totalADevolver() {
         return sumar(Cuota::getImporte);
     }

@@ -3,7 +3,7 @@ package com.uade.tpejemplo.controller;
 import com.uade.tpejemplo.dto.request.LoginRequest;
 import com.uade.tpejemplo.dto.request.RegisterRequest;
 import com.uade.tpejemplo.dto.response.AuthResponse;
-import com.uade.tpejemplo.security.UsuarioDetails;
+import com.uade.tpejemplo.model.interfaces.IUsuario;
 import com.uade.tpejemplo.service.AuthService;
 import jakarta.validation.Valid;
 import io.swagger.v3.oas.annotations.Operation;
@@ -50,7 +50,7 @@ public class AuthController {
     @ApiResponse(responseCode = "200", description = "OK")
     @ApiResponse(responseCode = "401", description = "Sin token o token inválido")
     @GetMapping("/me")
-    public ResponseEntity<AuthResponse> actual(@AuthenticationPrincipal UsuarioDetails usuario) {
+    public ResponseEntity<AuthResponse> actual(@AuthenticationPrincipal(expression = "usuario") IUsuario usuario) {
         return ResponseEntity.ok(authService.actual(usuario.getUsername()));
     }
 }

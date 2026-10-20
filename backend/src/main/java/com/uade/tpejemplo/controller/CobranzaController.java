@@ -2,7 +2,7 @@ package com.uade.tpejemplo.controller;
 
 import com.uade.tpejemplo.dto.request.CobranzaRequest;
 import com.uade.tpejemplo.dto.response.CobranzaResponse;
-import com.uade.tpejemplo.security.UsuarioDetails;
+import com.uade.tpejemplo.model.interfaces.IUsuario;
 import com.uade.tpejemplo.service.CobranzaService;
 import jakarta.validation.Valid;
 import io.swagger.v3.oas.annotations.Operation;
@@ -51,8 +51,8 @@ public class CobranzaController {
     @ApiResponse(responseCode = "403", description = "Sin rol o permiso")
     @ApiResponse(responseCode = "404", description = "No encontrado")
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> anularCobranza(@PathVariable Long id, @AuthenticationPrincipal UsuarioDetails principal) {
-        cobranzaService.anularCobranza(id, principal.getUsuario());
+    public ResponseEntity<Void> anularCobranza(@PathVariable Long id, @AuthenticationPrincipal(expression = "usuario") IUsuario usuario) {
+        cobranzaService.anularCobranza(id, usuario);
         return ResponseEntity.noContent().build();
     }
 }
