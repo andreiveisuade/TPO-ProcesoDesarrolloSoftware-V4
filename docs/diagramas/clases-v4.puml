@@ -30,6 +30,7 @@ package "Controlador (controller)" as Controlador {
     + crear(ClienteRequest) : ClienteResponse
     + buscarPorDni(String) : ClienteResponse
     + listarTodos() : List<ClienteResponse>
+    + deuda(String) : DeudaClienteResponse
   }
   class CreditoController <<RestController>> {
     - creditoService : CreditoService
@@ -72,6 +73,7 @@ package "Modelo: servicios (service)" as Servicios {
     + crear(ClienteRequest) : ClienteResponse
     + buscarPorDni(String) : ClienteResponse
     + listarTodos() : List<ClienteResponse>
+    + deuda(String) : DeudaClienteResponse
   }
   interface CreditoService {
     + crear(CreditoRequest) : CreditoResponse
@@ -101,6 +103,7 @@ package "Modelo: servicios (service)" as Servicios {
   }
   class ClienteServiceImpl {
     - clienteRepository : ClienteRepository
+    - creditoRepository : CreditoRepository
   }
   class CreditoServiceImpl {
     - creditoRepository : CreditoRepository
@@ -176,7 +179,7 @@ note as Leyenda
   Cada *ServiceImpl implementa las operaciones de su interfaz.
   Las entidades del modelo (Credito, Cuota, Cartera, ...) están en clases-v4-modelo;
   JWT, Spring Security y la Facade de autenticación, en clases-v4-seguridad.
-  CreditoServiceImpl y DashboardServiceImpl son Client del Composite (Cartera).
+  CreditoServiceImpl, ClienteServiceImpl y DashboardServiceImpl son Client del Composite (Cartera).
   Omitidos: DTOs (estructuras sin comportamiento), excepciones,
   configuración y GlobalExceptionHandler (@RestControllerAdvice).
 end note

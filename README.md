@@ -3,32 +3,33 @@
 # Dashboard de préstamos
 
 Sistema interno de una financiera: clientes, créditos en cuotas, cobranzas, anulaciones y dashboard de supervisor.<br>
-TPO de Proceso de Desarrollo de Software, UADE 2C 2026, grupo 7. Iteración 3: MVC + patrones.
+TPO de Proceso de Desarrollo de Software, UADE 2C 2026, grupo 7. Iteración 4: Composite, Decorator y Facade.
 
 ![Java 21](https://img.shields.io/badge/Java-21-007396)
 ![Spring Boot 3.4.3](https://img.shields.io/badge/Spring%20Boot-3.4.3-6DB33F)
 ![React 19](https://img.shields.io/badge/React-19-61DAFB)
-![Tests 43 OK](https://img.shields.io/badge/tests-43%20OK-brightgreen)
+![Tests 62 OK](https://img.shields.io/badge/tests-62%20OK-brightgreen)
 
-[Reporte](docs/reporte/reporte-v3.html) · [Manual](docs/manual/index.html) · [Casos de uso](docs/casos-de-uso/README.md) · [Lista de mejoras](docs/entrega/lista-mejoras.md) · [Swagger](http://localhost:8080/swagger-ui.html)
+[Reporte](docs/reporte/reporte-v4.html) · [Manual](docs/manual/index.html) · [Casos de uso](docs/casos-de-uso/README.md) · [Lista de mejoras](docs/entrega/lista-mejoras.md) · [Swagger](http://localhost:8080/swagger-ui.html)
 
 </div>
 
 ## Índice
 
 - [Qué es](#qué-es)
+- [Iteración 4: Composite, Decorator y Facade](#iteración-4-composite-decorator-y-facade)
 - [Iteración 3: Strategy y Adapter](#iteración-3-strategy-y-adapter)
 - [Mejoras](#mejoras)
 - [Modelo de dominio y DER](#modelo-de-dominio-y-der)
 - [Cómo levantarlo](#cómo-levantarlo)
 - [Cómo se verifica](#cómo-se-verifica)
 - [Documentación](#documentación)
-- [Historia V0 → V3](#historia-v0--v3)
+- [Historia V0 → V4](#historia-v0--v4)
 - [Equipo](#equipo)
 
 ## Qué es
 
-Un operador da de alta clientes, les otorga créditos (interés simple o sistema francés) y registra el cobro de cada cuota; un supervisor puede anular créditos y cobranzas y ve el dashboard con lo financiado, lo cobrado y la mora; el admin gestiona roles y permisos.
+Un operador da de alta clientes, consulta su deuda, les otorga créditos (interés simple o sistema francés, con seguro de vida y gastos opcionales; no a clientes en mora) y registra el cobro de cada cuota; un supervisor puede anular créditos y cobranzas y ve el dashboard con lo financiado, lo cobrado y la mora; el admin gestiona roles y permisos.
 
 - **Backend**: [Spring Boot](https://spring.io/projects/spring-boot) (framework Java para APIs REST) con Spring Security + JWT (token firmado que identifica al usuario en cada request), JPA (mapeo de objetos a tablas) y [H2](https://www.h2database.com) (base en memoria, se recrea al arrancar).
 - **Frontend**: [React](https://react.dev) (librería de interfaces) con [Redux Toolkit](https://redux-toolkit.js.org) (estado global de la app) y [Vite](https://vite.dev) (servidor de desarrollo y build).
@@ -36,6 +37,16 @@ Un operador da de alta clientes, les otorga créditos (interés simple o sistema
 Panorama MVC: la vista (React) llama a los controladores REST, que delegan en los servicios; las reglas de negocio viven en el modelo.
 
 ![Panorama MVC](docs/diagramas/archify/mvc.svg)
+
+## Iteración 4: Composite, Decorator y Facade
+
+**Composite (M11).** [`Deuda`](backend/src/main/java/com/uade/tpejemplo/model/interfaces/Deuda.java) es la interfaz común: la [`Cuota`](backend/src/main/java/com/uade/tpejemplo/model/Cuota.java) contesta su saldo y su monto vencido, y el [`Credito`](backend/src/main/java/com/uade/tpejemplo/model/Credito.java) y la [`Cartera`](backend/src/main/java/com/uade/tpejemplo/model/Cartera.java) suman a sus hijos. La usan el dashboard, la regla de mora (no se otorga crédito a un cliente con cuotas vencidas, M14) y la deuda del cliente (`GET /api/clientes/{dni}/deuda`, M15).
+
+**Decorator (M12).** Cargos opcionales sobre la cuota: [`CargoSobreCuota`](backend/src/main/java/com/uade/tpejemplo/model/plan/CargoSobreCuota.java) envuelve el `CalculoDeCuota` de la Strategy y le suma [`SeguroDeVida`](backend/src/main/java/com/uade/tpejemplo/model/plan/SeguroDeVida.java) (0,1 % del capital por cuota) o [`GastoDeAdministracion`](backend/src/main/java/com/uade/tpejemplo/model/plan/GastoDeAdministracion.java) ($500 por cuota); [`TipoCargo`](backend/src/main/java/com/uade/tpejemplo/model/TipoCargo.java) arma la pila. Es una expansión del dominio; en la pantalla de Créditos son dos casillas (M16).
+
+**Facade (M13).** [`AuthService`](backend/src/main/java/com/uade/tpejemplo/service/AuthService.java) ofrece `registrar`, `login` y `actual` sobre Spring Security (`AuthenticationManager`, `PasswordEncoder`) y JWT (`TokenService`, el Adapter de V3). Ningún controlador usa ese subsistema.
+
+![Secuencia del Composite](docs/diagramas/archify/composite-deuda.svg)
 
 ## Iteración 3: Strategy y Adapter
 
@@ -53,6 +64,10 @@ Detalle completo, con clase y método de cada una: [lista de mejoras](docs/entre
 
 | ID | Qué | Patrón o concepto | Código |
 |---|---|---|---|
+| M11 | Saldo y mora por cuota, crédito y cartera | Composite | [`Cartera`](backend/src/main/java/com/uade/tpejemplo/model/Cartera.java) |
+| M12 | Seguro de vida y gastos sobre la cuota | Decorator | [`CargoSobreCuota`](backend/src/main/java/com/uade/tpejemplo/model/plan/CargoSobreCuota.java) |
+| M13 | Autenticación detrás de una interfaz simple | Facade | [`AuthService`](backend/src/main/java/com/uade/tpejemplo/service/AuthService.java) |
+| M14, M15 | Regla de mora; deuda del cliente | Composite | [`CreditoServiceImpl`](backend/src/main/java/com/uade/tpejemplo/service/impl/CreditoServiceImpl.java), [`ClienteServiceImpl`](backend/src/main/java/com/uade/tpejemplo/service/impl/ClienteServiceImpl.java) |
 | M9 | Cuota con interés simple o sistema francés | Strategy | [`CalculoDeCuota`](backend/src/main/java/com/uade/tpejemplo/model/interfaces/CalculoDeCuota.java) |
 | M7 | JWT detrás de un Target propio | Adapter | [`JwtUtil`](backend/src/main/java/com/uade/tpejemplo/security/JwtUtil.java) |
 | M1 | No se cobra una cuota de un crédito anulado (TPO-004) | Information Expert | [`Cuota`](backend/src/main/java/com/uade/tpejemplo/model/Cuota.java) |
@@ -87,13 +102,13 @@ Detalle completo, con clase y método de cada una: [lista de mejoras](docs/entre
 
 ## Modelo de dominio y DER
 
-![Diagrama de clases del modelo](docs/diagramas/clases-v3-modelo.svg)
+![Diagrama de clases del modelo](docs/diagramas/clases-v4-modelo.svg)
 
-- Diagrama de clases entregable: [`clases-v3.puml`](docs/diagramas/clases-v3.puml) ([capas MVC](docs/diagramas/clases-v3-mvc.svg), [seguridad y Adapter](docs/diagramas/clases-v3-seguridad.svg), [modelo](docs/diagramas/clases-v3-modelo.svg)).
-- Ciclo de vida del crédito: [`credito-estados.svg`](docs/diagramas/archify/credito-estados.svg); secuencia de anular: [`anular-credito.svg`](docs/diagramas/archify/anular-credito.svg).
-- DER: [`der-v3.py`](docs/diagramas/der-v3.py) · [SVG](docs/diagramas/der-v3.svg) · [PNG](docs/diagramas/der-v3.png).
+- Diagrama de clases entregable: [`clases-v4.puml`](docs/diagramas/clases-v4.puml) ([capas MVC](docs/diagramas/clases-v4-mvc.svg), [seguridad, Facade y Adapter](docs/diagramas/clases-v4-seguridad.svg), [modelo](docs/diagramas/clases-v4-modelo.svg)).
+- Ciclo de vida del crédito: [`credito-estados.svg`](docs/diagramas/archify/credito-estados.svg); secuencias: [anular](docs/diagramas/archify/anular-credito.svg), [Composite](docs/diagramas/archify/composite-deuda.svg), [Decorator](docs/diagramas/archify/decorator-cargos.svg), [Facade](docs/diagramas/archify/facade-login.svg).
+- DER: [`der-v4.py`](docs/diagramas/der-v4.py) · [SVG](docs/diagramas/der-v4.svg) · [PNG](docs/diagramas/der-v4.png).
 
-![DER](docs/diagramas/der-v3.svg)
+![DER](docs/diagramas/der-v4.svg)
 
 ## Cómo levantarlo
 
@@ -121,19 +136,21 @@ Password = usuario. Los crea [`DataInitializer`](backend/src/main/java/com/uade/
 
 - **Swagger** (documentación interactiva de la API): <http://localhost:8080/swagger-ui.html>. Botón Authorize: pegar el token de `/api/auth/login`.
 - **Consola H2** (solo perfil dev): <http://localhost:8080/h2-console>, JDBC URL `jdbc:h2:mem:tpdb`, usuario `sa`, sin password.
-- **Demo guiada**: `bash docs/demo.sh` abre nvim con cada cambio V2 vs V3 en diff ([cómo usarla](docs/demo.md)).
+- **Demo guiada** (iteración 3): `bash docs/demo.sh` abre nvim con cada cambio V2 vs V3 en diff ([cómo usarla](docs/demo.md)).
 
 ## Cómo se verifica
 
-`cd backend && mvn test`: **43 tests, 0 fallas** ([JUnit 5](https://junit.org/junit5/), framework de tests de Java).
+`cd backend && mvn test`: **62 tests, 0 fallas** ([JUnit 5](https://junit.org/junit5/), framework de tests de Java).
 
 | Test | Cantidad | Qué cubre |
 |---|---|---|
-| [`CreditoTest`](backend/src/test/java/com/uade/tpejemplo/model/CreditoTest.java), [`CuotaTest`](backend/src/test/java/com/uade/tpejemplo/model/CuotaTest.java), [`CobranzaTest`](backend/src/test/java/com/uade/tpejemplo/model/CobranzaTest.java) | 21 | Reglas del dominio |
+| [`CreditoTest`](backend/src/test/java/com/uade/tpejemplo/model/CreditoTest.java), [`CuotaTest`](backend/src/test/java/com/uade/tpejemplo/model/CuotaTest.java), [`CobranzaTest`](backend/src/test/java/com/uade/tpejemplo/model/CobranzaTest.java), [`CarteraTest`](backend/src/test/java/com/uade/tpejemplo/model/CarteraTest.java) | 29 | Reglas del dominio y Composite |
 | [`InteresSimpleTest`](backend/src/test/java/com/uade/tpejemplo/model/plan/InteresSimpleTest.java), [`SistemaFrancesTest`](backend/src/test/java/com/uade/tpejemplo/model/plan/SistemaFrancesTest.java) | 8 | Estrategias de cuota |
+| [`SeguroDeVidaTest`](backend/src/test/java/com/uade/tpejemplo/model/plan/SeguroDeVidaTest.java), [`GastoDeAdministracionTest`](backend/src/test/java/com/uade/tpejemplo/model/plan/GastoDeAdministracionTest.java), [`CargosApiladosTest`](backend/src/test/java/com/uade/tpejemplo/model/plan/CargosApiladosTest.java) | 6 | Decoradores de cargos |
 | [`CodigosHttpTest`](backend/src/test/java/com/uade/tpejemplo/controller/CodigosHttpTest.java) | 11 | 400/401/403/404/405/406/415 con JWT real |
 | [`CobranzaConcurrenteTest`](backend/src/test/java/com/uade/tpejemplo/service/CobranzaConcurrenteTest.java) | 1 | Cobro concurrente de la misma cuota |
 | [`AnulacionConcurrenteTest`](backend/src/test/java/com/uade/tpejemplo/service/AnulacionConcurrenteTest.java) | 1 | Anular y cobrar el mismo crédito en paralelo |
+| [`ReglaDeMoraTest`](backend/src/test/java/com/uade/tpejemplo/service/ReglaDeMoraTest.java), [`DeudaClienteTest`](backend/src/test/java/com/uade/tpejemplo/service/DeudaClienteTest.java) | 5 | Regla de mora y deuda del cliente sobre H2 |
 | [`TpEjemploApplicationTests`](backend/src/test/java/com/uade/tpejemplo/TpEjemploApplicationTests.java) | 1 | Arranca el contexto de Spring |
 
 Además: [`verificar-cu.sh`](docs/casos-de-uso/verificar-cu.sh) (casos de uso contra la API). El resto de la evidencia está en [Evidencia de verificación](#evidencia-de-verificación-solo-en-el-repo-de-github).
@@ -142,11 +159,11 @@ Además: [`verificar-cu.sh`](docs/casos-de-uso/verificar-cu.sh) (casos de uso co
 
 | Documento | Para qué | Link |
 |---|---|---|
-| Reporte de la iteración 3 | Cada mejora: patrón, problema, solución y por qué | [HTML](docs/reporte/reporte-v3.html). Verlo renderizado: GitHub Pages (pendiente de activar) |
+| Reporte de la iteración 4 | Cada patrón: problema, solución y por qué (el de V3, en el tag `v3`) | [HTML](docs/reporte/reporte-v4.html). Verlo renderizado: GitHub Pages (pendiente de activar) |
 | Manual | Cómo usar y levantar el sistema | [HTML](docs/manual/index.html). Verlo renderizado: GitHub Pages (pendiente de activar) |
 | Lista de mejoras | Todas las mejoras con clase y método | [lista-mejoras.md](docs/entrega/lista-mejoras.md) |
-| Casos de uso | Fichas, diagrama y trazabilidad desde V0 | [README](docs/casos-de-uso/README.md) · [diagrama](docs/casos-de-uso/casos-de-uso-v3.svg) |
-| Diagramas | Clases, DER, Strategy, Adapter, MVC | [`docs/diagramas/`](docs/diagramas/) |
+| Casos de uso | Fichas, diagrama y trazabilidad desde V0 | [README](docs/casos-de-uso/README.md) · [diagrama](docs/casos-de-uso/casos-de-uso-v4.svg) |
+| Diagramas | Clases, DER, secuencias de los patrones, MVC | [`docs/diagramas/`](docs/diagramas/) |
 | Backlog | Lo que queda pendiente para las próximas iteraciones | [backlog.md](docs/backlog.md) |
 
 ### Evidencia de verificación (solo en el repo de GitHub)
@@ -162,12 +179,13 @@ Además: [`verificar-cu.sh`](docs/casos-de-uso/verificar-cu.sh) (casos de uso co
 | Recorrido de casos de uso | Casos de uso contra el sistema | [recorrido-cu.md](docs/trabajo/recorrido-cu.md) |
 | Notas de trabajo | Revisiones, tests y detalle de cada mejora | [`docs/trabajo/`](docs/trabajo/) |
 
-## Historia V0 → V3
+## Historia V0 → V4
 
 - **V0**: proyecto inicial, Spring Boot + React con el dominio de préstamos.
 - **V1**: iteración 1, bad smells (entregada 08/09).
 - **V2**: iteración 2, GRASP e interfaces de servicio restituidas.
-- **V3**: iteración 3, MVC + Strategy y Adapter (entrega 13/10). El cambio respecto de V2 se ve con `git diff v2..main`.
+- **V3**: iteración 3, MVC + Strategy y Adapter (entrega 13/10). El cambio respecto de V2 se ve con `git diff v2 v3`.
+- **V4**: iteración 4, Composite + Decorator + Facade y panel con deuda del cliente y cargos (entrega 27/10). El cambio respecto de V3 se ve con `git diff v3 iteracion4`.
 
 ## Equipo
 
