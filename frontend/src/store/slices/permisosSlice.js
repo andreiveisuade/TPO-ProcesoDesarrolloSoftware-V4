@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { updatePermisosSupervisor, getUsuariosSupervisor } from '../../api/supervisor';
-import { getUsuariosAdmin, updateRolUsuario } from '../../api/admin';
+import { getUsuariosAdmin, updateRolUsuario, crearUsuarioAdmin, updateActivoUsuario } from '../../api/admin';
 
 export const fetchUsuariosAdmin = createAsyncThunk('permisos/fetchAdmin', async (_, { rejectWithValue }) => {
   try {
@@ -34,6 +34,22 @@ export const cambiarRol = createAsyncThunk('permisos/cambiarRol', async ({ id, n
   }
 });
 
+export const crearUsuario = createAsyncThunk('permisos/crearUsuario', async (usuario, { rejectWithValue }) => {
+  try {
+    return await crearUsuarioAdmin(usuario);
+  } catch (err) {
+    return rejectWithValue(err.message);
+  }
+});
+
+export const cambiarActivo = createAsyncThunk('permisos/cambiarActivo', async ({ id, activo }, { rejectWithValue }) => {
+  try {
+    return await updateActivoUsuario(id, activo);
+  } catch (err) {
+    return rejectWithValue(err.message);
+  }
+});
+
 const permisosSlice = createSlice({
   name: 'permisos',
   initialState: {
@@ -61,7 +77,15 @@ const permisosSlice = createSlice({
       .addCase(fetchUsuariosSupervisor.rejected, handleRejected)
       
       .addCase(actualizarPermisos.fulfilled, reemplazarUsuario)
-      .addCase(cambiarRol.fulfilled, reemplazarUsuario);
+      .addCase(cambiarRol.fulfilled, reemplazarUsuario)
+
+      .addCase(crearUsuario.pending, handlePending)
+      .addCase(crearUsuario.fulfilled, (state, action) => { state.loading = false; state.lista.push(action.payload); })
+      .addCase(crearUsuario.rejected, handleRejected)
+
+      .addCase(cambiarActivo.pending, handlePending)
+      .addCase(cambiarActivo.fulfilled, (state, action) => { state.loading = false; reemplazarUsuario(state, action); })
+      .addCase(cambiarActivo.rejected, handleRejected);
   },
 });
 
