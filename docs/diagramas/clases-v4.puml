@@ -323,8 +323,11 @@ end note
 @startuml clases-v4-modelo
 title Dashboard de préstamos V4 — detalle del Modelo
 skinparam classAttributeIconSize 0
+skinparam packageStyle rectangle
 skinparam shadowing false
-left to right direction
+skinparam nodesep 40
+skinparam ranksep 60
+set separator none
 
 package "model.interfaces" {
   interface Deuda <<Component>> {
@@ -332,152 +335,115 @@ package "model.interfaces" {
     + montoVencido() : BigDecimal
     + tieneMora() : boolean
   }
-  interface ICliente {
-    + getDni() : String
-    + getNombre() : String
-  }
-  interface ICredito {
-    + getCondiciones() : ICondicionesDeCredito
-    + totalADevolver() : BigDecimal
-    + estado() : EstadoCredito
-    + puedeAnularse() : boolean
-    + anular() : void
-  }
-  interface ICondicionesDeCredito {
-    + getDeudaOriginal() : BigDecimal
-    + getTasaInteres() : BigDecimal
-    + getCantidadCuotas() : Integer
-    + getTipoPlan() : TipoPlan
-    + getCargos() : Set<TipoCargo>
-    + importeCuota() : BigDecimal
-  }
-  interface ICuota {
-    + estaPagada() : boolean
-    + estaVencida() : boolean
-    + registrarCobranza(BigDecimal) : ICobranza
-  }
-  interface ICobranza {
-    + isAnulada() : boolean
-    + anular() : void
-  }
-  interface IUsuario {
-    + getRol() : Rol
-    + getPermisos() : IPermisos
-    + otorgarPermisos(Permisos) : void
-    + asignarRol(Rol) : void
-    + puedeAnularCredito() : boolean
-    + puedeAnularCobranza() : boolean
-  }
-  interface IPermisos {
-    + isPuedeAnularCredito() : boolean
-    + isPuedeAnularCobranza() : boolean
-  }
-  interface IRol {
-    + autoridad() : String
-  }
   interface CalculoDeCuota <<Strategy / Component>> {
     + importeCuota(BigDecimal capital, BigDecimal tasa, int cuotas) : BigDecimal
   }
 }
 
 package "model" {
-  class Cliente {
-    - dni : String
-    - nombre : String
-    + {static} nuevo(String, String) : Cliente
+  together {
+    class "Usuario\n<size:10><i>implements IUsuario</i></size>" as Usuario {
+      - id : Long
+      - username : String
+      - password : String
+      + {static} nuevo(String, String, Rol, Permisos) : Usuario
+      + otorgarPermisos(Permisos) : void
+      + asignarRol(Rol) : void
+      + puedeAnularCredito() : boolean
+      + puedeAnularCobranza() : boolean
+    }
+    class "Permisos\n<size:10><i>implements IPermisos</i></size>" as Permisos <<Embeddable>> {
+      - puedeAnularCredito : boolean
+      - puedeAnularCobranza : boolean
+      + {static} de(boolean, boolean) : Permisos
+      + {static} ninguno() : Permisos
+      + {static} todos() : Permisos
+    }
+    enum "Rol\n<size:10><i>implements IRol</i></size>" as Rol {
+      ADMIN
+      SUPERVISOR
+      USER
+      + autoridad() : String
+    }
   }
-  class Cartera <<Composite>> {
-    - deudas : List<Deuda>
-    + {static} de(List<? extends Deuda>) : Cartera
-    + saldo() : BigDecimal
-    + montoVencido() : BigDecimal
-    - sumar(Function<Deuda, BigDecimal>) : BigDecimal
+  together {
+    class Cartera <<Composite>> {
+      - deudas : List<Deuda>
+      + {static} de(List<? extends Deuda>) : Cartera
+      + saldo() : BigDecimal
+      + montoVencido() : BigDecimal
+      - sumar(Function<Deuda, BigDecimal>) : BigDecimal
+    }
+    class "Credito\n<size:10><i>implements ICredito</i></size>" as Credito <<Composite>> {
+      - id : Long
+      - fecha : LocalDate
+      - importeCuota : BigDecimal
+      - anulado : boolean
+      + {static} nuevo(Cliente, LocalDate, CondicionesDeCredito) : Credito
+      + totalADevolver() : BigDecimal
+      - generarPlanDeCuotas() : void
+      + estado() : EstadoCredito
+      + saldo() : BigDecimal
+      + montoVencido() : BigDecimal
+      - sumar(Function<Cuota, BigDecimal>) : BigDecimal
+      - estaCancelado() : boolean
+      - tieneCobranzas() : boolean
+      + puedeAnularse() : boolean
+      + anular() : void
+    }
+    class "Cuota\n<size:10><i>implements ICuota</i></size>" as Cuota <<Leaf>> {
+      - id : Long
+      - numero : Integer
+      - importe : BigDecimal
+      - fechaVencimiento : LocalDate
+      + estaPagada() : boolean
+      + estaVencida() : boolean
+      + estaVencida(LocalDate) : boolean
+      + saldo() : BigDecimal
+      + montoVencido() : BigDecimal
+      + registrarCobranza(BigDecimal) : Cobranza
+    }
+    class "Cobranza\n<size:10><i>implements ICobranza</i></size>" as Cobranza {
+      - id : Long
+      - importe : BigDecimal
+      - fechaCobranza : LocalDate
+      - anulada : boolean
+      + anular() : void
+      + anular(LocalDate) : void
+    }
+    class "Cliente\n<size:10><i>implements ICliente</i></size>" as Cliente {
+      - dni : String
+      - nombre : String
+      + {static} nuevo(String, String) : Cliente
+    }
+    enum EstadoCredito {
+      VIGENTE
+      CANCELADO
+      ANULADO
+    }
   }
-  class Credito <<Composite>> {
-    - id : Long
-    - fecha : LocalDate
-    - importeCuota : BigDecimal
-    - anulado : boolean
-    + {static} nuevo(Cliente, LocalDate, CondicionesDeCredito) : Credito
-    + totalADevolver() : BigDecimal
-    - generarPlanDeCuotas() : void
-    + estado() : EstadoCredito
-    + saldo() : BigDecimal
-    + montoVencido() : BigDecimal
-    - sumar(Function<Cuota, BigDecimal>) : BigDecimal
-    - estaCancelado() : boolean
-    - tieneCobranzas() : boolean
-    + puedeAnularse() : boolean
-    + anular() : void
-  }
-  class CondicionesDeCredito <<Context / Embeddable>> {
-    - deudaOriginal : BigDecimal
-    - tasaInteres : BigDecimal
-    - cantidadCuotas : Integer
-    - tipoPlan : TipoPlan
-    - cargos : Set<TipoCargo>
-    + importeCuota() : BigDecimal
-    - calculo() : CalculoDeCuota
-  }
-  class Cuota <<Leaf>> {
-    - id : Long
-    - numero : Integer
-    - importe : BigDecimal
-    - fechaVencimiento : LocalDate
-    + estaPagada() : boolean
-    + estaVencida() : boolean
-    + estaVencida(LocalDate) : boolean
-    + saldo() : BigDecimal
-    + montoVencido() : BigDecimal
-    + registrarCobranza(BigDecimal) : Cobranza
-  }
-  class Cobranza {
-    - id : Long
-    - importe : BigDecimal
-    - fechaCobranza : LocalDate
-    - anulada : boolean
-    + anular() : void
-    + anular(LocalDate) : void
-  }
-  class Usuario {
-    - id : Long
-    - username : String
-    - password : String
-    + {static} nuevo(String, String, Rol, Permisos) : Usuario
-    + otorgarPermisos(Permisos) : void
-    + asignarRol(Rol) : void
-    + puedeAnularCredito() : boolean
-    + puedeAnularCobranza() : boolean
-  }
-  class Permisos <<Embeddable>> {
-    - puedeAnularCredito : boolean
-    - puedeAnularCobranza : boolean
-    + {static} de(boolean, boolean) : Permisos
-    + {static} ninguno() : Permisos
-    + {static} todos() : Permisos
-  }
-  enum Rol {
-    ADMIN
-    SUPERVISOR
-    USER
-    + autoridad() : String
-  }
-  enum EstadoCredito {
-    VIGENTE
-    CANCELADO
-    ANULADO
-  }
-  enum TipoPlan {
-    INTERES_SIMPLE
-    SISTEMA_FRANCES
-    - calculo : CalculoDeCuota
-    + calculo() : CalculoDeCuota
-  }
-  enum TipoCargo {
-    SEGURO_DE_VIDA
-    GASTO_DE_ADMINISTRACION
-    - decorador : UnaryOperator<CalculoDeCuota>
-    + aplicarSobre(CalculoDeCuota) : CalculoDeCuota
+  together {
+    class "CondicionesDeCredito\n<size:10><i>implements ICondicionesDeCredito</i></size>" as CondicionesDeCredito <<Context / Embeddable>> {
+      - deudaOriginal : BigDecimal
+      - tasaInteres : BigDecimal
+      - cantidadCuotas : Integer
+      - tipoPlan : TipoPlan
+      - cargos : Set<TipoCargo>
+      + importeCuota() : BigDecimal
+      - calculo() : CalculoDeCuota
+    }
+    enum TipoPlan {
+      INTERES_SIMPLE
+      SISTEMA_FRANCES
+      - calculo : CalculoDeCuota
+      + calculo() : CalculoDeCuota
+    }
+    enum TipoCargo {
+      SEGURO_DE_VIDA
+      GASTO_DE_ADMINISTRACION
+      - decorador : UnaryOperator<CalculoDeCuota>
+      + aplicarSobre(CalculoDeCuota) : CalculoDeCuota
+    }
   }
 }
 
@@ -503,55 +469,49 @@ package "model.plan" {
   }
 }
 
-Deuda <|-- ICredito
-Deuda <|-- ICuota
+' Zona deuda (Composite)
 Deuda <|.. Cartera
-ICliente <|.. Cliente
-ICredito <|.. Credito
-ICondicionesDeCredito <|.. CondicionesDeCredito
-ICuota <|.. Cuota
-ICobranza <|.. Cobranza
-IUsuario <|.. Usuario
-IPermisos <|.. Permisos
-IRol <|.. Rol
+Deuda "0..*" --o "1" Cartera : deudas
+Deuda <|.. Credito : vía ICredito
+Deuda <|.. Cuota : vía ICuota
+Credito "1" *-- "1..*" Cuota : cuotas\n(Creator, cascade PERSIST)
+Cuota "1" *-- "0..*" Cobranza : cobranzas
+Credito "0..*" --> "1" Cliente : cliente
+Credito ..> EstadoCredito : estado()
+
+' Zona calculo de cuota (Strategy + Decorator)
+Credito "1" *-right- "1" CondicionesDeCredito : condiciones
+CondicionesDeCredito --> "1" TipoPlan : tipoPlan
+CondicionesDeCredito --> "0..*" TipoCargo : cargos
+CondicionesDeCredito .up.> CalculoDeCuota : calculo()
+TipoPlan -up-> "1" CalculoDeCuota : calculo
+TipoCargo .right.> CargoSobreCuota : crea
 CalculoDeCuota <|.. InteresSimple
 CalculoDeCuota <|.. SistemaFrances
 CalculoDeCuota <|.. CargoSobreCuota
+CalculoDeCuota "1" <--o CargoSobreCuota : envuelto
 CargoSobreCuota <|-- SeguroDeVida
 CargoSobreCuota <|-- GastoDeAdministracion
 
-Cartera "1" o-- "0..*" Deuda : deudas
-Credito "0..*" --> "1" Cliente : cliente
-Credito "1" *-- "1..*" Cuota : cuotas\n(Creator, cascade PERSIST)
-Cuota "1" *-- "0..*" Cobranza : cobranzas
-Credito "1" *-- "1" CondicionesDeCredito : condiciones
-CondicionesDeCredito --> "1" TipoPlan : tipoPlan
-CondicionesDeCredito --> "0..*" TipoCargo : cargos
-TipoPlan --> "1" CalculoDeCuota : calculo
-TipoCargo ..> CargoSobreCuota : crea
-CargoSobreCuota o--> "1" CalculoDeCuota : envuelto
-CondicionesDeCredito ..> CalculoDeCuota : calculo()
-Credito ..> EstadoCredito : estado()
+' Zona usuarios
 Usuario --> "1" Rol : rol
 Usuario *-- "1" Permisos : permisos
 
-note right of TipoPlan
+note bottom of SeguroDeVida
   Strategy: CondicionesDeCredito delega importeCuota
-  en tipoPlan.calculo(); el total sale de las cuotas.
-  El plan se fija al otorgar el crédito.
+  en tipoPlan.calculo(). Decorator: calculo() lo
+  envuelve con cada cargo (TipoCargo.aplicarSobre);
+  cada capa delega en la envuelta y suma su cargo.
 end note
-note right of CargoSobreCuota
-  Decorator: CondicionesDeCredito.calculo() parte de
-  tipoPlan.calculo() y lo envuelve con cada
-  cargo (TipoCargo.aplicarSobre). Cada capa
-  delega en la envuelta y le suma su cargo.
+note bottom of Cobranza
+  Composite: Cartera contiene créditos, que contienen
+  cuotas. DashboardServiceImpl, CreditoServiceImpl y
+  ClienteServiceImpl tipan Deuda. Credito solo admite
+  Cuota como hijo (JPA): la profundidad es fija.
 end note
-note left of Cartera
-  Composite: Cartera contiene créditos, que a su
-  vez contienen cuotas. Los clientes (DashboardServiceImpl,
-  CreditoServiceImpl, ClienteServiceImpl) tipan Deuda y
-  piden saldo(), montoVencido() o tieneMora().
-  Credito solo admite Cuota como hijo (JPA):
-  la profundidad es fija.
+note as NConv
+  Cada entidad implementa su interfaz I* de model.interfaces
+  (convención de cátedra); se omiten las flechas.
+  ICredito e ICuota extienden Deuda.
 end note
 @enduml
