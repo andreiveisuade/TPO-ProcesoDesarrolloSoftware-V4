@@ -1,5 +1,6 @@
 package com.uade.tpejemplo.dto.response;
 
+import com.uade.tpejemplo.model.CondicionesDeCredito;
 import com.uade.tpejemplo.model.EstadoCredito;
 import com.uade.tpejemplo.model.TipoCargo;
 import com.uade.tpejemplo.model.TipoPlan;
@@ -37,18 +38,19 @@ public class CreditoResponse {
     private boolean puedeAnularse;
 
     public static CreditoResponse desde(ICredito credito) {
+        CondicionesDeCredito condiciones = credito.getCondiciones();
         return CreditoResponse.builder()
             .id(credito.getId())
             .dniCliente(credito.getCliente().getDni())
             .nombreCliente(credito.getCliente().getNombre())
-            .deudaOriginal(credito.getDeudaOriginal())
+            .deudaOriginal(condiciones.getDeudaOriginal())
             .fecha(credito.getFecha())
-            .tasaInteres(credito.getTasaInteres())
-            .tipoPlan(credito.getTipoPlan())
-            .cargos(Set.copyOf(credito.getCargos()))
+            .tasaInteres(condiciones.getTasaInteres())
+            .tipoPlan(condiciones.getTipoPlan())
+            .cargos(Set.copyOf(condiciones.getCargos()))
             .totalADevolver(credito.totalADevolver())
             .importeCuota(credito.getImporteCuota())
-            .cantidadCuotas(credito.getCantidadCuotas())
+            .cantidadCuotas(condiciones.getCantidadCuotas())
             .cuotas(credito.getCuotas().stream().map(CuotaResponse::desde).toList())
             .anulado(credito.isAnulado())
             .estado(credito.estado())

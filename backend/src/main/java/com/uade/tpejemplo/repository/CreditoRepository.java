@@ -23,6 +23,6 @@ public interface CreditoRepository extends JpaRepository<Credito, Long> {
     @Query("SELECT c FROM Credito c WHERE c.id = :id")
     Optional<Credito> bloquearPorId(@Param("id") Long id);
 
-    @Query("SELECT COALESCE(SUM(c.deudaOriginal), 0) FROM Credito c WHERE c.anulado = false")
+    @Query("SELECT COALESCE(SUM(c.condiciones.deudaOriginal), 0) FROM Credito c WHERE c.anulado = false")
     BigDecimal sumarDeudaOriginalNoAnulada();
 }

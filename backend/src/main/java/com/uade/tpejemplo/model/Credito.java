@@ -1,10 +1,9 @@
 package com.uade.tpejemplo.model;
 
 import com.uade.tpejemplo.exception.BusinessException;
-import com.uade.tpejemplo.model.interfaces.CalculoDeCuota;
 import com.uade.tpejemplo.model.interfaces.ICredito;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Min;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -14,13 +13,11 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.EnumSet;
 import java.util.List;
-import java.util.Set;
 import java.util.function.Function;
 
-// Credito otorgado a un cliente: genera sus cuotas, calcula saldo y estado
-// y decide si se puede anular.
+// Credito otorgado a un cliente: genera su plan de cuotas a partir de sus
+// condiciones y lleva su ciclo de vida (estado, saldo y anulacion).
 // Composite: suma la deuda de sus cuotas
 @Entity
 @Table(name = "creditos")
@@ -38,39 +35,18 @@ public class Credito implements ICredito {
     private Cliente cliente;
 
     @NotNull
-    @Column(name = "deuda_original", nullable = false, precision = 12, scale = 2)
-    private BigDecimal deudaOriginal;
-
-    @NotNull
     @Column(name = "fecha", nullable = false)
     private LocalDate fecha;
 
-    @NotNull
-    @Column(name = "tasa_interes", nullable = false, precision = 5, scale = 2)
-    private BigDecimal tasaInteres;
+    @Valid
+    @Embedded
+    private CondicionesDeCredito condiciones;
 
-    // Derivado de la deuda, la tasa y la cantidad de cuotas. Se guarda para
-    // que el credito conserve el importe con el que se otorgo aunque despues
-    // cambie la forma de calcularlo.
+    // Derivado de las condiciones. Se guarda para que el credito conserve el
+    // importe con el que se otorgo aunque despues cambie la forma de calcularlo.
     @NotNull
     @Column(name = "importe_cuota", nullable = false, precision = 12, scale = 2)
     private BigDecimal importeCuota;
-
-    @Min(1)
-    @Column(name = "cantidad_cuotas", nullable = false)
-    private Integer cantidadCuotas;
-
-    @NotNull
-    @Enumerated(EnumType.STRING)
-    @Column(name = "tipo_plan", nullable = false, columnDefinition = "varchar(20) default 'INTERES_SIMPLE'")
-    private TipoPlan tipoPlan;
-
-    // EnumSet: al otorgar, los cargos se aplican siempre en el orden del enum
-    @ElementCollection
-    @CollectionTable(name = "credito_cargos", joinColumns = @JoinColumn(name = "id_credito"))
-    @Enumerated(EnumType.STRING)
-    @Column(name = "tipo_cargo", nullable = false, length = 30)
-    private Set<TipoCargo> cargos = EnumSet.noneOf(TipoCargo.class);
 
     @Column(name = "anulado", nullable = false)
     private boolean anulado = false;
@@ -80,53 +56,32 @@ public class Credito implements ICredito {
     @OrderBy("numero")
     private List<Cuota> cuotas = new ArrayList<>();
 
-    private Credito(Cliente cliente, BigDecimal deudaOriginal, LocalDate fecha,
-                    BigDecimal tasaInteres, Integer cantidadCuotas, TipoPlan tipoPlan, Set<TipoCargo> cargos) {
+    private Credito(Cliente cliente, LocalDate fecha, CondicionesDeCredito condiciones) {
         this.cliente = cliente;
-        this.deudaOriginal = deudaOriginal;
         this.fecha = fecha;
-        this.tasaInteres = tasaInteres;
-        this.cantidadCuotas = cantidadCuotas;
-        this.tipoPlan = tipoPlan;
-        this.cargos.addAll(cargos);
-        this.importeCuota = calculo().importeCuota(deudaOriginal, tasaInteres, cantidadCuotas);
+        this.condiciones = condiciones;
+        this.importeCuota = condiciones.importeCuota();
         // Creator: el credito nace con su plan de cuotas
         generarPlanDeCuotas();
     }
 
     // Unica forma de dar de alta un credito. El id lo asigna la base, las
-    // cuotas las genera el propio credito y el importe de cuota lo calcula
-    // el, asi que ninguno de los tres se recibe desde afuera.
-    public static Credito nuevo(Cliente cliente, BigDecimal deudaOriginal, LocalDate fecha,
-                                BigDecimal tasaInteres, Integer cantidadCuotas, TipoPlan tipoPlan,
-                                Set<TipoCargo> cargos) {
-        return new Credito(cliente, deudaOriginal, fecha, tasaInteres, cantidadCuotas, tipoPlan, cargos);
-    }
-
-    // Strategy: el contexto delega el cálculo de la cuota en la estrategia elegida al otorgar (no cambia después)
-    // Decorator: cada cargo del credito envuelve a la estrategia y le suma lo suyo
-    private CalculoDeCuota calculo() {
-        CalculoDeCuota calculo = tipoPlan.calculo();
-        for (TipoCargo cargo : cargos) {
-            calculo = cargo.aplicarSobre(calculo);
-        }
-        return calculo;
+    // cuotas las genera el propio credito y el importe de cuota sale de sus
+    // condiciones, asi que ninguno de los tres se recibe desde afuera.
+    public static Credito nuevo(Cliente cliente, LocalDate fecha, CondicionesDeCredito condiciones) {
+        return new Credito(cliente, fecha, condiciones);
     }
 
     public BigDecimal totalADevolver() {
-        return importeCuota.multiply(BigDecimal.valueOf(cantidadCuotas));
+        return importeCuota.multiply(BigDecimal.valueOf(condiciones.getCantidadCuotas()));
     }
 
     // Es una regla del credito, no del caso de uso que lo da de alta:
     // por eso vive en la entidad y no en el servicio.
     private void generarPlanDeCuotas() {
-        for (int numeroCuota = 1; numeroCuota <= cantidadCuotas; numeroCuota++) {
+        for (int numeroCuota = 1; numeroCuota <= condiciones.getCantidadCuotas(); numeroCuota++) {
             cuotas.add(new Cuota(this, numeroCuota, importeCuota, fecha.plusMonths(numeroCuota)));
         }
-    }
-
-    public Set<TipoCargo> getCargos() {
-        return Collections.unmodifiableSet(cargos);
     }
 
     public List<Cuota> getCuotas() {
@@ -155,11 +110,11 @@ public class Credito implements ICredito {
             .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
-    public boolean estaCancelado() {
+    private boolean estaCancelado() {
         return !cuotas.isEmpty() && cuotas.stream().allMatch(Cuota::estaPagada);
     }
 
-    public boolean tieneCobranzas() {
+    private boolean tieneCobranzas() {
         return cuotas.stream().anyMatch(Cuota::estaPagada);
     }
 

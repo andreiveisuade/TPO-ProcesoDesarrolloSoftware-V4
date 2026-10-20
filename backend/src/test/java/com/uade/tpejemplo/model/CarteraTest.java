@@ -12,8 +12,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 class CarteraTest {
 
     private Credito creditoOtorgado(LocalDate fecha) {
-        return Credito.nuevo(Cliente.nuevo("30111222", "Ana"), new BigDecimal("900"),
-            fecha, BigDecimal.ZERO, 3, TipoPlan.INTERES_SIMPLE, Set.of());
+        return Credito.nuevo(Cliente.nuevo("30111222", "Ana"), fecha,
+            new CondicionesDeCredito(new BigDecimal("900"), BigDecimal.ZERO, 3, TipoPlan.INTERES_SIMPLE, Set.of()));
     }
 
     @Test

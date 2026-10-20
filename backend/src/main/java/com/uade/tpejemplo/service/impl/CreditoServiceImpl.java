@@ -6,7 +6,9 @@ import com.uade.tpejemplo.exception.BusinessException;
 import com.uade.tpejemplo.exception.ResourceNotFoundException;
 import com.uade.tpejemplo.model.Cartera;
 import com.uade.tpejemplo.model.Cliente;
+import com.uade.tpejemplo.model.CondicionesDeCredito;
 import com.uade.tpejemplo.model.Credito;
+import com.uade.tpejemplo.model.interfaces.Deuda;
 import com.uade.tpejemplo.repository.ClienteRepository;
 import com.uade.tpejemplo.repository.CreditoRepository;
 import com.uade.tpejemplo.service.CreditoService;
@@ -33,21 +35,21 @@ public class CreditoServiceImpl implements CreditoService {
     public CreditoResponse crear(CreditoRequest request) {
         Cliente cliente = buscarCliente(request.getDniCliente());
         // Composite: la cartera del cliente contesta su mora igual que la de toda la financiera
-        if (Cartera.de(creditoRepository.buscarPorCliente(cliente.getDni())).montoVencido().signum() > 0) {
+        Deuda cartera = Cartera.de(creditoRepository.buscarPorCliente(cliente.getDni()));
+        if (cartera.tieneMora()) {
             throw new BusinessException(
                 "El cliente " + cliente.getDni() + " tiene cuotas vencidas: no se le puede otorgar un crédito nuevo."
             );
         }
 
-        Credito credito = creditoRepository.save(Credito.nuevo(
-            cliente,
+        CondicionesDeCredito condiciones = new CondicionesDeCredito(
             request.getDeudaOriginal(),
-            request.getFecha(),
             request.getTasaInteres(),
             request.getCantidadCuotas(),
             request.getTipoPlan(),
             request.getCargos() == null ? Set.of() : request.getCargos()
-        ));
+        );
+        Credito credito = creditoRepository.save(Credito.nuevo(cliente, request.getFecha(), condiciones));
 
         return CreditoResponse.desde(credito);
     }

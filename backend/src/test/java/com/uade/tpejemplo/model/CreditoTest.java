@@ -13,8 +13,8 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 class CreditoTest {
 
     private Credito creditoDeTresCuotas() {
-        Credito credito = Credito.nuevo(Cliente.nuevo("30111222", "Ana"), new BigDecimal("900"),
-            LocalDate.now(), BigDecimal.ZERO, 3, TipoPlan.INTERES_SIMPLE, Set.of());
+        Credito credito = Credito.nuevo(Cliente.nuevo("30111222", "Ana"), LocalDate.now(),
+            new CondicionesDeCredito(new BigDecimal("900"), BigDecimal.ZERO, 3, TipoPlan.INTERES_SIMPLE, Set.of()));
         return credito;
     }
 
@@ -33,15 +33,15 @@ class CreditoTest {
 
     @Test
     void losCargosSeSumanACadaCuotaYAlTotalADevolver() {
-        Credito credito = Credito.nuevo(Cliente.nuevo("30111222", "Ana"), new BigDecimal("900"),
-            LocalDate.now(), BigDecimal.ZERO, 3, TipoPlan.INTERES_SIMPLE,
-            Set.of(TipoCargo.SEGURO_DE_VIDA, TipoCargo.GASTO_DE_ADMINISTRACION));
+        Credito credito = Credito.nuevo(Cliente.nuevo("30111222", "Ana"), LocalDate.now(),
+            new CondicionesDeCredito(new BigDecimal("900"), BigDecimal.ZERO, 3, TipoPlan.INTERES_SIMPLE,
+            Set.of(TipoCargo.SEGURO_DE_VIDA, TipoCargo.GASTO_DE_ADMINISTRACION)));
 
         // 300 + 0.90 de seguro + 500 de gastos
         assertThat(credito.getImporteCuota()).isEqualByComparingTo("800.90");
         assertThat(credito.totalADevolver()).isEqualByComparingTo("2402.70");
         assertThat(credito.getCuotas()).allMatch(cuota -> cuota.getImporte().compareTo(new BigDecimal("800.90")) == 0);
-        assertThat(credito.getCargos()).containsExactlyInAnyOrder(TipoCargo.SEGURO_DE_VIDA, TipoCargo.GASTO_DE_ADMINISTRACION);
+        assertThat(credito.getCondiciones().getCargos()).containsExactlyInAnyOrder(TipoCargo.SEGURO_DE_VIDA, TipoCargo.GASTO_DE_ADMINISTRACION);
     }
 
     @Test
@@ -73,8 +73,8 @@ class CreditoTest {
 
     @Test
     void elMontoVencidoSumaLasCuotasImpagasYaVencidas() {
-        Credito credito = Credito.nuevo(Cliente.nuevo("30111222", "Ana"), new BigDecimal("900"),
-            LocalDate.now().minusMonths(2).minusDays(1), BigDecimal.ZERO, 3, TipoPlan.INTERES_SIMPLE, Set.of());
+        Credito credito = Credito.nuevo(Cliente.nuevo("30111222", "Ana"), LocalDate.now().minusMonths(2).minusDays(1),
+            new CondicionesDeCredito(new BigDecimal("900"), BigDecimal.ZERO, 3, TipoPlan.INTERES_SIMPLE, Set.of()));
 
         assertThat(credito.montoVencido()).isEqualByComparingTo("600.00");
         pagar(credito.getCuotas().get(0));
