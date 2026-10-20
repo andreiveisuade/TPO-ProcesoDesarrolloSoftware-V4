@@ -42,12 +42,6 @@ public class Credito implements ICredito {
     @Embedded
     private CondicionesDeCredito condiciones;
 
-    // Derivado de las condiciones. Se guarda para que el credito conserve el
-    // importe con el que se otorgo aunque despues cambie la forma de calcularlo.
-    @NotNull
-    @Column(name = "importe_cuota", nullable = false, precision = 12, scale = 2)
-    private BigDecimal importeCuota;
-
     @Column(name = "anulado", nullable = false)
     private boolean anulado = false;
 
@@ -60,25 +54,32 @@ public class Credito implements ICredito {
         this.cliente = cliente;
         this.fecha = fecha;
         this.condiciones = condiciones;
-        this.importeCuota = condiciones.importeCuota();
         // Creator: el credito nace con su plan de cuotas
         generarPlanDeCuotas();
     }
 
     // Unica forma de dar de alta un credito. El id lo asigna la base, las
-    // cuotas las genera el propio credito y el importe de cuota sale de sus
+    // cuotas las genera el propio credito y el importe de cada una sale de sus
     // condiciones, asi que ninguno de los tres se recibe desde afuera.
     public static Credito nuevo(Cliente cliente, LocalDate fecha, CondicionesDeCredito condiciones) {
         return new Credito(cliente, fecha, condiciones);
     }
 
+    // Composite: el total, como el saldo, es la suma de sus cuotas
     public BigDecimal totalADevolver() {
-        return importeCuota.multiply(BigDecimal.valueOf(condiciones.getCantidadCuotas()));
+        return sumar(Cuota::getImporte);
+    }
+
+    // Todas las cuotas valen lo mismo
+    public BigDecimal importeCuota() {
+        return cuotas.get(0).getImporte();
     }
 
     // Es una regla del credito, no del caso de uso que lo da de alta:
     // por eso vive en la entidad y no en el servicio.
     private void generarPlanDeCuotas() {
+        // La cuota guarda lo que se le exige: es el hecho historico
+        BigDecimal importeCuota = condiciones.importeCuota();
         for (int numeroCuota = 1; numeroCuota <= condiciones.getCantidadCuotas(); numeroCuota++) {
             cuotas.add(new Cuota(this, numeroCuota, importeCuota, fecha.plusMonths(numeroCuota)));
         }

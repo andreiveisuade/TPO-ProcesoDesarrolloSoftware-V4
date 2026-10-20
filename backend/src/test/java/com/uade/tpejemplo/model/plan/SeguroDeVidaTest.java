@@ -10,9 +10,9 @@ class SeguroDeVidaTest {
 
     @Test
     void sumaElCeroComaUnoPorCientoDelCapitalALaCuotaDeInteresSimple() {
-        // 604.17 + 10 de seguro
-        assertThat(new SeguroDeVida(new InteresSimple()).importeCuota(new BigDecimal("10000"), new BigDecimal("45"), 24))
-            .isEqualByComparingTo("614.17");
+        // 716.67 + 10 de seguro
+        assertThat(new SeguroDeVida(new InteresSimple()).importeCuota(new BigDecimal("10000"), new BigDecimal("3"), 24))
+            .isEqualByComparingTo("726.67");
     }
 
     @Test

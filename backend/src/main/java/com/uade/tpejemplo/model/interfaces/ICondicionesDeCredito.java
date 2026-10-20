@@ -17,6 +17,4 @@ public interface ICondicionesDeCredito {
     TipoPlan getTipoPlan();
 
     Set<TipoCargo> getCargos();
-
-    BigDecimal importeCuota();
 }

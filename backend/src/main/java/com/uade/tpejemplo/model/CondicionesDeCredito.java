@@ -1,5 +1,6 @@
 package com.uade.tpejemplo.model;
 
+import com.uade.tpejemplo.exception.BusinessException;
 import com.uade.tpejemplo.model.interfaces.CalculoDeCuota;
 import com.uade.tpejemplo.model.interfaces.ICondicionesDeCredito;
 import jakarta.persistence.*;
@@ -14,7 +15,7 @@ import java.util.Collections;
 import java.util.EnumSet;
 import java.util.Set;
 
-// Lo que se pacta al otorgar un credito (capital, tasa, cuotas, plan y cargos)
+// Lo que se pacta al otorgar un credito (capital, tasa mensual, cuotas, plan y cargos)
 // y cuanto vale la cuota con esas condiciones. No cambia despues de otorgado.
 @Embeddable
 @Getter
@@ -47,6 +48,19 @@ public class CondicionesDeCredito implements ICondicionesDeCredito {
 
     public CondicionesDeCredito(BigDecimal deudaOriginal, BigDecimal tasaInteres, Integer cantidadCuotas,
                                 TipoPlan tipoPlan, Set<TipoCargo> cargos) {
+        // Objeto de valor: nace valido o no nace
+        if (deudaOriginal.signum() <= 0) {
+            throw new BusinessException("El capital debe ser mayor a cero");
+        }
+        if (cantidadCuotas < 1) {
+            throw new BusinessException("Debe tener al menos 1 cuota");
+        }
+        if (tasaInteres.signum() < 0) {
+            throw new BusinessException("La tasa de interes no puede ser negativa");
+        }
+        if (tipoPlan == null) {
+            throw new BusinessException("El tipo de plan es obligatorio");
+        }
         this.deudaOriginal = deudaOriginal;
         this.tasaInteres = tasaInteres;
         this.cantidadCuotas = cantidadCuotas;
@@ -54,7 +68,8 @@ public class CondicionesDeCredito implements ICondicionesDeCredito {
         this.cargos.addAll(cargos);
     }
 
-    public BigDecimal importeCuota() {
+    // Solo para que Credito genere su plan: despues el importe vive en cada cuota
+    BigDecimal importeCuota() {
         return calculo().importeCuota(deudaOriginal, tasaInteres, cantidadCuotas);
     }
 

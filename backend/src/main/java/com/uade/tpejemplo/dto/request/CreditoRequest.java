@@ -31,7 +31,7 @@ public class CreditoRequest {
     @NotNull(message = "La fecha es obligatoria")
     private LocalDate fecha;
 
-    // Interes simple: % total sobre el capital; sistema frances: % mensual.
+    // % mensual, con cualquier plan.
     @NotNull(message = "La tasa de interes es obligatoria")
     @DecimalMin(value = "0", message = "La tasa de interes no puede ser negativa")
     @DecimalMax(value = "999.99", message = "La tasa de interes es demasiado alta")

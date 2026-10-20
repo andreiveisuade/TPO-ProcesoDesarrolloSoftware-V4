@@ -28,7 +28,7 @@ class CreditoTest {
 
         assertThat(credito.getCuotas()).hasSize(3);
         assertThat(credito.getCuotas().get(0).getFechaVencimiento()).isEqualTo(LocalDate.now().plusMonths(1));
-        assertThat(credito.getImporteCuota()).isEqualByComparingTo("300.00");
+        assertThat(credito.importeCuota()).isEqualByComparingTo("300.00");
     }
 
     @Test
@@ -38,10 +38,20 @@ class CreditoTest {
             Set.of(TipoCargo.SEGURO_DE_VIDA, TipoCargo.GASTO_DE_ADMINISTRACION)));
 
         // 300 + 0.90 de seguro + 500 de gastos
-        assertThat(credito.getImporteCuota()).isEqualByComparingTo("800.90");
+        assertThat(credito.importeCuota()).isEqualByComparingTo("800.90");
         assertThat(credito.totalADevolver()).isEqualByComparingTo("2402.70");
         assertThat(credito.getCuotas()).allMatch(cuota -> cuota.getImporte().compareTo(new BigDecimal("800.90")) == 0);
         assertThat(credito.getCondiciones().getCargos()).containsExactlyInAnyOrder(TipoCargo.SEGURO_DE_VIDA, TipoCargo.GASTO_DE_ADMINISTRACION);
+    }
+
+    @Test
+    void elTotalADevolverEsLaSumaDeSusCuotas() {
+        Credito credito = Credito.nuevo(Cliente.nuevo("30111222", "Ana"), LocalDate.now(),
+            new CondicionesDeCredito(new BigDecimal("1200"), BigDecimal.TEN, 3, TipoPlan.INTERES_SIMPLE, Set.of()));
+
+        // 1200 x (1 + 0.10 x 3) = 1560, en 3 cuotas de 520
+        assertThat(credito.importeCuota()).isEqualByComparingTo("520.00");
+        assertThat(credito.totalADevolver()).isEqualByComparingTo("1560.00");
     }
 
     @Test

@@ -10,8 +10,8 @@ class GastoDeAdministracionTest {
 
     @Test
     void sumaQuinientosALaCuotaDeInteresSimple() {
-        assertThat(new GastoDeAdministracion(new InteresSimple()).importeCuota(new BigDecimal("10000"), new BigDecimal("45"), 24))
-            .isEqualByComparingTo("1104.17");
+        assertThat(new GastoDeAdministracion(new InteresSimple()).importeCuota(new BigDecimal("10000"), new BigDecimal("3"), 24))
+            .isEqualByComparingTo("1216.67");
     }
 
     @Test

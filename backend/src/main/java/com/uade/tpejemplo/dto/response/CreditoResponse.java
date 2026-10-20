@@ -49,7 +49,7 @@ public class CreditoResponse {
             .tipoPlan(condiciones.getTipoPlan())
             .cargos(Set.copyOf(condiciones.getCargos()))
             .totalADevolver(credito.totalADevolver())
-            .importeCuota(credito.getImporteCuota())
+            .importeCuota(credito.importeCuota())
             .cantidadCuotas(condiciones.getCantidadCuotas())
             .cuotas(credito.getCuotas().stream().map(CuotaResponse::desde).toList())
             .anulado(credito.isAnulado())

@@ -9,13 +9,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 class CargosApiladosTest {
 
     private final BigDecimal capital = new BigDecimal("10000");
-    private final BigDecimal tasa = new BigDecimal("45");
+    private final BigDecimal tasa = new BigDecimal("3");
 
     @Test
     void losDosCargosSeSumanSobreLaCuotaDelPlan() {
-        // 604.17 + 10 de seguro + 500 de gastos
+        // 716.67 + 10 de seguro + 500 de gastos
         assertThat(new GastoDeAdministracion(new SeguroDeVida(new InteresSimple())).importeCuota(capital, tasa, 24))
-            .isEqualByComparingTo("1114.17");
+            .isEqualByComparingTo("1226.67");
     }
 
     @Test

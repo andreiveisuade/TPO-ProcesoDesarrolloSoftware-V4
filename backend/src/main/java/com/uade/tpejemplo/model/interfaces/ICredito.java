@@ -16,7 +16,7 @@ public interface ICredito extends Deuda {
 
     ICondicionesDeCredito getCondiciones();
 
-    BigDecimal getImporteCuota();
+    BigDecimal importeCuota();
 
     boolean isAnulado();
 
