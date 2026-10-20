@@ -219,7 +219,9 @@ m17 = bloque("credito", "M17. Credito: Extract Class + ISP", "refactor",
     + '<h4>Descartado</h4>' + roles([
         ("State para el estado", "3 estados y un <code>if</code>: es un valor derivado (O9)"),
         ("Extraer el plan de cuotas", "<strong>Creator</strong>: <code>Credito</code> contiene y registra sus cuotas"),
-    ]).replace("<th>Rol</th><th>Clase</th>", "<th>Idea</th><th>Por qué no</th>"))
+    ]).replace("<th>Rol</th><th>Clase</th>", "<th>Idea</th><th>Por qué no</th>")
+    + trampa("¿No conviene pasar la lógica de <code>Credito</code> al controller?",
+        "No: <strong>Controller</strong> (<code>CreditoController</code> → <code>CreditoService</code>) recibe y coordina el evento; la regla la decide el <strong>experto</strong>. Moverla deja un modelo anémico."))
 
 # ---------------- M18 IUsuario ----------------
 m18 = bloque("usuario", "M18. IUsuario depende de IPermisos (DIP)", "refactor",
@@ -314,7 +316,7 @@ def dependencias(c):
 
 m23 = bloque("paquetes", "M23. Paquetes por concepto", "refactor",
     "<strong>High Cohesion</strong> y <strong>Low Coupling</strong> (GRASP) a nivel paquete.",
-    "<code>model</code> mezclaba préstamos, usuarios y cálculo; <code>model.interfaces</code> agrupaba <strong>por tipo de archivo</strong>.",
+    "<code>model</code> mezclaba créditos, usuarios y cálculo; <code>model.interfaces</code> agrupaba <strong>por tipo de archivo</strong>.",
     '<pre><code>' + e(arbol(P23)) + '</code></pre>',
     "Un paquete por concepto; cada <code>I*</code> con su clase. <strong>Sin ciclos</strong>:",
     '<pre><code>' + e(arbol(D)) + '</code></pre><pre><code>' + e(dependencias(D)) + '</code></pre>',

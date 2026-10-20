@@ -9,7 +9,7 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @OpenAPIDefinition(
-    info = @Info(title = "Dashboard de préstamos", version = "v3"),
+    info = @Info(title = "Dashboard de préstamos", version = "v4"),
     security = @SecurityRequirement(name = "bearerAuth")
 )
 // Configuracion de Swagger con autenticacion Bearer.
