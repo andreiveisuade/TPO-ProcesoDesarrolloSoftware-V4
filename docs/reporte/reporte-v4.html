@@ -127,10 +127,11 @@ body.lb-locked{overflow:hidden}
 <ul><li>Expert y Creator</li><li>Restituye las interfaces de servicio</li></ul></div>
 <div class="hito"><div class="punto"></div><h4>V3</h4><p class="tema">MVC + Strategy + Adapter</p><p class="meta">13/10 · tag <code>v3</code></p>
 <ul><li>Cuota simple o francesa</li><li><code>TokenService</code> sobre jjwt</li><li>43 tests</li></ul></div>
-<div class="hito actual"><div class="punto"></div><h4>V4</h4><p class="tema">Composite + Decorator + Facade</p><p class="meta">27/10 · 15 commits</p>
-<ul><li><strong>Composite</strong>: <code>Deuda</code> (M11)</li><li><strong>Decorator</strong>: cargos (M12)</li><li><strong>Facade</strong>: <code>AuthService</code> (M13)</li><li>Panel: deuda del cliente y cargos</li><li>62 tests</li></ul></div>
+<div class="hito actual"><div class="punto"></div><h4>V4</h4><p class="tema">Composite + Decorator + Facade</p><p class="meta">27/10 · 16 commits</p>
+<ul><li><strong>Composite</strong>: <code>Deuda</code> (M11)</li><li><strong>Decorator</strong>: cargos (M12)</li><li><strong>Facade</strong>: <code>AuthService</code> (M13)</li><li>Panel: deuda del cliente y cargos</li><li>63 tests</li></ul></div>
 </div>
-<details><summary>Commits V3 → V4 (git log v3..iteracion4)</summary><pre><code>a46793e Secuencias de Composite, Decorator y Facade
+<details><summary>Commits V3 → V4 (git log v3..iteracion4)</summary><pre><code>6286109 CreditoResponse copia los cargos dentro de la transacción: consultar un crédito ya no da 500 (LazyInitializationException)
+a46793e Secuencias de Composite, Decorator y Facade
 b6ad026 DER v4: tabla credito_cargos y rol como enum
 248b50a Diagrama de clases v4: Composite Deuda, Decorator de cargos y Facade de autenticacion
 06437ad Creditos: casillas de cargos en el alta y linea de cargos en la ficha
@@ -1652,9 +1653,9 @@ TokenService &lt;|.. JwtUtil
 
 <section id="verificacion"><h2>Verificación</h2>
 <ul>
-<li><strong>62 tests, 0 fallas</strong> (<code>mvn test</code>; V3: 43): 29 de dominio, 14 de cálculo de cuota, 11 HTTP, 7 de integración, <code>contextLoads</code>.</li>
+<li><strong>63 tests, 0 fallas</strong> (<code>mvn test</code>; V3: 43): 29 de dominio, 14 de cálculo de cuota, 11 HTTP, 8 de integración, <code>contextLoads</code>.</li>
 <li><strong>Casos de uso por API</strong>: <code>docs/casos-de-uso/verificar-cu.sh</code>, incluida la mora (400).</li>
-<li><strong>Hallazgo H5</strong>: consultar créditos guardados da 500 (<code>Credito.cargos</code> lazy fuera de la transacción). Pendiente.</li>
+<li><strong>Hallazgo H5, corregido</strong>: <code>verificar-cu.sh</code> detectó 500 al consultar créditos (<code>Credito.cargos</code> lazy fuera de la transacción); fix: <code>CreditoResponse.desde</code> copia los cargos (<code>6286109</code>), test <code>CreditoConCargosTest</code>.</li>
 </ul>
 </section>
 
@@ -1827,7 +1828,6 @@ TokenService &lt;|.. JwtUtil
 
 <section id="pendientes"><h2>Cambios pendientes</h2>
 <ul>
-<li><strong>H5</strong>: 500 al consultar créditos con cargos lazy.</li>
 <li><strong>H8</strong>: quién cobró y quién anuló.</li>
 <li><strong>P-M9</strong>: tasa con unidad por plan; cuota con capital e interés separados (habilita IVA sobre intereses).</li>
 <li><strong>O3b</strong>: ajustar la última cuota para que el total cierre exacto.</li>
