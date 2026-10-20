@@ -5,7 +5,7 @@ Casos de uso del dashboard de préstamos tal como funcionan en V4 (rama `iteraci
 Convenciones:
 
 - Rutas del backend relativas a `backend/src/main/java/com/uade/tpejemplo/`; tests relativos a `backend/src/test/java/com/uade/tpejemplo/`; front relativo a `frontend/src/`. Cada cita de código es `archivo` + método.
-- **Verificación**: *Test* = test automático (`mvn test`, 62 tests, todos pasan al 2026-10-20): de dominio en `model/` y `model/plan/`, y de códigos HTTP en `controller/CodigosHttpTest` (`@WebMvcTest` con la seguridad JWT real). *Smoke* = smoke test manual del equipo. *Final* = verificación final manual del equipo, con capturas. Smoke y Final son notas de trabajo internas que no van en la entrega. *API* = `verificar-cu.sh` de esta carpeta, corrido sobre una base limpia (resultados en la sección 6).
+- **Verificación**: *Test* = test automático (`mvn test`, 63 tests, todos pasan al 2026-10-20): de dominio en `model/` y `model/plan/`, y de códigos HTTP en `controller/CodigosHttpTest` (`@WebMvcTest` con la seguridad JWT real). *Smoke* = smoke test manual del equipo. *Final* = verificación final manual del equipo, con capturas. Smoke y Final son notas de trabajo internas que no van en la entrega. *API* = `verificar-cu.sh` de esta carpeta, corrido sobre una base limpia (resultados en la sección 6).
 - Errores: todos salen por `exception/GlobalExceptionHandler.java` con cuerpo `{status, error, mensajes[]}`: 400 regla de negocio (`handleNegocio`), 400 validación del DTO (`handleValidacion`), 400 body o parámetro mal formado (`handleSolicitudInvalida`), 401 credenciales (`handleNoAutenticado`), 403 sin permiso (`handleAccesoDenegado`), 404 no encontrado (`handleNoEncontrado`). Sin token, o con token inválido, la cadena de seguridad responde 401 sin cuerpo; con token y sin el rol, 403 sin cuerpo (`config/SecurityConfig.java` `filterChain`). Los dos casos y el 400/404/405 los cubre `controller/CodigosHttpTest`.
 
 ## 1. Actores
@@ -288,17 +288,15 @@ Los tests de dominio están en `model/` y `model/plan/` del árbol de tests; los
 
 ### Corrida V4 (2026-10-20)
 
-`verificar-cu.sh` corrido contra `iteracion4` (`a46793e`) en el puerto 8093, base H2 limpia. El crédito vencido pasa a otro cliente (30999888) para que la regla de mora no bloquee las altas de 30111222. Todo lo de V3 da igual que en la corrida de abajo (con H1 y BS14 ya resueltos: 400), salvo el hallazgo H5.
+`verificar-cu.sh` corrido contra `iteracion4` (`6286109`) en el puerto 8093, base H2 limpia. El crédito vencido pasa a otro cliente (30999888) para que la regla de mora no bloquee las altas de 30111222. Todo lo de V3 da igual que en la corrida de abajo, con H1 y BS14 ya resueltos (400). Ninguna respuesta 500.
 
 | Caso | HTTP | Nota |
 |---|---|---|
 | UC04 DNI `"abc"` | 400 | BS14 |
 | UC07 cliente en mora / con seguro y gastos / cargo inexistente | 400 / 201 / 400 | 100000 en 2 cuotas: cuota 50600 (M12) |
+| UC09, UC10, `GET /api/creditos` | 200 | Con `cargos` en la respuesta |
 | UC21 al día / en mora / inexistente / sin token | 200 / 200 / 404 / 401 | Vencido 0 y 500 |
 | UC21 y UC07 tras cobrar las cuotas vencidas | 200 / 201 | Vencido 0: se le vuelve a otorgar |
-| **UC09, UC10 y `GET /api/creditos`** | **500** | **H5** |
-
-**H5 (UC09, UC10)**: toda respuesta que lista o consulta créditos ya guardados da 500 (`LazyInitializationException` sobre `Credito.cargos`). `dto/response/CreditoResponse.java` `desde` pasa `credito.getCargos()`, una vista sobre la colección lazy de Hibernate, y Jackson la recorre después de cerrar la transacción (`open-in-view=false`). El alta (UC07) no falla porque el set recién creado no es un proxy. Ningún test pasa por esos endpoints con la base real. Pendiente de corrección en el backend (copiar el set dentro de la transacción).
 
 ### Corrida V3 (2026-10-06)
 

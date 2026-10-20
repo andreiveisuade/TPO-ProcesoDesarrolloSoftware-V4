@@ -8,7 +8,7 @@ TPO de Proceso de Desarrollo de Software, UADE 2C 2026, grupo 7. Iteración 4: C
 ![Java 21](https://img.shields.io/badge/Java-21-007396)
 ![Spring Boot 3.4.3](https://img.shields.io/badge/Spring%20Boot-3.4.3-6DB33F)
 ![React 19](https://img.shields.io/badge/React-19-61DAFB)
-![Tests 62 OK](https://img.shields.io/badge/tests-62%20OK-brightgreen)
+![Tests 63 OK](https://img.shields.io/badge/tests-63%20OK-brightgreen)
 
 [Reporte](docs/reporte/reporte-v4.html) · [Manual](docs/manual/index.html) · [Casos de uso](docs/casos-de-uso/README.md) · [Lista de mejoras](docs/entrega/lista-mejoras.md) · [Swagger](http://localhost:8080/swagger-ui.html)
 
@@ -140,7 +140,7 @@ Password = usuario. Los crea [`DataInitializer`](backend/src/main/java/com/uade/
 
 ## Cómo se verifica
 
-`cd backend && mvn test`: **62 tests, 0 fallas** ([JUnit 5](https://junit.org/junit5/), framework de tests de Java).
+`cd backend && mvn test`: **63 tests, 0 fallas** ([JUnit 5](https://junit.org/junit5/), framework de tests de Java).
 
 | Test | Cantidad | Qué cubre |
 |---|---|---|
@@ -150,7 +150,7 @@ Password = usuario. Los crea [`DataInitializer`](backend/src/main/java/com/uade/
 | [`CodigosHttpTest`](backend/src/test/java/com/uade/tpejemplo/controller/CodigosHttpTest.java) | 11 | 400/401/403/404/405/406/415 con JWT real |
 | [`CobranzaConcurrenteTest`](backend/src/test/java/com/uade/tpejemplo/service/CobranzaConcurrenteTest.java) | 1 | Cobro concurrente de la misma cuota |
 | [`AnulacionConcurrenteTest`](backend/src/test/java/com/uade/tpejemplo/service/AnulacionConcurrenteTest.java) | 1 | Anular y cobrar el mismo crédito en paralelo |
-| [`ReglaDeMoraTest`](backend/src/test/java/com/uade/tpejemplo/service/ReglaDeMoraTest.java), [`DeudaClienteTest`](backend/src/test/java/com/uade/tpejemplo/service/DeudaClienteTest.java) | 5 | Regla de mora y deuda del cliente sobre H2 |
+| [`ReglaDeMoraTest`](backend/src/test/java/com/uade/tpejemplo/service/ReglaDeMoraTest.java), [`DeudaClienteTest`](backend/src/test/java/com/uade/tpejemplo/service/DeudaClienteTest.java), [`CreditoConCargosTest`](backend/src/test/java/com/uade/tpejemplo/service/CreditoConCargosTest.java) | 6 | Regla de mora, deuda del cliente y crédito con cargos leído de la base, sobre H2 |
 | [`TpEjemploApplicationTests`](backend/src/test/java/com/uade/tpejemplo/TpEjemploApplicationTests.java) | 1 | Arranca el contexto de Spring |
 
 Además: [`verificar-cu.sh`](docs/casos-de-uso/verificar-cu.sh) (casos de uso contra la API). El resto de la evidencia está en [Evidencia de verificación](#evidencia-de-verificación-solo-en-el-repo-de-github).

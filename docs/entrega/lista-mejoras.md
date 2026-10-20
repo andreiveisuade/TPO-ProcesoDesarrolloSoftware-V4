@@ -12,6 +12,7 @@ Rutas Java relativas a `backend/src/main/java/com/uade/tpejemplo/`. Reporte comp
 | M14 | Regla de mora: no se otorga un crédito a un cliente con cuotas vencidas (400) | `service/impl/CreditoServiceImpl.java` `crear`; test `backend/src/test/java/com/uade/tpejemplo/service/ReglaDeMoraTest.java` | Composite (segundo cliente) |
 | M15 | Deuda del cliente: `GET /api/clientes/{dni}/deuda` y saldo/vencido en la búsqueda por DNI (UC21) | `controller/ClienteController.java` `deuda`; `service/impl/ClienteServiceImpl.java` `deuda`; `dto/response/DeudaClienteResponse.java`; `frontend/src/pages/Clientes.jsx`, `frontend/src/api/clientes.js` `getDeudaCliente`; test `backend/src/test/java/com/uade/tpejemplo/service/DeudaClienteTest.java` | Composite (tercer cliente), MVC |
 | M16 | Cargos en el alta de crédito (casillas) y en la ficha | `frontend/src/pages/Creditos.jsx`; `frontend/src/utils/cargos.js` | Decorator (vista) |
+| H5 | Consultar un crédito guardado daba 500 (`GET /api/creditos/{id}`, `/api/creditos/cliente/{dni}`, `/api/creditos`). Lo detectó `verificar-cu.sh`: la respuesta recorría `Credito.cargos` (colección lazy) fuera de la transacción. Fix: se copian los cargos dentro de la transacción | `dto/response/CreditoResponse.java` `desde` (`Set.copyOf`); test `backend/src/test/java/com/uade/tpejemplo/service/CreditoConCargosTest.java` | Hallazgo corregido (LazyInitializationException) |
 | DER4 | DER v4: tabla `credito_cargos` (PK compuesta `id_credito`, `tipo_cargo`) y `rol` como enum | `docs/diagramas/der-v4.py` | Documentación |
 | CU4 | UC07 con cargos y error 400 por mora; UC21 Consultar deuda del cliente; `verificar-cu.sh` con el caso de mora | `docs/casos-de-uso/README.md`, `docs/casos-de-uso/verificar-cu.sh`, `docs/casos-de-uso/casos-de-uso-v4.puml` | Documentación |
 
@@ -79,9 +80,9 @@ Convenciones nuevas: `Deuda` va sin prefijo `I` porque nombra un rol de patrón 
 | T-1 | Tests de los códigos HTTP 400/401/403/404/405 con la seguridad JWT real y los servicios simulados | `backend/src/test/java/com/uade/tpejemplo/controller/CodigosHttpTest.java` (`@WebMvcTest`) | Tests |
 | T-5 | La fecha de hoy entra por parámetro: se testea anular una cobranza de otro día y el vencimiento sin depender del reloj | `model/Cobranza.java` `anular(LocalDate)`; `model/Cuota.java` `estaVencida(LocalDate)` | Tests |
 | DER | Diagrama entidad-relación de la base, con claves y restricciones | `docs/diagramas/der-v3.py` en V3; hoy `docs/diagramas/der-v4.py` (genera `.svg` y `.png`) | Documentación |
-| Tests | 62 tests, 0 fallas (43 en V3) | `backend/src/test/java/com/uade/tpejemplo/` | JUnit 5 + AssertJ, `@WebMvcTest` |
+| Tests | 63 tests, 0 fallas (43 en V3) | `backend/src/test/java/com/uade/tpejemplo/` | JUnit 5 + AssertJ, `@WebMvcTest` |
 
-Desglose de los 62 tests:
+Desglose de los 63 tests:
 
 - `model/CreditoTest`: 10
 - `model/CuotaTest`: 12
@@ -97,6 +98,7 @@ Desglose de los 62 tests:
 - `service/AnulacionConcurrenteTest`: 1 (I1)
 - `service/ReglaDeMoraTest`: 2 (M14)
 - `service/DeudaClienteTest`: 3 (M15)
+- `service/CreditoConCargosTest`: 1 (H5)
 - `TpEjemploApplicationTests` (`contextLoads`): 1
 
 Decisión S6: el control de roles queda doble a propósito, reglas de URL en `config/SecurityConfig.java` `filterChain` y `@PreAuthorize` en `controller/AdminController.java` y `controller/SupervisorController.java`. Es defensa en profundidad: si una ruta cambia y la regla de URL deja de cubrirla, el método sigue protegido.
@@ -166,7 +168,6 @@ Salen de recorrer cada caso de uso por la UI (incluido H4).
 
 | ID | Qué | Dónde | Por qué queda |
 |---|---|---|---|
-| H5 | `GET /api/creditos/{id}`, `/api/creditos/cliente/{dni}` y `/api/creditos` dan 500: `LazyInitializationException` sobre `Credito.cargos` al serializar | `dto/response/CreditoResponse.java` `desde` | Bug de M12 hallado con `verificar-cu.sh`; fix en el backend |
 | O8 | Pagos parciales | `model/Cuota.java` `estaPagada` y todo lo que depende | Tamaño L, fuera de alcance de V3 y V4 |
 | O3b | Ajustar la última cuota para que el total cierre exacto | `model/plan/InteresSimple.java`, `model/plan/SistemaFrances.java` | Hoy el centavo se explica como redondeo por cuota |
 | S10 | Renombrar paquete `com.uade.tpejemplo` (TPO-014) | todo el backend | Diff ruidoso; evaluar para el 17/11 |

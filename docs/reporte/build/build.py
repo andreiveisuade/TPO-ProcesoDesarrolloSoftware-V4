@@ -242,7 +242,7 @@ timeline = f'''<div class="timeline">
 <div class="hito"><div class="punto"></div><h4>V3</h4><p class="tema">MVC + Strategy + Adapter</p><p class="meta">13/10 · tag <code>v3</code></p>
 <ul><li>Cuota simple o francesa</li><li><code>TokenService</code> sobre jjwt</li><li>43 tests</li></ul></div>
 <div class="hito actual"><div class="punto"></div><h4>V4</h4><p class="tema">Composite + Decorator + Facade</p><p class="meta">27/10 · {n_v4} commits</p>
-<ul><li><strong>Composite</strong>: <code>Deuda</code> (M11)</li><li><strong>Decorator</strong>: cargos (M12)</li><li><strong>Facade</strong>: <code>AuthService</code> (M13)</li><li>Panel: deuda del cliente y cargos</li><li>62 tests</li></ul></div>
+<ul><li><strong>Composite</strong>: <code>Deuda</code> (M11)</li><li><strong>Decorator</strong>: cargos (M12)</li><li><strong>Facade</strong>: <code>AuthService</code> (M13)</li><li>Panel: deuda del cliente y cargos</li><li>63 tests</li></ul></div>
 </div>
 <details><summary>Commits V3 → V4 (git log v3..iteracion4)</summary><pre><code>{e(log_v4)}</code></pre></details>'''
 
@@ -275,7 +275,6 @@ def clases(vista):
 
 
 pendientes = '''<ul>
-<li><strong>H5</strong>: 500 al consultar créditos con cargos lazy.</li>
 <li><strong>H8</strong>: quién cobró y quién anuló.</li>
 <li><strong>P-M9</strong>: tasa con unidad por plan; cuota con capital e interés separados (habilita IVA sobre intereses).</li>
 <li><strong>O3b</strong>: ajustar la última cuota para que el total cierre exacto.</li>
@@ -404,9 +403,9 @@ doc = f'''<!doctype html>
 
 <section id="verificacion"><h2>Verificación</h2>
 <ul>
-<li><strong>62 tests, 0 fallas</strong> (<code>mvn test</code>; V3: 43): 29 de dominio, 14 de cálculo de cuota, 11 HTTP, 7 de integración, <code>contextLoads</code>.</li>
+<li><strong>63 tests, 0 fallas</strong> (<code>mvn test</code>; V3: 43): 29 de dominio, 14 de cálculo de cuota, 11 HTTP, 8 de integración, <code>contextLoads</code>.</li>
 <li><strong>Casos de uso por API</strong>: <code>docs/casos-de-uso/verificar-cu.sh</code>, incluida la mora (400).</li>
-<li><strong>Hallazgo H5</strong>: consultar créditos guardados da 500 (<code>Credito.cargos</code> lazy fuera de la transacción). Pendiente.</li>
+<li><strong>Hallazgo H5, corregido</strong>: <code>verificar-cu.sh</code> detectó 500 al consultar créditos (<code>Credito.cargos</code> lazy fuera de la transacción); fix: <code>CreditoResponse.desde</code> copia los cargos (<code>6286109</code>), test <code>CreditoConCargosTest</code>.</li>
 </ul>
 </section>
 
