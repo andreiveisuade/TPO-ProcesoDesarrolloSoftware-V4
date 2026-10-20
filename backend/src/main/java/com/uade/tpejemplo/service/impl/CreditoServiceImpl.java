@@ -2,7 +2,9 @@ package com.uade.tpejemplo.service.impl;
 
 import com.uade.tpejemplo.dto.request.CreditoRequest;
 import com.uade.tpejemplo.dto.response.CreditoResponse;
+import com.uade.tpejemplo.exception.BusinessException;
 import com.uade.tpejemplo.exception.ResourceNotFoundException;
+import com.uade.tpejemplo.model.Cartera;
 import com.uade.tpejemplo.model.Cliente;
 import com.uade.tpejemplo.model.Credito;
 import com.uade.tpejemplo.repository.ClienteRepository;
@@ -30,6 +32,12 @@ public class CreditoServiceImpl implements CreditoService {
     @Override
     public CreditoResponse crear(CreditoRequest request) {
         Cliente cliente = buscarCliente(request.getDniCliente());
+        // Composite: la cartera del cliente contesta su mora igual que la de toda la financiera
+        if (Cartera.de(creditoRepository.buscarPorCliente(cliente.getDni())).montoVencido().signum() > 0) {
+            throw new BusinessException(
+                "El cliente " + cliente.getDni() + " tiene cuotas vencidas: no se le puede otorgar un crédito nuevo."
+            );
+        }
 
         Credito credito = creditoRepository.save(Credito.nuevo(
             cliente,
