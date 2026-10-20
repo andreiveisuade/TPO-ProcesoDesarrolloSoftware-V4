@@ -1,0 +1,198 @@
+{
+  "schema_version": 1,
+  "diagram_type": "sequence",
+  "meta": {
+    "title": "Composite: el dashboard pide el saldo a la cartera sin saber cuántos niveles hay",
+    "quality_profile": "showcase",
+    "viewBox": [
+      1080,
+      680
+    ],
+    "column_fit": "spread",
+    "legend": {
+      "entries": {
+        "default": {
+          "label": "armado de la cartera"
+        },
+        "emphasis": {
+          "label": "llamada a Deuda (Component)"
+        },
+        "dashed": {
+          "label": "misma recursión"
+        },
+        "return": {
+          "label": "respuesta (suma)"
+        }
+      }
+    }
+  },
+  "participants": [
+    {
+      "id": "svc",
+      "type": "backend",
+      "label": "DashboardServiceImpl",
+      "sublabel": "Client"
+    },
+    {
+      "id": "repo",
+      "type": "database",
+      "label": "CreditoRepository",
+      "sublabel": "JPA"
+    },
+    {
+      "id": "cartera",
+      "type": "backend",
+      "label": "Cartera",
+      "sublabel": "Composite"
+    },
+    {
+      "id": "credito",
+      "type": "backend",
+      "label": "Credito",
+      "sublabel": "Composite"
+    },
+    {
+      "id": "cuota",
+      "type": "backend",
+      "label": "Cuota",
+      "sublabel": "Leaf"
+    }
+  ],
+  "segments": [
+    {
+      "from": 160,
+      "to": 260,
+      "label": "Armar la cartera"
+    },
+    {
+      "from": 290,
+      "to": 475,
+      "label": "saldo(): recursión Cartera → Credito → Cuota"
+    },
+    {
+      "from": 505,
+      "to": 565,
+      "label": "montoVencido(): mismo recorrido"
+    }
+  ],
+  "messages": [
+    {
+      "id": "findall",
+      "from": "svc",
+      "to": "repo",
+      "y": 190,
+      "label": "findAll()"
+    },
+    {
+      "id": "lista",
+      "from": "repo",
+      "to": "svc",
+      "y": 220,
+      "label": "List<Credito>",
+      "variant": "return"
+    },
+    {
+      "id": "de",
+      "from": "svc",
+      "to": "cartera",
+      "y": 250,
+      "label": "Cartera.de(creditos)"
+    },
+    {
+      "id": "saldo",
+      "from": "svc",
+      "to": "cartera",
+      "y": 315,
+      "label": "saldo()",
+      "variant": "emphasis"
+    },
+    {
+      "id": "saldocred",
+      "from": "cartera",
+      "to": "credito",
+      "y": 345,
+      "label": "saldo() de cada Deuda",
+      "variant": "emphasis"
+    },
+    {
+      "id": "saldocuota",
+      "from": "credito",
+      "to": "cuota",
+      "y": 375,
+      "label": "saldo() de cada Cuota",
+      "variant": "emphasis"
+    },
+    {
+      "id": "importe",
+      "from": "cuota",
+      "to": "credito",
+      "y": 405,
+      "label": "importe, o 0",
+      "variant": "return"
+    },
+    {
+      "id": "sumacred",
+      "from": "credito",
+      "to": "cartera",
+      "y": 435,
+      "label": "suma de sus cuotas",
+      "variant": "return"
+    },
+    {
+      "id": "sumacartera",
+      "from": "cartera",
+      "to": "svc",
+      "y": 465,
+      "label": "saldoPendiente",
+      "variant": "return"
+    },
+    {
+      "id": "vencido",
+      "from": "svc",
+      "to": "cartera",
+      "y": 525,
+      "label": "montoVencido()",
+      "variant": "dashed"
+    },
+    {
+      "id": "sumavenc",
+      "from": "cartera",
+      "to": "svc",
+      "y": 555,
+      "label": "montoVencido (cuotas vencidas)",
+      "variant": "return"
+    }
+  ],
+  "activations": [
+    {
+      "participant": "svc",
+      "from": 185,
+      "to": 560,
+      "type": "backend"
+    },
+    {
+      "participant": "repo",
+      "from": 185,
+      "to": 225,
+      "type": "database"
+    },
+    {
+      "participant": "cartera",
+      "from": 245,
+      "to": 560,
+      "type": "backend"
+    },
+    {
+      "participant": "credito",
+      "from": 340,
+      "to": 440,
+      "type": "backend"
+    },
+    {
+      "participant": "cuota",
+      "from": 370,
+      "to": 410,
+      "type": "backend"
+    }
+  ]
+}

@@ -1,0 +1,191 @@
+{
+  "schema_version": 1,
+  "diagram_type": "sequence",
+  "meta": {
+    "title": "Decorator: cada cargo envuelve el cálculo de la cuota y le suma lo suyo",
+    "quality_profile": "showcase",
+    "viewBox": [
+      1080,
+      650
+    ],
+    "column_fit": "spread",
+    "legend": {
+      "entries": {
+        "default": {
+          "label": "armado de la pila (TipoPlan, TipoCargo)"
+        },
+        "emphasis": {
+          "label": "llamada a CalculoDeCuota (Component)"
+        },
+        "dashed": {
+          "label": "delega en el envuelto"
+        },
+        "return": {
+          "label": "respuesta (suma su cargo)"
+        }
+      }
+    }
+  },
+  "participants": [
+    {
+      "id": "svc",
+      "type": "backend",
+      "label": "CreditoServiceImpl",
+      "sublabel": "crear()"
+    },
+    {
+      "id": "credito",
+      "type": "backend",
+      "label": "Credito",
+      "sublabel": "Context / Client"
+    },
+    {
+      "id": "gasto",
+      "type": "backend",
+      "label": "GastoDeAdministracion",
+      "sublabel": "ConcreteDecorator"
+    },
+    {
+      "id": "seguro",
+      "type": "backend",
+      "label": "SeguroDeVida",
+      "sublabel": "ConcreteDecorator"
+    },
+    {
+      "id": "frances",
+      "type": "backend",
+      "label": "SistemaFrances",
+      "sublabel": "ConcreteComponent"
+    }
+  ],
+  "segments": [
+    {
+      "from": 160,
+      "to": 305,
+      "label": "calculo(): armar la pila"
+    },
+    {
+      "from": 330,
+      "to": 535,
+      "label": "importeCuota atraviesa la pila y vuelve sumando"
+    }
+  ],
+  "messages": [
+    {
+      "id": "nuevo",
+      "from": "svc",
+      "to": "credito",
+      "y": 190,
+      "label": "Credito.nuevo(..., SISTEMA_FRANCES, cargos)"
+    },
+    {
+      "id": "plan",
+      "from": "credito",
+      "to": "frances",
+      "y": 225,
+      "label": "TipoPlan.calculo(): SistemaFrances"
+    },
+    {
+      "id": "aplseg",
+      "from": "credito",
+      "to": "seguro",
+      "y": 260,
+      "label": "SEGURO_DE_VIDA.aplicarSobre(calculo)"
+    },
+    {
+      "id": "aplgas",
+      "from": "credito",
+      "to": "gasto",
+      "y": 295,
+      "label": "GASTO_DE_ADMINISTRACION.aplicarSobre(calculo)"
+    },
+    {
+      "id": "imp",
+      "from": "credito",
+      "to": "gasto",
+      "y": 345,
+      "label": "importeCuota(capital, tasa, cuotas)",
+      "variant": "emphasis"
+    },
+    {
+      "id": "delseg",
+      "from": "gasto",
+      "to": "seguro",
+      "y": 370,
+      "label": "importeCuota(...)",
+      "variant": "dashed"
+    },
+    {
+      "id": "delfr",
+      "from": "seguro",
+      "to": "frances",
+      "y": 400,
+      "label": "importeCuota(...)",
+      "variant": "dashed"
+    },
+    {
+      "id": "cuotafr",
+      "from": "frances",
+      "to": "seguro",
+      "y": 430,
+      "label": "cuota del sistema francés",
+      "variant": "return"
+    },
+    {
+      "id": "masseg",
+      "from": "seguro",
+      "to": "gasto",
+      "y": 460,
+      "label": "+ 0,1 % del capital",
+      "variant": "return"
+    },
+    {
+      "id": "masgas",
+      "from": "gasto",
+      "to": "credito",
+      "y": 490,
+      "label": "+ $500 por cuota",
+      "variant": "return"
+    },
+    {
+      "id": "creado",
+      "from": "credito",
+      "to": "svc",
+      "y": 525,
+      "label": "crédito con importeCuota y su plan de cuotas",
+      "variant": "return"
+    }
+  ],
+  "activations": [
+    {
+      "participant": "svc",
+      "from": 185,
+      "to": 530,
+      "type": "backend"
+    },
+    {
+      "participant": "credito",
+      "from": 185,
+      "to": 530,
+      "type": "backend"
+    },
+    {
+      "participant": "gasto",
+      "from": 335,
+      "to": 495,
+      "type": "backend"
+    },
+    {
+      "participant": "seguro",
+      "from": 365,
+      "to": 465,
+      "type": "backend"
+    },
+    {
+      "participant": "frances",
+      "from": 395,
+      "to": 435,
+      "type": "backend"
+    }
+  ]
+}

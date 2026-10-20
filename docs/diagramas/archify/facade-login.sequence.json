@@ -1,0 +1,173 @@
+{
+  "schema_version": 1,
+  "diagram_type": "sequence",
+  "meta": {
+    "title": "Facade: el login atraviesa Spring Security, el repositorio y JWT detrás de AuthService",
+    "quality_profile": "showcase",
+    "viewBox": [
+      1080,
+      665
+    ],
+    "column_fit": "spread",
+    "legend": {
+      "entries": {
+        "default": {
+          "label": "acceso a datos"
+        },
+        "emphasis": {
+          "label": "llamada a la Facade"
+        },
+        "security": {
+          "label": "Spring Security"
+        },
+        "dashed": {
+          "label": "Adapter sobre jjwt"
+        },
+        "return": {
+          "label": "respuesta"
+        }
+      }
+    }
+  },
+  "participants": [
+    {
+      "id": "ctrl",
+      "type": "backend",
+      "label": "AuthController",
+      "sublabel": "Client"
+    },
+    {
+      "id": "facade",
+      "type": "backend",
+      "label": "AuthService",
+      "sublabel": "Facade (AuthServiceImpl)"
+    },
+    {
+      "id": "am",
+      "type": "security",
+      "label": "AuthenticationManager",
+      "sublabel": "Spring Security + BCrypt"
+    },
+    {
+      "id": "repo",
+      "type": "database",
+      "label": "UsuarioRepository",
+      "sublabel": "JPA"
+    },
+    {
+      "id": "token",
+      "type": "external",
+      "label": "TokenService",
+      "sublabel": "JwtUtil (Adapter)"
+    }
+  ],
+  "segments": [
+    {
+      "from": 160,
+      "to": 245,
+      "label": "Pedido del controlador"
+    },
+    {
+      "from": 275,
+      "to": 495,
+      "label": "Subsistema: no conoce a la Facade"
+    }
+  ],
+  "messages": [
+    {
+      "id": "login",
+      "from": "ctrl",
+      "to": "facade",
+      "y": 230,
+      "label": "login(request)  ← POST /api/auth/login",
+      "variant": "emphasis"
+    },
+    {
+      "id": "auth",
+      "from": "facade",
+      "to": "am",
+      "y": 300,
+      "label": "authenticate(usuario, contraseña)",
+      "variant": "security"
+    },
+    {
+      "id": "authret",
+      "from": "am",
+      "to": "facade",
+      "y": 335,
+      "label": "ok, o 401 si no coincide",
+      "variant": "return"
+    },
+    {
+      "id": "find",
+      "from": "facade",
+      "to": "repo",
+      "y": 375,
+      "label": "findByUsername(username)"
+    },
+    {
+      "id": "usr",
+      "from": "repo",
+      "to": "facade",
+      "y": 410,
+      "label": "Usuario",
+      "variant": "return"
+    },
+    {
+      "id": "gen",
+      "from": "facade",
+      "to": "token",
+      "y": 450,
+      "label": "generarToken(username)",
+      "variant": "dashed"
+    },
+    {
+      "id": "jwt",
+      "from": "token",
+      "to": "facade",
+      "y": 485,
+      "label": "JWT firmado",
+      "variant": "return"
+    },
+    {
+      "id": "resp",
+      "from": "facade",
+      "to": "ctrl",
+      "y": 540,
+      "label": "AuthResponse (token, rol, permisos) → 200",
+      "variant": "return"
+    }
+  ],
+  "activations": [
+    {
+      "participant": "ctrl",
+      "from": 225,
+      "to": 545,
+      "type": "backend"
+    },
+    {
+      "participant": "facade",
+      "from": 225,
+      "to": 545,
+      "type": "backend"
+    },
+    {
+      "participant": "am",
+      "from": 295,
+      "to": 340,
+      "type": "security"
+    },
+    {
+      "participant": "repo",
+      "from": 370,
+      "to": 415,
+      "type": "database"
+    },
+    {
+      "participant": "token",
+      "from": 445,
+      "to": 490,
+      "type": "external"
+    }
+  ]
+}
