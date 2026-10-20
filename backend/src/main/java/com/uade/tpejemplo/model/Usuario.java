@@ -1,6 +1,7 @@
 package com.uade.tpejemplo.model;
 
 import com.uade.tpejemplo.exception.BusinessException;
+import com.uade.tpejemplo.model.interfaces.IPermisos;
 import com.uade.tpejemplo.model.interfaces.IUsuario;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -50,11 +51,12 @@ public class Usuario implements IUsuario {
         return permisos.isPuedeAnularCobranza();
     }
 
-    public void otorgarPermisos(Permisos permisos) {
+    // Recibe la interfaz y guarda una copia en Permisos, que es lo que JPA persiste embebido.
+    public void otorgarPermisos(IPermisos permisos) {
         if (rol == Rol.ADMIN) {
             throw new BusinessException("No se pueden modificar los permisos de un administrador");
         }
-        this.permisos = permisos;
+        this.permisos = Permisos.de(permisos.isPuedeAnularCredito(), permisos.isPuedeAnularCobranza());
     }
 
     // El rol se cambia con nombre de negocio en vez de un setter suelto:

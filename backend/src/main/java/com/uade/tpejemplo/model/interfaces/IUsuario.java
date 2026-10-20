@@ -1,6 +1,5 @@
 package com.uade.tpejemplo.model.interfaces;
 
-import com.uade.tpejemplo.model.Permisos;
 import com.uade.tpejemplo.model.Rol;
 
 public interface IUsuario {
@@ -19,8 +18,7 @@ public interface IUsuario {
 
     boolean puedeAnularCobranza();
 
-    // Recibe la clase concreta porque es lo que JPA persiste como embebido.
-    void otorgarPermisos(Permisos permisos);
+    void otorgarPermisos(IPermisos permisos);
 
     void asignarRol(Rol rol);
 }
