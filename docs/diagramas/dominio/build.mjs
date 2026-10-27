@@ -24,6 +24,27 @@ const FAMILIA = {
   estructura: { color: "#2e5aa8", nombre: "composición / agregación / asociación" },
   uso: { color: "#8b93a7", nombre: "dependencia" },
 };
+// Patrones GoF: rol de cada clase (pastilla en la caja) y ficha del boton de vista
+const PATRONES = {
+  Composite: {
+    color: "#c2410c",
+    roles: { Deuda: "Component", ICredito: "Component", ICuota: "Component", Credito: "Composite", Cartera: "Composite", Cuota: "Leaf", CreditoServiceImpl: "Client" },
+    problema: "Saldo y mora se consultan igual en una cuota, un crédito o una cartera: la hoja responde y el compuesto suma a sus hijos.",
+  },
+  Strategy: {
+    color: "#0f766e",
+    roles: { CondicionesDeCredito: "Context", CalculoDeCuota: "Strategy", InteresSimple: "ConcreteStrategy", SistemaFrances: "ConcreteStrategy", TipoPlan: "Selector" },
+    problema: "El sistema de amortización se elige al otorgar el crédito y se intercambia sin tocar a quien calcula la cuota.",
+  },
+  Decorator: {
+    color: "#7c3aed",
+    roles: { CalculoDeCuota: "Component", InteresSimple: "ConcreteComponent", SistemaFrances: "ConcreteComponent", CargoSobreCuota: "Decorator", SeguroDeVida: "ConcreteDecorator", GastoDeAdministracion: "ConcreteDecorator", TipoCargo: "Ensambla", CondicionesDeCredito: "Client" },
+    problema: "Los cargos opcionales se apilan sobre el cálculo base: cada capa delega en la envuelta y suma su cargo, sin una subclase por combinación.",
+  },
+};
+const rolesDe = (id) => Object.entries(PATRONES).filter(([, p]) => p.roles[id]).map(([n, p]) => ({ texto: `${n.toUpperCase()} · ${p.roles[id]}`, color: p.color }));
+const anchoPastilla = (t) => Math.ceil(t.length * 5.4) + 12;
+const ROLES_GOF = new Set(["Component", "Composite", "Leaf", "Strategy", "ConcreteStrategy", "ConcreteComponent", "Decorator", "ConcreteDecorator", "Context"]);
 const MONO = "'Geist Mono', ui-monospace, Menlo, monospace";
 const SANS = "'Geist', -apple-system, 'Helvetica Neue', sans-serif";
 const SERIF = "'Instrument Serif', Georgia, serif";
@@ -70,7 +91,7 @@ function cabecera(c) {
   if (c.tipo === "interface") linea.push("interface");
   if (c.tipo === "enum") linea.push("enumeration");
   if (c.tipo === "abstract class") linea.push("abstract");
-  if (c.estereotipo) linea.push(c.estereotipo);
+  if (c.estereotipo) linea.push(...c.estereotipo.split(" / ").filter((t) => !ROLES_GOF.has(t)));
   return linea.length ? "«" + linea.join(" · ") + "»" : null;
 }
 
@@ -88,14 +109,17 @@ function medir(c) {
   const est = cabecera(c);
   const grupos = compartimentos(c);
   const textos = grupos.flat().map(limpiar);
+  const pastillas = rolesDe(c.id);
+  const anchoPast = pastillas.reduce((s, p) => s + anchoPastilla(p.texto) + 4, 0);
   const ancho = Math.max(
     c.id.length * NOMBRE.ancho,
     est ? est.length * ESTEREO.ancho : 0,
     ...textos.map((t) => t.length * MIEMBRO.ancho),
+    anchoPast,
   ) + PAD * 2;
-  const altoCab = PAD + (est ? ESTEREO.alto : 0) + NOMBRE.alto + PAD - 2;
+  const altoCab = PAD + (pastillas.length ? 18 : 0) + (est ? ESTEREO.alto : 0) + NOMBRE.alto + PAD - 2;
   const alto = altoCab + grupos.reduce((s, g) => s + g.length * MIEMBRO.alto + PAD, 0);
-  return { ancho: Math.ceil(ancho), alto: Math.ceil(alto), altoCab, est, grupos };
+  return { ancho: Math.ceil(ancho), alto: Math.ceil(alto), altoCab, est, grupos, pastillas };
 }
 
 const limpiar = (l) => l.replace(/\{(static|abstract)\}\s*/g, "");
@@ -163,6 +187,16 @@ function caja(c, m, x, y) {
   s.push(`<path d="M${x + 0.6},${y + m.altoCab} V${y + 6} Q${x + 0.6},${y + 0.6} ${x + 6},${y + 0.6} H${x + m.ancho - 6} Q${x + m.ancho - 0.6},${y + 0.6} ${x + m.ancho - 0.6},${y + 6} V${y + m.altoCab} Z" fill="${col}" fill-opacity="0.32"/>`);
   let cy = y + PAD;
   const cx = x + m.ancho / 2;
+  if (m.pastillas.length) {
+    let px = x + PAD;
+    for (const p of m.pastillas) {
+      const w = anchoPastilla(p.texto);
+      s.push(`<rect x="${px}" y="${y + 6}" width="${w}" height="15" rx="7.5" fill="${p.color}"/>`);
+      s.push(`<text x="${px + w / 2}" y="${y + 16.5}" text-anchor="middle" font-family="${MONO}" font-size="8.5" font-weight="600" fill="#ffffff" letter-spacing="0.3">${esc(p.texto)}</text>`);
+      px += w + 4;
+    }
+    cy += 18;
+  }
   if (m.est) {
     cy += ESTEREO.alto - 3;
     s.push(`<text x="${cx}" y="${cy}" text-anchor="middle" font-family="${MONO}" font-size="${ESTEREO.size}" fill="${C.soft}" letter-spacing="0.4">${esc(m.est)}</text>`);
@@ -231,7 +265,7 @@ function dibujar(modelo, medidas, g) {
   };
   recorrer(g, 0, 0);
 
-  const MARGEN = 32, TITULO = 56;
+  const MARGEN = 32, TITULO = 100;
   const W = Math.ceil(g.width) + MARGEN * 2, H = Math.ceil(g.height) + MARGEN * 2 + TITULO;
   const out = [];
   out.push(`<svg xmlns="http://www.w3.org/2000/svg" data-dominio="" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" font-family="${SANS}">`);
@@ -244,6 +278,21 @@ function dibujar(modelo, medidas, g) {
     out.push(`<line x1="${lx}" y1="${MARGEN + 18}" x2="${lx + 28}" y2="${MARGEN + 18}" stroke="${f.color}" stroke-width="2"${f === FAMILIA.uso ? ` stroke-dasharray="4,3"` : ""}/>`);
     out.push(`<text x="${lx + 36}" y="${MARGEN + 22}" font-family="${MONO}" font-size="11" fill="${C.ink}">${esc(f.nombre)}</text>`);
     lx += 64 + f.nombre.length * 6.6;
+  }
+  let bx = MARGEN;
+  out.push(`<text x="${bx}" y="${MARGEN + 77}" font-family="${MONO}" font-size="12" fill="${C.soft}" letter-spacing="1">VER PATRÓN</text>`);
+  bx += 104;
+  for (const [nombre, p] of Object.entries(PATRONES)) {
+    const w = nombre.length * 11 + 40;
+    const roles = {};
+    for (const [clase, rol] of Object.entries(p.roles)) (roles[rol] = roles[rol] || []).push(clase);
+    const ficha = `<div style='font:600 14px Geist,sans-serif;color:${p.color}'>${nombre}</div>` +
+      `<div style='margin:4px 0 6px'>${p.problema}</div>` +
+      Object.entries(roles).map(([rol, cs]) => `<div><b>${rol}</b>: ${cs.join(", ")}</div>`).join("");
+    out.push(`<g class="btn-patron" data-patron="${nombre}" data-color="${p.color}" data-clases="${Object.keys(p.roles).join(",")}" data-ficha="${esc(ficha).replace(/"/g, "&quot;")}">` +
+      `<rect x="${bx}" y="${MARGEN + 56}" width="${w}" height="32" rx="16" fill="${p.color}"/>` +
+      `<text x="${bx + w / 2}" y="${MARGEN + 77.5}" text-anchor="middle" font-family="${SANS}" font-size="16" font-weight="600" fill="#ffffff">${nombre}</text></g>`);
+    bx += w + 12;
   }
   out.push(`<g transform="translate(${MARGEN},${MARGEN + TITULO})">`);
 
@@ -306,6 +355,10 @@ svg[data-dominio] .clase, svg[data-dominio] .rel { transition: opacity .15s; }
 svg[data-dominio].foco .clase:not(.activa), svg[data-dominio].foco .rel:not(.activa) { opacity: .1; }
 svg[data-dominio].foco .rel.activa path { stroke-width: 2.4; }
 svg[data-dominio] .clase.elegida > rect:first-child { stroke: #bf4520; stroke-width: 2; }
+svg[data-dominio] .btn-patron { cursor: pointer; }
+svg[data-dominio] .btn-patron.elegido rect { stroke: ${C.ink}; stroke-width: 2.5; }
+svg[data-dominio].patron .rel.activa path { stroke: var(--patron); stroke-width: 2.6; }
+svg[data-dominio].patron .clase.activa > rect:first-child { stroke: var(--patron); stroke-width: 2.4; }
 `;
 
 // Hover: deja a la vista la clase, sus vecinas y sus relaciones. Clic fija, Esc o clic afuera limpia.
@@ -332,7 +385,8 @@ const INTERACCION = `
     panel.style.display = "block";
   }
   function limpiar(svg) {
-    svg.classList.remove("foco");
+    svg.classList.remove("foco", "patron");
+    svg.querySelectorAll(".btn-patron.elegido").forEach(function (b) { b.classList.remove("elegido"); });
     svg.querySelectorAll(".activa, .elegida").forEach(function (e) { e.classList.remove("activa", "elegida"); });
     if (panel) panel.style.display = "none";
   }
@@ -362,7 +416,28 @@ const INTERACCION = `
     var c = e.target.closest && e.target.closest(".clase"), svg = svgDe(c);
     if (svg && !fijada && !(e.relatedTarget && c.contains(e.relatedTarget))) limpiar(svg);
   });
+  function enfocarPatron(svg, btn) {
+    limpiar(svg);
+    svg.classList.add("foco", "patron");
+    svg.style.setProperty("--patron", btn.getAttribute("data-color"));
+    btn.classList.add("elegido");
+    var en = {};
+    btn.getAttribute("data-clases").split(",").forEach(function (id) { en[id] = true; });
+    svg.querySelectorAll(".clase").forEach(function (c) { if (en[c.getAttribute("data-id")]) c.classList.add("activa"); });
+    svg.querySelectorAll(".rel").forEach(function (r) { if (en[r.getAttribute("data-a")] && en[r.getAttribute("data-b")]) r.classList.add("activa"); });
+    if (!document.body) return;
+    mostrarPanel("", []);
+    panel.innerHTML = btn.getAttribute("data-ficha") + "<div style='margin-top:6px;color:#5a6580'>Esc o clic afuera para salir</div>";
+  }
   document.addEventListener("click", function (e) {
+    var b = e.target.closest && e.target.closest(".btn-patron"), sb = svgDe(b);
+    if (sb) {
+      e.stopPropagation();
+      var nombre = "patron:" + b.getAttribute("data-patron");
+      fijada = fijada === nombre ? null : nombre;
+      if (fijada) enfocarPatron(sb, b); else limpiar(sb);
+      return;
+    }
     var c = e.target.closest && e.target.closest(".clase"), svg = svgDe(c);
     if (svg) {
       e.stopPropagation();
