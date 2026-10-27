@@ -576,8 +576,9 @@ doc = f'''<!doctype html>
 <div class="clases">{clases("mvc")}</div>
 <h3>Seguridad: Facade y Adapter</h3>
 <div class="clases">{clases("seguridad")}</div>
-<h3>Modelo: Composite, Strategy y Decorator</h3>
-<div class="clases">{clases("modelo")}</div>
+<h3>Dominio: Composite, Strategy y Decorator</h3>
+<p>Cada relación tiene semántica (el verbo, que se lee del origen al destino), multiplicidad en ambos extremos y tipo; las realizaciones y herencias no llevan multiplicidad. Se genera con <code>docs/diagramas/dominio/build.mjs</code> a partir del bloque <code>clases-v4-modelo</code>.</p>
+<div class="clases">{clases("dominio")}</div>
 <h3>Paquetes del Modelo</h3>
 <div class="clases">{clases("paquetes")}</div>
 <h3>DER</h3>

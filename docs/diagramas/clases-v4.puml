@@ -352,37 +352,284 @@ end note
 @enduml
 
 @startuml clases-v4-modelo
-title Dashboard de préstamos V4 — detalle del Modelo
+!pragma layout elk
+title Dashboard de préstamos V4 — diagrama de clases del dominio
 skinparam classAttributeIconSize 0
 skinparam packageStyle rectangle
 skinparam shadowing false
-skinparam nodesep 40
-skinparam ranksep 60
+skinparam linetype ortho
+skinparam nodesep 80
+skinparam ranksep 70
 set separator none
 hide empty members
 
+package "model.cliente" {
+  interface ICliente {
+    + getDni() : String
+    + getNombre() : String
+  }
+  class Cliente <<Entity>> {
+    - dni : String
+    - nombre : String
+    - Cliente(dni : String, nombre : String)
+    + {static} nuevo(dni : String, nombre : String) : Cliente
+    + getDni() : String
+    + getNombre() : String
+  }
+}
+
+package "model.credito" {
+  interface Deuda <<Component>> {
+    + saldo() : BigDecimal
+    + montoVencido() : BigDecimal
+    + tieneMora() : boolean
+  }
+  interface ICredito {
+    + getId() : Long
+    + getCliente() : ICliente
+    + getFecha() : LocalDate
+    + getCondiciones() : ICondicionesDeCredito
+    + importeCuota() : BigDecimal
+    + isAnulado() : boolean
+    + totalADevolver() : BigDecimal
+    + getCuotas() : List<? extends ICuota>
+    + estado() : EstadoCredito
+    + puedeAnularse() : boolean
+    + anular() : void
+  }
+  interface ICuota {
+    + getId() : Long
+    + getCredito() : ICredito
+    + getNumero() : Integer
+    + getImporte() : BigDecimal
+    + getFechaVencimiento() : LocalDate
+    + estaPagada() : boolean
+    + estaVencida() : boolean
+    + registrarCobranza(importe : BigDecimal) : ICobranza
+  }
+  interface ICobranza {
+    + getId() : Long
+    + getCuota() : ICuota
+    + getImporte() : BigDecimal
+    + getFechaCobranza() : LocalDate
+    + isAnulada() : boolean
+    + anular() : void
+  }
+  interface ICondicionesDeCredito {
+    + getDeudaOriginal() : BigDecimal
+    + getTasaInteres() : BigDecimal
+    + getCantidadCuotas() : Integer
+    + getTipoPlan() : TipoPlan
+    + getCargos() : Set<TipoCargo>
+    + desglose() : List<Renglon>
+  }
+  class Cartera <<Composite>> {
+    - deudas : List<Deuda>
+    - Cartera(deudas : List<Deuda>)
+    + {static} de(deudas : List<? extends Deuda>) : Cartera
+    + saldo() : BigDecimal
+    + montoVencido() : BigDecimal
+    - sumar(monto : Function<Deuda, BigDecimal>) : BigDecimal
+  }
+  class Credito <<Entity / Composite>> {
+    - id : Long
+    - cliente : Cliente
+    - fecha : LocalDate
+    - condiciones : CondicionesDeCredito
+    - anulado : boolean
+    - cuotas : List<Cuota>
+    - Credito(cliente : Cliente, fecha : LocalDate, condiciones : CondicionesDeCredito)
+    + {static} nuevo(cliente : Cliente, fecha : LocalDate, condiciones : CondicionesDeCredito) : Credito
+    + getId() : Long
+    + getCliente() : Cliente
+    + getFecha() : LocalDate
+    + getCondiciones() : CondicionesDeCredito
+    + isAnulado() : boolean
+    + getCuotas() : List<Cuota>
+    + totalADevolver() : BigDecimal
+    + importeCuota() : BigDecimal
+    - generarPlanDeCuotas() : void
+    + estado() : EstadoCredito
+    + saldo() : BigDecimal
+    + montoVencido() : BigDecimal
+    - sumar(monto : Function<Cuota, BigDecimal>) : BigDecimal
+    - estaCancelado() : boolean
+    - tieneCobranzas() : boolean
+    + puedeAnularse() : boolean
+    + anular() : void
+  }
+  class Cuota <<Entity / Leaf>> {
+    - id : Long
+    - credito : Credito
+    - numero : Integer
+    - importe : BigDecimal
+    - fechaVencimiento : LocalDate
+    - cobranzas : List<Cobranza>
+    ~ Cuota(credito : Credito, numero : Integer, importe : BigDecimal, fechaVencimiento : LocalDate)
+    + getId() : Long
+    + getCredito() : Credito
+    + getNumero() : Integer
+    + getImporte() : BigDecimal
+    + getFechaVencimiento() : LocalDate
+    + estaPagada() : boolean
+    + estaVencida() : boolean
+    + estaVencida(hoy : LocalDate) : boolean
+    + saldo() : BigDecimal
+    + montoVencido() : BigDecimal
+    + registrarCobranza(importe : BigDecimal) : Cobranza
+  }
+  class Cobranza <<Entity>> {
+    - id : Long
+    - cuota : Cuota
+    - importe : BigDecimal
+    - fechaCobranza : LocalDate
+    - anulada : boolean
+    - Cobranza(cuota : Cuota, importe : BigDecimal)
+    ~ {static} registrar(cuota : Cuota, importe : BigDecimal) : Cobranza
+    + getId() : Long
+    + getCuota() : Cuota
+    + getImporte() : BigDecimal
+    + getFechaCobranza() : LocalDate
+    + isAnulada() : boolean
+    + anular() : void
+    + anular(hoy : LocalDate) : void
+  }
+  class CondicionesDeCredito <<Embeddable / Context>> {
+    - deudaOriginal : BigDecimal
+    - tasaInteres : BigDecimal
+    - cantidadCuotas : Integer
+    - tipoPlan : TipoPlan
+    - cargos : Set<TipoCargo>
+    + CondicionesDeCredito(deudaOriginal : BigDecimal, tasaInteres : BigDecimal, cantidadCuotas : Integer, tipoPlan : TipoPlan, cargos : Set<TipoCargo>)
+    + getDeudaOriginal() : BigDecimal
+    + getTasaInteres() : BigDecimal
+    + getCantidadCuotas() : Integer
+    + getTipoPlan() : TipoPlan
+    + getCargos() : Set<TipoCargo>
+    ~ importeCuota() : BigDecimal
+    + desglose() : List<Renglon>
+    - calculo() : CalculoDeCuota
+  }
+  enum EstadoCredito {
+    VIGENTE
+    CANCELADO
+    ANULADO
+  }
+}
+
+package "model.plan" {
+  interface CalculoDeCuota <<Strategy / Component>> {
+    + importeCuota(capital : BigDecimal, tasaInteres : BigDecimal, cantidadCuotas : int) : BigDecimal
+    + desglose(capital : BigDecimal, tasaInteres : BigDecimal, cantidadCuotas : int) : List<Renglon>
+  }
+  enum TipoPlan {
+    INTERES_SIMPLE
+    SISTEMA_FRANCES
+    - calculo : CalculoDeCuota
+    - TipoPlan(calculo : CalculoDeCuota)
+    + calculo() : CalculoDeCuota
+  }
+  enum TipoCargo {
+    SEGURO_DE_VIDA
+    GASTO_DE_ADMINISTRACION
+    + {abstract} aplicarSobre(calculo : CalculoDeCuota) : CalculoDeCuota
+  }
+  class InteresSimple <<ConcreteStrategy / ConcreteComponent>> {
+    - {static} CIEN : BigDecimal
+    - totalADevolver(capital : BigDecimal, tasaInteres : BigDecimal, cantidadCuotas : int) : BigDecimal
+    + importeCuota(capital : BigDecimal, tasaInteres : BigDecimal, cantidadCuotas : int) : BigDecimal
+    + desglose(capital : BigDecimal, tasaInteres : BigDecimal, cantidadCuotas : int) : List<Renglon>
+  }
+  class SistemaFrances <<ConcreteStrategy / ConcreteComponent>> {
+    - {static} CIEN : BigDecimal
+    - {static} PRECISION : MathContext
+    + importeCuota(capital : BigDecimal, tasaInteres : BigDecimal, cantidadCuotas : int) : BigDecimal
+    + desglose(capital : BigDecimal, tasaInteres : BigDecimal, cantidadCuotas : int) : List<Renglon>
+  }
+  abstract class CargoSobreCuota <<Decorator>> {
+    - envuelto : CalculoDeCuota
+    # CargoSobreCuota(envuelto : CalculoDeCuota)
+    + importeCuota(capital : BigDecimal, tasaInteres : BigDecimal, cantidadCuotas : int) : BigDecimal
+    + desglose(capital : BigDecimal, tasaInteres : BigDecimal, cantidadCuotas : int) : List<Renglon>
+    # {abstract} nombre() : String
+    # {abstract} cargo(capital : BigDecimal, cantidadCuotas : int) : BigDecimal
+  }
+  class SeguroDeVida <<ConcreteDecorator>> {
+    - {static} PORCENTAJE_POR_CUOTA : BigDecimal
+    + SeguroDeVida(envuelto : CalculoDeCuota)
+    # nombre() : String
+    # cargo(capital : BigDecimal, cantidadCuotas : int) : BigDecimal
+  }
+  class GastoDeAdministracion <<ConcreteDecorator>> {
+    - {static} MONTO_POR_CUOTA : BigDecimal
+    + GastoDeAdministracion(envuelto : CalculoDeCuota)
+    # nombre() : String
+    # cargo(capital : BigDecimal, cantidadCuotas : int) : BigDecimal
+  }
+  class Renglon <<record>> {
+    - concepto : String
+    - importe : BigDecimal
+    + Renglon(concepto : String, importe : BigDecimal)
+    + concepto() : String
+    + importe() : BigDecimal
+  }
+}
+
 package "model.usuario" {
-  class "Usuario\n<size:10><i>implements IUsuario</i></size>" as Usuario {
+  interface IUsuario {
+    + getId() : Long
+    + getUsername() : String
+    + getPassword() : String
+    + getRol() : Rol
+    + getPermisos() : IPermisos
+    + isActivo() : boolean
+    + puedeAnularCredito() : boolean
+    + puedeAnularCobranza() : boolean
+    + otorgarPermisos(permisos : IPermisos) : void
+    + asignarRol(rol : Rol) : void
+    + desactivar() : void
+    + reactivar() : void
+  }
+  interface IPermisos {
+    + isPuedeAnularCredito() : boolean
+    + isPuedeAnularCobranza() : boolean
+  }
+  interface IRol {
+    + autoridad() : String
+  }
+  class Usuario <<Entity>> {
     - id : Long
     - username : String
     - password : String
+    - rol : Rol
+    - permisos : Permisos
     - activo : boolean
-    + {static} nuevo(String, String, Rol, Permisos) : Usuario
-    + otorgarPermisos(IPermisos) : void
-    + asignarRol(Rol) : void
-    + desactivar() : void
-    + reactivar() : void
+    - Usuario(username : String, passwordHasheado : String, rol : Rol, permisos : Permisos)
+    + {static} nuevo(username : String, passwordHasheado : String, rol : Rol, permisos : Permisos) : Usuario
+    + getId() : Long
+    + getUsername() : String
+    + getPassword() : String
+    + getRol() : Rol
+    + getPermisos() : Permisos
+    + isActivo() : boolean
     + puedeAnularCredito() : boolean
     + puedeAnularCobranza() : boolean
+    + otorgarPermisos(permisos : IPermisos) : void
+    + asignarRol(rol : Rol) : void
+    + desactivar() : void
+    + reactivar() : void
   }
-  class "Permisos\n<size:10><i>implements IPermisos</i></size>" as Permisos <<Embeddable>> {
+  class Permisos <<Embeddable>> {
     - puedeAnularCredito : boolean
     - puedeAnularCobranza : boolean
-    + {static} de(boolean, boolean) : Permisos
+    - Permisos(puedeAnularCredito : boolean, puedeAnularCobranza : boolean)
+    + {static} de(puedeAnularCredito : boolean, puedeAnularCobranza : boolean) : Permisos
     + {static} ninguno() : Permisos
     + {static} todos() : Permisos
+    + isPuedeAnularCredito() : boolean
+    + isPuedeAnularCobranza() : boolean
   }
-  enum "Rol\n<size:10><i>implements IRol</i></size>" as Rol {
+  enum Rol {
     ADMIN
     SUPERVISOR
     USER
@@ -390,183 +637,102 @@ package "model.usuario" {
   }
 }
 
-package "model.credito" {
-  interface Deuda <<Component>> {
-  + saldo() : BigDecimal
-  + montoVencido() : BigDecimal
-  + tieneMora() : boolean
+' Layout: credito arriba, plan y cliente al costado, usuario abajo
+
+package "service.impl" {
+  class CreditoServiceImpl <<Service>> {
+    - creditoRepository : CreditoRepository
+    - clienteRepository : ClienteRepository
+    + crear(request : CreditoRequest) : CreditoResponse
+    + buscarPorId(id : Long) : CreditoResponse
+    + listarTodos() : List<CreditoResponse>
+    + listarPorCliente(dniCliente : String) : List<CreditoResponse>
+    + anularCredito(id : Long, usuario : IUsuario) : void
+    - buscarCliente(dni : String) : Cliente
+    - buscarCredito(id : Long) : Credito
   }
-  interface ICredito
-  interface ICuota
-  class Cartera <<Composite>> {
-    - deudas : List<Deuda>
-    + {static} de(List<? extends Deuda>) : Cartera
-    + saldo() : BigDecimal
-    + montoVencido() : BigDecimal
-    - sumar(Function<Deuda, BigDecimal>) : BigDecimal
-  }
-  class Credito <<Composite>> {
-    - id : Long
-    - fecha : LocalDate
-    - anulado : boolean
-    + {static} nuevo(Cliente, LocalDate, CondicionesDeCredito) : Credito
-    + totalADevolver() : BigDecimal
-    + importeCuota() : BigDecimal
-    - generarPlanDeCuotas() : void
-    + estado() : EstadoCredito
-    + saldo() : BigDecimal
-    + montoVencido() : BigDecimal
-    - sumar(Function<Cuota, BigDecimal>) : BigDecimal
-    - estaCancelado() : boolean
-    - tieneCobranzas() : boolean
-    + puedeAnularse() : boolean
-    + anular() : void
-  }
-  class Cuota <<Leaf>> {
-    - id : Long
-    - numero : Integer
-    - importe : BigDecimal
-    - fechaVencimiento : LocalDate
-    + estaPagada() : boolean
-    + estaVencida() : boolean
-    + estaVencida(LocalDate) : boolean
-    + saldo() : BigDecimal
-    + montoVencido() : BigDecimal
-    + registrarCobranza(BigDecimal) : Cobranza
-  }
-  class "Cobranza\n<size:10><i>implements ICobranza</i></size>" as Cobranza {
-    - id : Long
-    - importe : BigDecimal
-    - fechaCobranza : LocalDate
-    - anulada : boolean
-    + anular() : void
-    + anular(LocalDate) : void
-  }
-  enum EstadoCredito {
-    VIGENTE
-    CANCELADO
-    ANULADO
-  }
-  class "CondicionesDeCredito\n<size:10><i>implements ICondicionesDeCredito</i></size>" as CondicionesDeCredito <<Context / Embeddable>> {
-    - deudaOriginal : BigDecimal
-    - tasaInteres : BigDecimal
-    - cantidadCuotas : Integer
-    - tipoPlan : TipoPlan
-    - cargos : Set<TipoCargo>
-    ~ importeCuota() : BigDecimal
-    + desglose() : List<Renglon>
-    - calculo() : CalculoDeCuota
+  class CobranzaServiceImpl <<Service>> {
+    - cobranzaRepository : CobranzaRepository
+    - cuotaRepository : CuotaRepository
+    - creditoRepository : CreditoRepository
+    + registrar(request : CobranzaRequest) : CobranzaResponse
+    + listarPorCredito(idCredito : Long) : List<CobranzaResponse>
+    + anularCobranza(id : Long, usuario : IUsuario) : void
   }
 }
 
-package "model.cliente" {
-  class "Cliente\n<size:10><i>implements ICliente</i></size>" as Cliente {
-    - dni : String
-    - nombre : String
-    + {static} nuevo(String, String) : Cliente
-  }
-}
+' Realizaciones y herencia
+ICliente <|.. Cliente : implementa
+Deuda <|-- ICredito : extiende
+Deuda <|-- ICuota : extiende
+Deuda <|.. Cartera : implementa
+ICredito <|.. Credito : implementa
+ICuota <|.. Cuota : implementa
+ICobranza <|.. Cobranza : implementa
+ICondicionesDeCredito <|.. CondicionesDeCredito : implementa
+CalculoDeCuota <|.. InteresSimple : implementa
+CalculoDeCuota <|.. SistemaFrances : implementa
+CalculoDeCuota <|.. CargoSobreCuota : implementa
+CargoSobreCuota <|-- SeguroDeVida : extiende
+CargoSobreCuota <|-- GastoDeAdministracion : extiende
+IUsuario <|.. Usuario : implementa
+IPermisos <|.. Permisos : implementa
+IRol <|.. Rol : implementa
 
-package "model.plan" {
-  interface CalculoDeCuota <<Strategy / Component>> {
-  + importeCuota(BigDecimal capital, BigDecimal tasa, int cuotas) : BigDecimal
-  + desglose(BigDecimal capital, BigDecimal tasa, int cuotas) : List<Renglon>
-  }
-  enum TipoPlan {
-    INTERES_SIMPLE
-    SISTEMA_FRANCES
-    - calculo : CalculoDeCuota
-    + calculo() : CalculoDeCuota
-  }
-  enum TipoCargo {
-    SEGURO_DE_VIDA
-    GASTO_DE_ADMINISTRACION
-    + {abstract} aplicarSobre(CalculoDeCuota) : CalculoDeCuota
-  }
-  class InteresSimple <<ConcreteStrategy / ConcreteComponent>> {
-  + importeCuota(BigDecimal, BigDecimal, int) : BigDecimal
-  }
-  class SistemaFrances <<ConcreteStrategy / ConcreteComponent>> {
-  + importeCuota(BigDecimal, BigDecimal, int) : BigDecimal
-  }
-  abstract class CargoSobreCuota <<Decorator>> {
-  - envuelto : CalculoDeCuota
-  + importeCuota(BigDecimal, BigDecimal, int) : BigDecimal
-  + desglose(BigDecimal, BigDecimal, int) : List<Renglon>
-  # {abstract} nombre() : String
-  # {abstract} cargo(BigDecimal, int) : BigDecimal
-  }
-  class SeguroDeVida <<ConcreteDecorator>> {
-  - {static} PORCENTAJE_POR_CUOTA : BigDecimal
-  # cargo(BigDecimal, int) : BigDecimal
-  }
-  class GastoDeAdministracion <<ConcreteDecorator>> {
-  - {static} MONTO_POR_CUOTA : BigDecimal
-  # cargo(BigDecimal, int) : BigDecimal
-  }
-  class Renglon <<record>> {
-  + concepto : String
-  + importe : BigDecimal
-  }
-}
+' Asociaciones del dominio (se leen de izquierda a derecha siguiendo >)
+Cartera "0..*" o--> "0..*" Deuda : agrupa >
+Credito "0..*" --> "1" Cliente : se otorga a >
+Credito "1" *--> "1" CondicionesDeCredito : se pacta con >
+Credito "1" *-- "1..*" Cuota : se divide en >
+Cuota "1" *-- "0..*" Cobranza : se paga con >
+CondicionesDeCredito "0..*" --> "0..*" TipoCargo : incluye >
+CondicionesDeCredito "0..*" --> "1" TipoPlan : calcula la cuota según >
+TipoPlan "0..1" --> "1" CalculoDeCuota : provee >
+CargoSobreCuota "0..*" o--> "1" CalculoDeCuota : envuelve >
+Usuario "0..*" --> "1" Rol : tiene asignado >
+Usuario "1" *--> "1" Permisos : cuenta con >
 
+' Dependencias (uso sin atributo)
+Credito "0..*" ..> "1" EstadoCredito : calcula su >
+CondicionesDeCredito "1" ..> "1" CalculoDeCuota : arma >
+TipoCargo "1" ..> "0..*" SeguroDeVida : crea >
+TipoCargo "1" ..> "0..*" GastoDeAdministracion : crea >
+TipoCargo "0..*" ..> "1" CalculoDeCuota : decora >
+TipoPlan "1" ..> "1" InteresSimple : crea >
+TipoPlan "1" ..> "1" SistemaFrances : crea >
+CondicionesDeCredito "1" ..> "1..*" Renglon : desglosa en >
+Usuario "0..*" ..> "1" IPermisos : copia los permisos de >
 
-' Zona deuda (Composite)
-Deuda <|.. Cartera
-Deuda "0..*" --o "0..*" Cartera : deudas
-Deuda <|-- ICredito
-ICredito <|.. Credito
-Deuda <|-- ICuota
-ICuota <|.. Cuota
-Credito "1" *-- "1..*" Cuota : cuotas\n(Creator, cascade PERSIST)
-Cuota "1" *-- "0..*" Cobranza : cobranzas
-Credito "0..*" --> "1" Cliente : cliente
-Credito ..> EstadoCredito : estado()
+' Servicios: unen usuarios con el dominio (verifican el permiso antes de anular)
+CreditoServiceImpl "1" ..> "0..*" IUsuario : verifica el permiso de >
+CreditoServiceImpl "1" ..> "0..*" Cliente : busca >
+CreditoServiceImpl "1" ..> "0..*" Cartera : consulta la mora en >
+CreditoServiceImpl "1" ..> "0..*" CondicionesDeCredito : pacta >
+CreditoServiceImpl "1" ..> "0..*" Credito : otorga y anula >
+CobranzaServiceImpl "1" ..> "0..*" IUsuario : verifica el permiso de >
+CobranzaServiceImpl "1" ..> "0..*" Cuota : cobra >
+CobranzaServiceImpl "1" ..> "0..*" Cobranza : anula >
 
-' Zona calculo de cuota (Strategy + Decorator)
-Credito "1" *-right- "1" CondicionesDeCredito : condiciones
-CondicionesDeCredito --> "1" TipoPlan : tipoPlan
-CondicionesDeCredito --> "0..*" TipoCargo : cargos
-CondicionesDeCredito .up.> CalculoDeCuota : calculo()
-TipoPlan -up-> "1" CalculoDeCuota : calculo
-TipoCargo .right.> CargoSobreCuota : crea
-CalculoDeCuota <|.. InteresSimple
-CalculoDeCuota <|.. SistemaFrances
-CalculoDeCuota <|.. CargoSobreCuota
-CalculoDeCuota "1" <--o CargoSobreCuota : envuelto
-CalculoDeCuota ..> Renglon : desglose
-CargoSobreCuota <|-- SeguroDeVida
-CargoSobreCuota <|-- GastoDeAdministracion
+' Dependencias entre interfaces (tipos de sus firmas; sin multiplicidad)
+ICredito ..> ICliente : se otorga a >
+ICredito ..> ICondicionesDeCredito : se pacta con >
+ICredito ..> ICuota : se divide en >
+ICredito ..> EstadoCredito : informa >
+ICuota ..> ICredito : pertenece a >
+ICuota ..> ICobranza : registra >
+ICobranza ..> ICuota : paga >
+ICondicionesDeCredito ..> TipoPlan : calcula la cuota según >
+ICondicionesDeCredito ..> TipoCargo : incluye >
+ICondicionesDeCredito "1" ..> "1..*" Renglon : desglosa en >
+IUsuario ..> Rol : tiene asignado >
+IUsuario ..> IPermisos : expone >
+CalculoDeCuota ..> Renglon : desglosa en >
 
-' Zona usuarios
-Usuario --> "1" Rol : rol
-Usuario *-- "1" Permisos : permisos
-
-note bottom of SeguroDeVida
-  Strategy: CondicionesDeCredito delega importeCuota
-  en tipoPlan.calculo(). Decorator: calculo() lo
-  envuelve con cada cargo (TipoCargo.aplicarSobre);
-  cada capa delega en la envuelta y suma su cargo.
-  JPA guarda el plan por nombre (tipo_plan); TipoPlan
-  es el selector persistible y el Contexto
-  (CondicionesDeCredito) obtiene la estrategia en
-  calculo(); mismo criterio que TipoCargo.
-end note
-note bottom of Cobranza
-  Composite: Cartera contiene créditos, que contienen
-  cuotas. DashboardServiceImpl, CreditoServiceImpl y
-  ClienteServiceImpl tipan Deuda. Credito solo admite
-  Cuota como hijo (JPA): la profundidad es fija.
-end note
-note as NConv
-  Cada entidad implementa su interfaz I* de su paquete
-  (convención de cátedra); se omiten las flechas, salvo
-  ICredito e ICuota: extienden Deuda (parte del Composite).
-end note
 @enduml
 
 @startuml clases-v4-paquetes
 title Dashboard de préstamos V4 — dependencias entre paquetes del Modelo
+skinparam linetype ortho
 skinparam packageStyle rectangle
 skinparam shadowing false
 set separator none
