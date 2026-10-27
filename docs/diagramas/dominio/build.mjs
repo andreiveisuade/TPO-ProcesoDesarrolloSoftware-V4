@@ -42,6 +42,24 @@ const PATRONES = {
     problema: "Los cargos opcionales se apilan sobre el cálculo base: cada capa delega en la envuelta y suma su cargo, sin una subclase por combinación.",
   },
 };
+// GRASP: se marca a nivel metodo (no es una estructura de clases sino un criterio de asignacion)
+const GRASP = {
+  Expert: {
+    color: "#0369a1", relaciones: false,
+    metodos: { Credito: ["totalADevolver", "estado", "saldo", "montoVencido", "puedeAnularse"], Cuota: ["estaPagada"], Cobranza: ["anular"] },
+    problema: "La responsabilidad va a la clase que tiene la información para cumplirla: el crédito calcula su total, su estado y su saldo con sus cuotas; la cuota sabe si está pagada; la cobranza decide si todavía se puede anular.",
+  },
+  Creator: {
+    color: "#be185d", relaciones: true,
+    metodos: { Credito: ["generarPlanDeCuotas"], Cuota: ["registrarCobranza"], Cobranza: ["registrar"] },
+    problema: "Crea quien contiene al objeto creado y tiene los datos para inicializarlo: el crédito arma su plan de cuotas y la cuota registra su cobranza.",
+  },
+  Polymorphism: {
+    color: "#4d7c0f", relaciones: true,
+    metodos: { TipoCargo: ["aplicarSobre"], TipoPlan: ["calculo"], SeguroDeVida: [], GastoDeAdministracion: [], InteresSimple: [], SistemaFrances: [] },
+    problema: "Cada constante del enum resuelve su caso con su propio método, sin un switch sobre el tipo: TipoCargo elige con qué decorador envolver y TipoPlan qué estrategia usar.",
+  },
+};
 const rolesDe = (id) => Object.entries(PATRONES).filter(([, p]) => p.roles[id]).map(([n, p]) => ({ texto: `${n.toUpperCase()} · ${p.roles[id]}`, color: p.color }));
 const anchoPastilla = (t) => Math.ceil(t.length * 5.4) + 12;
 const ROLES_GOF = new Set(["Component", "Composite", "Leaf", "Strategy", "ConcreteStrategy", "ConcreteComponent", "Decorator", "ConcreteDecorator", "Context"]);
@@ -214,7 +232,10 @@ function caja(c, m, x, y) {
       const deco = [];
       if (l.includes("{static}")) deco.push(`text-decoration="underline"`);
       if (l.includes("{abstract}")) deco.push(`font-style="italic"`);
-      s.push(`<text x="${x + PAD}" y="${cy - 3.5}" font-family="${MONO}" font-size="${MIEMBRO.size}" fill="${C.ink}" ${deco.join(" ")}>${esc(limpiar(l))}</text>`);
+      const nombre = (l.match(/(\w+)\(/) || [])[1];
+      const dm = nombre ? ` data-m="${nombre}"` : "";
+      if (nombre) s.push(`<rect class="resalte"${dm} x="${x + 2}" y="${cy - MIEMBRO.alto + 1}" width="${m.ancho - 4}" height="${MIEMBRO.alto - 1}" rx="2" style="fill:var(--patron)" opacity="0"/>`);
+      s.push(`<text class="miembro"${dm} x="${x + PAD}" y="${cy - 3.5}" font-family="${MONO}" font-size="${MIEMBRO.size}" fill="${C.ink}" ${deco.join(" ")}>${esc(limpiar(l))}</text>`);
     }
     cy += PAD / 2;
   }
@@ -265,7 +286,7 @@ function dibujar(modelo, medidas, g) {
   };
   recorrer(g, 0, 0);
 
-  const MARGEN = 32, TITULO = 100;
+  const MARGEN = 32, TITULO = 144;
   const W = Math.ceil(g.width) + MARGEN * 2, H = Math.ceil(g.height) + MARGEN * 2 + TITULO;
   const out = [];
   out.push(`<svg xmlns="http://www.w3.org/2000/svg" data-dominio="" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" font-family="${SANS}">`);
@@ -279,20 +300,32 @@ function dibujar(modelo, medidas, g) {
     out.push(`<text x="${lx + 36}" y="${MARGEN + 22}" font-family="${MONO}" font-size="11" fill="${C.ink}">${esc(f.nombre)}</text>`);
     lx += 64 + f.nombre.length * 6.6;
   }
-  let bx = MARGEN;
-  out.push(`<text x="${bx}" y="${MARGEN + 77}" font-family="${MONO}" font-size="12" fill="${C.soft}" letter-spacing="1">VER PATRÓN</text>`);
-  bx += 104;
-  for (const [nombre, p] of Object.entries(PATRONES)) {
+  const boton = (bx, by, nombre, color, attrs, ficha) => {
     const w = nombre.length * 11 + 40;
+    out.push(`<g class="btn-patron" data-patron="${nombre}" data-color="${color}" ${attrs} data-ficha="${esc(ficha).replace(/"/g, "&quot;")}">` +
+      `<rect x="${bx}" y="${by}" width="${w}" height="32" rx="16" fill="${color}"/>` +
+      `<text x="${bx + w / 2}" y="${by + 21.5}" text-anchor="middle" font-family="${SANS}" font-size="16" font-weight="600" fill="#ffffff">${nombre}</text></g>`);
+    return w + 12;
+  };
+  const titulo = (nombre, color, problema) =>
+    `<div style='font:600 14px Geist,sans-serif;color:${color}'>${nombre}</div><div style='margin:4px 0 6px'>${problema}</div>`;
+  let bx = MARGEN + 120;
+  out.push(`<text x="${MARGEN}" y="${MARGEN + 77}" font-family="${MONO}" font-size="12" fill="${C.soft}" letter-spacing="1">PATRONES GOF</text>`);
+  for (const [nombre, p] of Object.entries(PATRONES)) {
     const roles = {};
     for (const [clase, rol] of Object.entries(p.roles)) (roles[rol] = roles[rol] || []).push(clase);
-    const ficha = `<div style='font:600 14px Geist,sans-serif;color:${p.color}'>${nombre}</div>` +
-      `<div style='margin:4px 0 6px'>${p.problema}</div>` +
+    const ficha = titulo(nombre, p.color, p.problema) +
       Object.entries(roles).map(([rol, cs]) => `<div><b>${rol}</b>: ${cs.join(", ")}</div>`).join("");
-    out.push(`<g class="btn-patron" data-patron="${nombre}" data-color="${p.color}" data-clases="${Object.keys(p.roles).join(",")}" data-ficha="${esc(ficha).replace(/"/g, "&quot;")}">` +
-      `<rect x="${bx}" y="${MARGEN + 56}" width="${w}" height="32" rx="16" fill="${p.color}"/>` +
-      `<text x="${bx + w / 2}" y="${MARGEN + 77.5}" text-anchor="middle" font-family="${SANS}" font-size="16" font-weight="600" fill="#ffffff">${nombre}</text></g>`);
-    bx += w + 12;
+    bx += boton(bx, MARGEN + 56, nombre, p.color, `data-clases="${Object.keys(p.roles).join(",")}" data-rel="1"`, ficha);
+  }
+  bx = MARGEN + 120;
+  out.push(`<text x="${MARGEN}" y="${MARGEN + 119}" font-family="${MONO}" font-size="12" fill="${C.soft}" letter-spacing="1">GRASP</text>`);
+  for (const [nombre, p] of Object.entries(GRASP)) {
+    const metodos = Object.entries(p.metodos).flatMap(([c, ms]) => ms.map((m) => `${c}.${m}`));
+    const ficha = titulo(nombre, p.color, p.problema) +
+      Object.entries(p.metodos).filter(([, ms]) => ms.length).map(([c, ms]) => `<div><b>${c}</b>: ${ms.map((m) => m + "()").join(", ")}</div>`).join("");
+    bx += boton(bx, MARGEN + 98, nombre, p.color,
+      `data-clases="${Object.keys(p.metodos).join(",")}" data-metodos="${metodos.join(",")}" data-rel="${p.relaciones ? 1 : 0}"`, ficha);
   }
   out.push(`<g transform="translate(${MARGEN},${MARGEN + TITULO})">`);
 
@@ -359,6 +392,8 @@ svg[data-dominio] .btn-patron { cursor: pointer; }
 svg[data-dominio] .btn-patron.elegido rect { stroke: ${C.ink}; stroke-width: 2.5; }
 svg[data-dominio].patron .rel.activa path { stroke: var(--patron); stroke-width: 2.6; }
 svg[data-dominio].patron .clase.activa > rect:first-child { stroke: var(--patron); stroke-width: 2.4; }
+svg[data-dominio].patron .resalte.marcado { opacity: .2; }
+svg[data-dominio].patron text.miembro.marcado { fill: var(--patron); font-weight: 600; }
 `;
 
 // Hover: deja a la vista la clase, sus vecinas y sus relaciones. Clic fija, Esc o clic afuera limpia.
@@ -387,7 +422,7 @@ const INTERACCION = `
   function limpiar(svg) {
     svg.classList.remove("foco", "patron");
     svg.querySelectorAll(".btn-patron.elegido").forEach(function (b) { b.classList.remove("elegido"); });
-    svg.querySelectorAll(".activa, .elegida").forEach(function (e) { e.classList.remove("activa", "elegida"); });
+    svg.querySelectorAll(".activa, .elegida, .marcado").forEach(function (e) { e.classList.remove("activa", "elegida", "marcado"); });
     if (panel) panel.style.display = "none";
   }
   function enfocar(svg, id) {
@@ -424,7 +459,12 @@ const INTERACCION = `
     var en = {};
     btn.getAttribute("data-clases").split(",").forEach(function (id) { en[id] = true; });
     svg.querySelectorAll(".clase").forEach(function (c) { if (en[c.getAttribute("data-id")]) c.classList.add("activa"); });
-    svg.querySelectorAll(".rel").forEach(function (r) { if (en[r.getAttribute("data-a")] && en[r.getAttribute("data-b")]) r.classList.add("activa"); });
+    if (btn.getAttribute("data-rel") === "1")
+      svg.querySelectorAll(".rel").forEach(function (r) { if (en[r.getAttribute("data-a")] && en[r.getAttribute("data-b")]) r.classList.add("activa"); });
+    (btn.getAttribute("data-metodos") || "").split(",").filter(Boolean).forEach(function (cm) {
+      var p = cm.split(".");
+      svg.querySelectorAll(".clase[data-id='" + p[0] + "'] [data-m='" + p[1] + "']").forEach(function (e) { e.classList.add("marcado"); });
+    });
     if (!document.body) return;
     mostrarPanel("", []);
     panel.innerHTML = btn.getAttribute("data-ficha") + "<div style='margin-top:6px;color:#5a6580'>Esc o clic afuera para salir</div>";

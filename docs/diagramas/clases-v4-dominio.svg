@@ -1,6 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" data-dominio="" viewBox="0 0 4166 3522" width="4166" height="3522" font-family="'Geist', -apple-system, 'Helvetica Neue', sans-serif">
+<svg xmlns="http://www.w3.org/2000/svg" data-dominio="" viewBox="0 0 4166 3566" width="4166" height="3566" font-family="'Geist', -apple-system, 'Helvetica Neue', sans-serif">
 <style>@import url('https://fonts.googleapis.com/css2?family=Geist:wght@400;600&amp;family=Geist+Mono:wght@400&amp;family=Instrument+Serif:ital@0;1&amp;display=swap');</style>
-<rect width="4166" height="3522" fill="#f5f5f5"/>
+<rect width="4166" height="3566" fill="#f5f5f5"/>
 <text x="32" y="54" font-family="'Instrument Serif', Georgia, serif" font-size="30" fill="#2d3142">Diagrama de clases del dominio</text>
 <text x="32" y="74" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#5a6580" letter-spacing="1">DASHBOARD DE PRÉSTAMOS · V4 · CADA RELACIÓN SE LEE COMO ORACIÓN, DEL ORIGEN AL DESTINO</text>
 <line x1="3374" y1="50" x2="3402" y2="50" stroke="#2d3142" stroke-width="2"/>
@@ -9,11 +9,15 @@
 <text x="3612.6" y="54" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="11" fill="#2d3142">composición / agregación / asociación</text>
 <line x1="3884.7999999999997" y1="50" x2="3912.7999999999997" y2="50" stroke="#8b93a7" stroke-width="2" stroke-dasharray="4,3"/>
 <text x="3920.7999999999997" y="54" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="11" fill="#2d3142">dependencia</text>
-<text x="32" y="109" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="12" fill="#5a6580" letter-spacing="1">VER PATRÓN</text>
-<g class="btn-patron" data-patron="Composite" data-color="#c2410c" data-clases="Deuda,ICredito,ICuota,Credito,Cartera,Cuota,CreditoServiceImpl" data-ficha="&lt;div style='font:600 14px Geist,sans-serif;color:#c2410c'&gt;Composite&lt;/div&gt;&lt;div style='margin:4px 0 6px'&gt;Saldo y mora se consultan igual en una cuota, un crédito o una cartera: la hoja responde y el compuesto suma a sus hijos.&lt;/div&gt;&lt;div&gt;&lt;b&gt;Component&lt;/b&gt;: Deuda, ICredito, ICuota&lt;/div&gt;&lt;div&gt;&lt;b&gt;Composite&lt;/b&gt;: Credito, Cartera&lt;/div&gt;&lt;div&gt;&lt;b&gt;Leaf&lt;/b&gt;: Cuota&lt;/div&gt;&lt;div&gt;&lt;b&gt;Client&lt;/b&gt;: CreditoServiceImpl&lt;/div&gt;"><rect x="136" y="88" width="139" height="32" rx="16" fill="#c2410c"/><text x="205.5" y="109.5" text-anchor="middle" font-family="'Geist', -apple-system, 'Helvetica Neue', sans-serif" font-size="16" font-weight="600" fill="#ffffff">Composite</text></g>
-<g class="btn-patron" data-patron="Strategy" data-color="#0f766e" data-clases="CondicionesDeCredito,CalculoDeCuota,InteresSimple,SistemaFrances,TipoPlan" data-ficha="&lt;div style='font:600 14px Geist,sans-serif;color:#0f766e'&gt;Strategy&lt;/div&gt;&lt;div style='margin:4px 0 6px'&gt;El sistema de amortización se elige al otorgar el crédito y se intercambia sin tocar a quien calcula la cuota.&lt;/div&gt;&lt;div&gt;&lt;b&gt;Context&lt;/b&gt;: CondicionesDeCredito&lt;/div&gt;&lt;div&gt;&lt;b&gt;Strategy&lt;/b&gt;: CalculoDeCuota&lt;/div&gt;&lt;div&gt;&lt;b&gt;ConcreteStrategy&lt;/b&gt;: InteresSimple, SistemaFrances&lt;/div&gt;&lt;div&gt;&lt;b&gt;Selector&lt;/b&gt;: TipoPlan&lt;/div&gt;"><rect x="287" y="88" width="128" height="32" rx="16" fill="#0f766e"/><text x="351" y="109.5" text-anchor="middle" font-family="'Geist', -apple-system, 'Helvetica Neue', sans-serif" font-size="16" font-weight="600" fill="#ffffff">Strategy</text></g>
-<g class="btn-patron" data-patron="Decorator" data-color="#7c3aed" data-clases="CalculoDeCuota,InteresSimple,SistemaFrances,CargoSobreCuota,SeguroDeVida,GastoDeAdministracion,TipoCargo,CondicionesDeCredito" data-ficha="&lt;div style='font:600 14px Geist,sans-serif;color:#7c3aed'&gt;Decorator&lt;/div&gt;&lt;div style='margin:4px 0 6px'&gt;Los cargos opcionales se apilan sobre el cálculo base: cada capa delega en la envuelta y suma su cargo, sin una subclase por combinación.&lt;/div&gt;&lt;div&gt;&lt;b&gt;Component&lt;/b&gt;: CalculoDeCuota&lt;/div&gt;&lt;div&gt;&lt;b&gt;ConcreteComponent&lt;/b&gt;: InteresSimple, SistemaFrances&lt;/div&gt;&lt;div&gt;&lt;b&gt;Decorator&lt;/b&gt;: CargoSobreCuota&lt;/div&gt;&lt;div&gt;&lt;b&gt;ConcreteDecorator&lt;/b&gt;: SeguroDeVida, GastoDeAdministracion&lt;/div&gt;&lt;div&gt;&lt;b&gt;Ensambla&lt;/b&gt;: TipoCargo&lt;/div&gt;&lt;div&gt;&lt;b&gt;Client&lt;/b&gt;: CondicionesDeCredito&lt;/div&gt;"><rect x="427" y="88" width="139" height="32" rx="16" fill="#7c3aed"/><text x="496.5" y="109.5" text-anchor="middle" font-family="'Geist', -apple-system, 'Helvetica Neue', sans-serif" font-size="16" font-weight="600" fill="#ffffff">Decorator</text></g>
-<g transform="translate(32,132)">
+<text x="32" y="109" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="12" fill="#5a6580" letter-spacing="1">PATRONES GOF</text>
+<g class="btn-patron" data-patron="Composite" data-color="#c2410c" data-clases="Deuda,ICredito,ICuota,Credito,Cartera,Cuota,CreditoServiceImpl" data-rel="1" data-ficha="&lt;div style='font:600 14px Geist,sans-serif;color:#c2410c'&gt;Composite&lt;/div&gt;&lt;div style='margin:4px 0 6px'&gt;Saldo y mora se consultan igual en una cuota, un crédito o una cartera: la hoja responde y el compuesto suma a sus hijos.&lt;/div&gt;&lt;div&gt;&lt;b&gt;Component&lt;/b&gt;: Deuda, ICredito, ICuota&lt;/div&gt;&lt;div&gt;&lt;b&gt;Composite&lt;/b&gt;: Credito, Cartera&lt;/div&gt;&lt;div&gt;&lt;b&gt;Leaf&lt;/b&gt;: Cuota&lt;/div&gt;&lt;div&gt;&lt;b&gt;Client&lt;/b&gt;: CreditoServiceImpl&lt;/div&gt;"><rect x="152" y="88" width="139" height="32" rx="16" fill="#c2410c"/><text x="221.5" y="109.5" text-anchor="middle" font-family="'Geist', -apple-system, 'Helvetica Neue', sans-serif" font-size="16" font-weight="600" fill="#ffffff">Composite</text></g>
+<g class="btn-patron" data-patron="Strategy" data-color="#0f766e" data-clases="CondicionesDeCredito,CalculoDeCuota,InteresSimple,SistemaFrances,TipoPlan" data-rel="1" data-ficha="&lt;div style='font:600 14px Geist,sans-serif;color:#0f766e'&gt;Strategy&lt;/div&gt;&lt;div style='margin:4px 0 6px'&gt;El sistema de amortización se elige al otorgar el crédito y se intercambia sin tocar a quien calcula la cuota.&lt;/div&gt;&lt;div&gt;&lt;b&gt;Context&lt;/b&gt;: CondicionesDeCredito&lt;/div&gt;&lt;div&gt;&lt;b&gt;Strategy&lt;/b&gt;: CalculoDeCuota&lt;/div&gt;&lt;div&gt;&lt;b&gt;ConcreteStrategy&lt;/b&gt;: InteresSimple, SistemaFrances&lt;/div&gt;&lt;div&gt;&lt;b&gt;Selector&lt;/b&gt;: TipoPlan&lt;/div&gt;"><rect x="303" y="88" width="128" height="32" rx="16" fill="#0f766e"/><text x="367" y="109.5" text-anchor="middle" font-family="'Geist', -apple-system, 'Helvetica Neue', sans-serif" font-size="16" font-weight="600" fill="#ffffff">Strategy</text></g>
+<g class="btn-patron" data-patron="Decorator" data-color="#7c3aed" data-clases="CalculoDeCuota,InteresSimple,SistemaFrances,CargoSobreCuota,SeguroDeVida,GastoDeAdministracion,TipoCargo,CondicionesDeCredito" data-rel="1" data-ficha="&lt;div style='font:600 14px Geist,sans-serif;color:#7c3aed'&gt;Decorator&lt;/div&gt;&lt;div style='margin:4px 0 6px'&gt;Los cargos opcionales se apilan sobre el cálculo base: cada capa delega en la envuelta y suma su cargo, sin una subclase por combinación.&lt;/div&gt;&lt;div&gt;&lt;b&gt;Component&lt;/b&gt;: CalculoDeCuota&lt;/div&gt;&lt;div&gt;&lt;b&gt;ConcreteComponent&lt;/b&gt;: InteresSimple, SistemaFrances&lt;/div&gt;&lt;div&gt;&lt;b&gt;Decorator&lt;/b&gt;: CargoSobreCuota&lt;/div&gt;&lt;div&gt;&lt;b&gt;ConcreteDecorator&lt;/b&gt;: SeguroDeVida, GastoDeAdministracion&lt;/div&gt;&lt;div&gt;&lt;b&gt;Ensambla&lt;/b&gt;: TipoCargo&lt;/div&gt;&lt;div&gt;&lt;b&gt;Client&lt;/b&gt;: CondicionesDeCredito&lt;/div&gt;"><rect x="443" y="88" width="139" height="32" rx="16" fill="#7c3aed"/><text x="512.5" y="109.5" text-anchor="middle" font-family="'Geist', -apple-system, 'Helvetica Neue', sans-serif" font-size="16" font-weight="600" fill="#ffffff">Decorator</text></g>
+<text x="32" y="151" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="12" fill="#5a6580" letter-spacing="1">GRASP</text>
+<g class="btn-patron" data-patron="Expert" data-color="#0369a1" data-clases="Credito,Cuota,Cobranza" data-metodos="Credito.totalADevolver,Credito.estado,Credito.saldo,Credito.montoVencido,Credito.puedeAnularse,Cuota.estaPagada,Cobranza.anular" data-rel="0" data-ficha="&lt;div style='font:600 14px Geist,sans-serif;color:#0369a1'&gt;Expert&lt;/div&gt;&lt;div style='margin:4px 0 6px'&gt;La responsabilidad va a la clase que tiene la información para cumplirla: el crédito calcula su total, su estado y su saldo con sus cuotas; la cuota sabe si está pagada; la cobranza decide si todavía se puede anular.&lt;/div&gt;&lt;div&gt;&lt;b&gt;Credito&lt;/b&gt;: totalADevolver(), estado(), saldo(), montoVencido(), puedeAnularse()&lt;/div&gt;&lt;div&gt;&lt;b&gt;Cuota&lt;/b&gt;: estaPagada()&lt;/div&gt;&lt;div&gt;&lt;b&gt;Cobranza&lt;/b&gt;: anular()&lt;/div&gt;"><rect x="152" y="130" width="106" height="32" rx="16" fill="#0369a1"/><text x="205" y="151.5" text-anchor="middle" font-family="'Geist', -apple-system, 'Helvetica Neue', sans-serif" font-size="16" font-weight="600" fill="#ffffff">Expert</text></g>
+<g class="btn-patron" data-patron="Creator" data-color="#be185d" data-clases="Credito,Cuota,Cobranza" data-metodos="Credito.generarPlanDeCuotas,Cuota.registrarCobranza,Cobranza.registrar" data-rel="1" data-ficha="&lt;div style='font:600 14px Geist,sans-serif;color:#be185d'&gt;Creator&lt;/div&gt;&lt;div style='margin:4px 0 6px'&gt;Crea quien contiene al objeto creado y tiene los datos para inicializarlo: el crédito arma su plan de cuotas y la cuota registra su cobranza.&lt;/div&gt;&lt;div&gt;&lt;b&gt;Credito&lt;/b&gt;: generarPlanDeCuotas()&lt;/div&gt;&lt;div&gt;&lt;b&gt;Cuota&lt;/b&gt;: registrarCobranza()&lt;/div&gt;&lt;div&gt;&lt;b&gt;Cobranza&lt;/b&gt;: registrar()&lt;/div&gt;"><rect x="270" y="130" width="117" height="32" rx="16" fill="#be185d"/><text x="328.5" y="151.5" text-anchor="middle" font-family="'Geist', -apple-system, 'Helvetica Neue', sans-serif" font-size="16" font-weight="600" fill="#ffffff">Creator</text></g>
+<g class="btn-patron" data-patron="Polymorphism" data-color="#4d7c0f" data-clases="TipoCargo,TipoPlan,SeguroDeVida,GastoDeAdministracion,InteresSimple,SistemaFrances" data-metodos="TipoCargo.aplicarSobre,TipoPlan.calculo" data-rel="1" data-ficha="&lt;div style='font:600 14px Geist,sans-serif;color:#4d7c0f'&gt;Polymorphism&lt;/div&gt;&lt;div style='margin:4px 0 6px'&gt;Cada constante del enum resuelve su caso con su propio método, sin un switch sobre el tipo: TipoCargo elige con qué decorador envolver y TipoPlan qué estrategia usar.&lt;/div&gt;&lt;div&gt;&lt;b&gt;TipoCargo&lt;/b&gt;: aplicarSobre()&lt;/div&gt;&lt;div&gt;&lt;b&gt;TipoPlan&lt;/b&gt;: calculo()&lt;/div&gt;"><rect x="399" y="130" width="172" height="32" rx="16" fill="#4d7c0f"/><text x="485" y="151.5" text-anchor="middle" font-family="'Geist', -apple-system, 'Helvetica Neue', sans-serif" font-size="16" font-weight="600" fill="#ffffff">Polymorphism</text></g>
+<g transform="translate(32,176)">
 <rect x="1352" y="2651" width="357" height="354" rx="8" fill="#b8915a" fill-opacity="0.11" stroke="#b8915a" stroke-opacity="0.55" stroke-width="1.2"/>
 <text x="1368" y="2675" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="11" font-weight="600" fill="#b8915a" letter-spacing="1.2">MODEL.CLIENTE</text>
 <rect x="1226" y="467" width="2448.8" height="2025" rx="8" fill="#5e7a9b" fill-opacity="0.11" stroke="#5e7a9b" stroke-opacity="0.55" stroke-width="1.2"/>
@@ -87,8 +91,10 @@
 <text x="1530.5" y="2708" text-anchor="middle" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="8.5" fill="#5a6580" letter-spacing="0.4">«interface»</text>
 <text x="1530.5" y="2724" text-anchor="middle" font-family="'Geist', -apple-system, 'Helvetica Neue', sans-serif" font-size="12.5" font-weight="600" fill="#2d3142" font-style="italic">ICliente</text>
 <line x1="1455" y1="2734" x2="1606" y2="2734" stroke="#2d3142" stroke-width="0.6" stroke-opacity="0.45"/>
-<text x="1463" y="2748.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ getDni() : String</text>
-<text x="1463" y="2762.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ getNombre() : String</text>
+<rect class="resalte" data-m="getDni" x="1457" y="2739" width="147" height="13" rx="2" style="fill:var(--patron)" opacity="0"/>
+<text class="miembro" data-m="getDni" x="1463" y="2748.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ getDni() : String</text>
+<rect class="resalte" data-m="getNombre" x="1457" y="2753" width="147" height="13" rx="2" style="fill:var(--patron)" opacity="0"/>
+<text class="miembro" data-m="getNombre" x="1463" y="2762.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ getNombre() : String</text>
 </g>
 <g class="clase" data-id="Cliente">
 <rect x="1376" y="2838" width="309" height="143" rx="6" fill="#ffffff" stroke="#b8915a" stroke-width="1.2"/>
@@ -96,13 +102,17 @@
 <text x="1530.5" y="2855" text-anchor="middle" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="8.5" fill="#5a6580" letter-spacing="0.4">«Entity»</text>
 <text x="1530.5" y="2871" text-anchor="middle" font-family="'Geist', -apple-system, 'Helvetica Neue', sans-serif" font-size="12.5" font-weight="600" fill="#2d3142">Cliente</text>
 <line x1="1376" y1="2881" x2="1685" y2="2881" stroke="#2d3142" stroke-width="0.6" stroke-opacity="0.45"/>
-<text x="1384" y="2895.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >- dni : String</text>
-<text x="1384" y="2909.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >- nombre : String</text>
+<text class="miembro" x="1384" y="2895.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >- dni : String</text>
+<text class="miembro" x="1384" y="2909.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >- nombre : String</text>
 <line x1="1376" y1="2917" x2="1685" y2="2917" stroke="#2d3142" stroke-width="0.6" stroke-opacity="0.45"/>
-<text x="1384" y="2931.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >- Cliente(dni : String, nombre : String)</text>
-<text x="1384" y="2945.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" text-decoration="underline">+ nuevo(dni : String, nombre : String) : Cliente</text>
-<text x="1384" y="2959.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ getDni() : String</text>
-<text x="1384" y="2973.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ getNombre() : String</text>
+<rect class="resalte" data-m="Cliente" x="1378" y="2922" width="305" height="13" rx="2" style="fill:var(--patron)" opacity="0"/>
+<text class="miembro" data-m="Cliente" x="1384" y="2931.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >- Cliente(dni : String, nombre : String)</text>
+<rect class="resalte" data-m="nuevo" x="1378" y="2936" width="305" height="13" rx="2" style="fill:var(--patron)" opacity="0"/>
+<text class="miembro" data-m="nuevo" x="1384" y="2945.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" text-decoration="underline">+ nuevo(dni : String, nombre : String) : Cliente</text>
+<rect class="resalte" data-m="getDni" x="1378" y="2950" width="305" height="13" rx="2" style="fill:var(--patron)" opacity="0"/>
+<text class="miembro" data-m="getDni" x="1384" y="2959.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ getDni() : String</text>
+<rect class="resalte" data-m="getNombre" x="1378" y="2964" width="305" height="13" rx="2" style="fill:var(--patron)" opacity="0"/>
+<text class="miembro" data-m="getNombre" x="1384" y="2973.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ getNombre() : String</text>
 </g>
 <g class="clase" data-id="Deuda">
 <rect x="3435.8" y="507" width="193" height="111" rx="6" fill="#ffffff" stroke="#5e7a9b" stroke-width="1.2"/>
@@ -112,9 +122,12 @@
 <text x="3532.3" y="542" text-anchor="middle" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="8.5" fill="#5a6580" letter-spacing="0.4">«interface»</text>
 <text x="3532.3" y="558" text-anchor="middle" font-family="'Geist', -apple-system, 'Helvetica Neue', sans-serif" font-size="12.5" font-weight="600" fill="#2d3142" font-style="italic">Deuda</text>
 <line x1="3435.8" y1="568" x2="3628.8" y2="568" stroke="#2d3142" stroke-width="0.6" stroke-opacity="0.45"/>
-<text x="3443.8" y="582.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ saldo() : BigDecimal</text>
-<text x="3443.8" y="596.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ montoVencido() : BigDecimal</text>
-<text x="3443.8" y="610.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ tieneMora() : boolean</text>
+<rect class="resalte" data-m="saldo" x="3437.8" y="573" width="189" height="13" rx="2" style="fill:var(--patron)" opacity="0"/>
+<text class="miembro" data-m="saldo" x="3443.8" y="582.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ saldo() : BigDecimal</text>
+<rect class="resalte" data-m="montoVencido" x="3437.8" y="587" width="189" height="13" rx="2" style="fill:var(--patron)" opacity="0"/>
+<text class="miembro" data-m="montoVencido" x="3443.8" y="596.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ montoVencido() : BigDecimal</text>
+<rect class="resalte" data-m="tieneMora" x="3437.8" y="601" width="189" height="13" rx="2" style="fill:var(--patron)" opacity="0"/>
+<text class="miembro" data-m="tieneMora" x="3443.8" y="610.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ tieneMora() : boolean</text>
 </g>
 <g class="clase" data-id="ICredito">
 <rect x="3312.4" y="960" width="273" height="223" rx="6" fill="#ffffff" stroke="#5e7a9b" stroke-width="1.2"/>
@@ -124,17 +137,28 @@
 <text x="3448.9" y="995" text-anchor="middle" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="8.5" fill="#5a6580" letter-spacing="0.4">«interface»</text>
 <text x="3448.9" y="1011" text-anchor="middle" font-family="'Geist', -apple-system, 'Helvetica Neue', sans-serif" font-size="12.5" font-weight="600" fill="#2d3142" font-style="italic">ICredito</text>
 <line x1="3312.4" y1="1021" x2="3585.4" y2="1021" stroke="#2d3142" stroke-width="0.6" stroke-opacity="0.45"/>
-<text x="3320.4" y="1035.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ getId() : Long</text>
-<text x="3320.4" y="1049.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ getCliente() : ICliente</text>
-<text x="3320.4" y="1063.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ getFecha() : LocalDate</text>
-<text x="3320.4" y="1077.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ getCondiciones() : ICondicionesDeCredito</text>
-<text x="3320.4" y="1091.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ importeCuota() : BigDecimal</text>
-<text x="3320.4" y="1105.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ isAnulado() : boolean</text>
-<text x="3320.4" y="1119.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ totalADevolver() : BigDecimal</text>
-<text x="3320.4" y="1133.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ getCuotas() : List&lt;? extends ICuota&gt;</text>
-<text x="3320.4" y="1147.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ estado() : EstadoCredito</text>
-<text x="3320.4" y="1161.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ puedeAnularse() : boolean</text>
-<text x="3320.4" y="1175.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ anular() : void</text>
+<rect class="resalte" data-m="getId" x="3314.4" y="1026" width="269" height="13" rx="2" style="fill:var(--patron)" opacity="0"/>
+<text class="miembro" data-m="getId" x="3320.4" y="1035.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ getId() : Long</text>
+<rect class="resalte" data-m="getCliente" x="3314.4" y="1040" width="269" height="13" rx="2" style="fill:var(--patron)" opacity="0"/>
+<text class="miembro" data-m="getCliente" x="3320.4" y="1049.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ getCliente() : ICliente</text>
+<rect class="resalte" data-m="getFecha" x="3314.4" y="1054" width="269" height="13" rx="2" style="fill:var(--patron)" opacity="0"/>
+<text class="miembro" data-m="getFecha" x="3320.4" y="1063.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ getFecha() : LocalDate</text>
+<rect class="resalte" data-m="getCondiciones" x="3314.4" y="1068" width="269" height="13" rx="2" style="fill:var(--patron)" opacity="0"/>
+<text class="miembro" data-m="getCondiciones" x="3320.4" y="1077.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ getCondiciones() : ICondicionesDeCredito</text>
+<rect class="resalte" data-m="importeCuota" x="3314.4" y="1082" width="269" height="13" rx="2" style="fill:var(--patron)" opacity="0"/>
+<text class="miembro" data-m="importeCuota" x="3320.4" y="1091.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ importeCuota() : BigDecimal</text>
+<rect class="resalte" data-m="isAnulado" x="3314.4" y="1096" width="269" height="13" rx="2" style="fill:var(--patron)" opacity="0"/>
+<text class="miembro" data-m="isAnulado" x="3320.4" y="1105.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ isAnulado() : boolean</text>
+<rect class="resalte" data-m="totalADevolver" x="3314.4" y="1110" width="269" height="13" rx="2" style="fill:var(--patron)" opacity="0"/>
+<text class="miembro" data-m="totalADevolver" x="3320.4" y="1119.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ totalADevolver() : BigDecimal</text>
+<rect class="resalte" data-m="getCuotas" x="3314.4" y="1124" width="269" height="13" rx="2" style="fill:var(--patron)" opacity="0"/>
+<text class="miembro" data-m="getCuotas" x="3320.4" y="1133.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ getCuotas() : List&lt;? extends ICuota&gt;</text>
+<rect class="resalte" data-m="estado" x="3314.4" y="1138" width="269" height="13" rx="2" style="fill:var(--patron)" opacity="0"/>
+<text class="miembro" data-m="estado" x="3320.4" y="1147.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ estado() : EstadoCredito</text>
+<rect class="resalte" data-m="puedeAnularse" x="3314.4" y="1152" width="269" height="13" rx="2" style="fill:var(--patron)" opacity="0"/>
+<text class="miembro" data-m="puedeAnularse" x="3320.4" y="1161.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ puedeAnularse() : boolean</text>
+<rect class="resalte" data-m="anular" x="3314.4" y="1166" width="269" height="13" rx="2" style="fill:var(--patron)" opacity="0"/>
+<text class="miembro" data-m="anular" x="3320.4" y="1175.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ anular() : void</text>
 </g>
 <g class="clase" data-id="ICuota">
 <rect x="3165.5666666666666" y="706" width="340" height="181" rx="6" fill="#ffffff" stroke="#5e7a9b" stroke-width="1.2"/>
@@ -144,14 +168,22 @@
 <text x="3335.5666666666666" y="741" text-anchor="middle" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="8.5" fill="#5a6580" letter-spacing="0.4">«interface»</text>
 <text x="3335.5666666666666" y="757" text-anchor="middle" font-family="'Geist', -apple-system, 'Helvetica Neue', sans-serif" font-size="12.5" font-weight="600" fill="#2d3142" font-style="italic">ICuota</text>
 <line x1="3165.5666666666666" y1="767" x2="3505.5666666666666" y2="767" stroke="#2d3142" stroke-width="0.6" stroke-opacity="0.45"/>
-<text x="3173.5666666666666" y="781.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ getId() : Long</text>
-<text x="3173.5666666666666" y="795.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ getCredito() : ICredito</text>
-<text x="3173.5666666666666" y="809.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ getNumero() : Integer</text>
-<text x="3173.5666666666666" y="823.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ getImporte() : BigDecimal</text>
-<text x="3173.5666666666666" y="837.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ getFechaVencimiento() : LocalDate</text>
-<text x="3173.5666666666666" y="851.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ estaPagada() : boolean</text>
-<text x="3173.5666666666666" y="865.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ estaVencida() : boolean</text>
-<text x="3173.5666666666666" y="879.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ registrarCobranza(importe : BigDecimal) : ICobranza</text>
+<rect class="resalte" data-m="getId" x="3167.5666666666666" y="772" width="336" height="13" rx="2" style="fill:var(--patron)" opacity="0"/>
+<text class="miembro" data-m="getId" x="3173.5666666666666" y="781.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ getId() : Long</text>
+<rect class="resalte" data-m="getCredito" x="3167.5666666666666" y="786" width="336" height="13" rx="2" style="fill:var(--patron)" opacity="0"/>
+<text class="miembro" data-m="getCredito" x="3173.5666666666666" y="795.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ getCredito() : ICredito</text>
+<rect class="resalte" data-m="getNumero" x="3167.5666666666666" y="800" width="336" height="13" rx="2" style="fill:var(--patron)" opacity="0"/>
+<text class="miembro" data-m="getNumero" x="3173.5666666666666" y="809.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ getNumero() : Integer</text>
+<rect class="resalte" data-m="getImporte" x="3167.5666666666666" y="814" width="336" height="13" rx="2" style="fill:var(--patron)" opacity="0"/>
+<text class="miembro" data-m="getImporte" x="3173.5666666666666" y="823.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ getImporte() : BigDecimal</text>
+<rect class="resalte" data-m="getFechaVencimiento" x="3167.5666666666666" y="828" width="336" height="13" rx="2" style="fill:var(--patron)" opacity="0"/>
+<text class="miembro" data-m="getFechaVencimiento" x="3173.5666666666666" y="837.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ getFechaVencimiento() : LocalDate</text>
+<rect class="resalte" data-m="estaPagada" x="3167.5666666666666" y="842" width="336" height="13" rx="2" style="fill:var(--patron)" opacity="0"/>
+<text class="miembro" data-m="estaPagada" x="3173.5666666666666" y="851.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ estaPagada() : boolean</text>
+<rect class="resalte" data-m="estaVencida" x="3167.5666666666666" y="856" width="336" height="13" rx="2" style="fill:var(--patron)" opacity="0"/>
+<text class="miembro" data-m="estaVencida" x="3173.5666666666666" y="865.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ estaVencida() : boolean</text>
+<rect class="resalte" data-m="registrarCobranza" x="3167.5666666666666" y="870" width="336" height="13" rx="2" style="fill:var(--patron)" opacity="0"/>
+<text class="miembro" data-m="registrarCobranza" x="3173.5666666666666" y="879.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ registrarCobranza(importe : BigDecimal) : ICobranza</text>
 </g>
 <g class="clase" data-id="ICobranza">
 <rect x="1332" y="989.3333333333333" width="212" height="135" rx="6" fill="#ffffff" stroke="#5e7a9b" stroke-width="1.2"/>
@@ -159,12 +191,18 @@
 <text x="1438" y="1006.3333333333333" text-anchor="middle" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="8.5" fill="#5a6580" letter-spacing="0.4">«interface»</text>
 <text x="1438" y="1022.3333333333333" text-anchor="middle" font-family="'Geist', -apple-system, 'Helvetica Neue', sans-serif" font-size="12.5" font-weight="600" fill="#2d3142" font-style="italic">ICobranza</text>
 <line x1="1332" y1="1032.3333333333333" x2="1544" y2="1032.3333333333333" stroke="#2d3142" stroke-width="0.6" stroke-opacity="0.45"/>
-<text x="1340" y="1046.8333333333333" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ getId() : Long</text>
-<text x="1340" y="1060.8333333333333" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ getCuota() : ICuota</text>
-<text x="1340" y="1074.8333333333333" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ getImporte() : BigDecimal</text>
-<text x="1340" y="1088.8333333333333" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ getFechaCobranza() : LocalDate</text>
-<text x="1340" y="1102.8333333333333" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ isAnulada() : boolean</text>
-<text x="1340" y="1116.8333333333333" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ anular() : void</text>
+<rect class="resalte" data-m="getId" x="1334" y="1037.3333333333333" width="208" height="13" rx="2" style="fill:var(--patron)" opacity="0"/>
+<text class="miembro" data-m="getId" x="1340" y="1046.8333333333333" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ getId() : Long</text>
+<rect class="resalte" data-m="getCuota" x="1334" y="1051.3333333333333" width="208" height="13" rx="2" style="fill:var(--patron)" opacity="0"/>
+<text class="miembro" data-m="getCuota" x="1340" y="1060.8333333333333" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ getCuota() : ICuota</text>
+<rect class="resalte" data-m="getImporte" x="1334" y="1065.3333333333333" width="208" height="13" rx="2" style="fill:var(--patron)" opacity="0"/>
+<text class="miembro" data-m="getImporte" x="1340" y="1074.8333333333333" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ getImporte() : BigDecimal</text>
+<rect class="resalte" data-m="getFechaCobranza" x="1334" y="1079.3333333333333" width="208" height="13" rx="2" style="fill:var(--patron)" opacity="0"/>
+<text class="miembro" data-m="getFechaCobranza" x="1340" y="1088.8333333333333" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ getFechaCobranza() : LocalDate</text>
+<rect class="resalte" data-m="isAnulada" x="1334" y="1093.3333333333333" width="208" height="13" rx="2" style="fill:var(--patron)" opacity="0"/>
+<text class="miembro" data-m="isAnulada" x="1340" y="1102.8333333333333" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ isAnulada() : boolean</text>
+<rect class="resalte" data-m="anular" x="1334" y="1107.3333333333333" width="208" height="13" rx="2" style="fill:var(--patron)" opacity="0"/>
+<text class="miembro" data-m="anular" x="1340" y="1116.8333333333333" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ anular() : void</text>
 </g>
 <g class="clase" data-id="ICondicionesDeCredito">
 <rect x="3421.8" y="1504.6" width="218" height="135" rx="6" fill="#ffffff" stroke="#5e7a9b" stroke-width="1.2"/>
@@ -172,12 +210,18 @@
 <text x="3530.8" y="1521.6" text-anchor="middle" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="8.5" fill="#5a6580" letter-spacing="0.4">«interface»</text>
 <text x="3530.8" y="1537.6" text-anchor="middle" font-family="'Geist', -apple-system, 'Helvetica Neue', sans-serif" font-size="12.5" font-weight="600" fill="#2d3142" font-style="italic">ICondicionesDeCredito</text>
 <line x1="3421.8" y1="1547.6" x2="3639.8" y2="1547.6" stroke="#2d3142" stroke-width="0.6" stroke-opacity="0.45"/>
-<text x="3429.8" y="1562.1" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ getDeudaOriginal() : BigDecimal</text>
-<text x="3429.8" y="1576.1" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ getTasaInteres() : BigDecimal</text>
-<text x="3429.8" y="1590.1" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ getCantidadCuotas() : Integer</text>
-<text x="3429.8" y="1604.1" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ getTipoPlan() : TipoPlan</text>
-<text x="3429.8" y="1618.1" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ getCargos() : Set&lt;TipoCargo&gt;</text>
-<text x="3429.8" y="1632.1" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ desglose() : List&lt;Renglon&gt;</text>
+<rect class="resalte" data-m="getDeudaOriginal" x="3423.8" y="1552.6" width="214" height="13" rx="2" style="fill:var(--patron)" opacity="0"/>
+<text class="miembro" data-m="getDeudaOriginal" x="3429.8" y="1562.1" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ getDeudaOriginal() : BigDecimal</text>
+<rect class="resalte" data-m="getTasaInteres" x="3423.8" y="1566.6" width="214" height="13" rx="2" style="fill:var(--patron)" opacity="0"/>
+<text class="miembro" data-m="getTasaInteres" x="3429.8" y="1576.1" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ getTasaInteres() : BigDecimal</text>
+<rect class="resalte" data-m="getCantidadCuotas" x="3423.8" y="1580.6" width="214" height="13" rx="2" style="fill:var(--patron)" opacity="0"/>
+<text class="miembro" data-m="getCantidadCuotas" x="3429.8" y="1590.1" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ getCantidadCuotas() : Integer</text>
+<rect class="resalte" data-m="getTipoPlan" x="3423.8" y="1594.6" width="214" height="13" rx="2" style="fill:var(--patron)" opacity="0"/>
+<text class="miembro" data-m="getTipoPlan" x="3429.8" y="1604.1" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ getTipoPlan() : TipoPlan</text>
+<rect class="resalte" data-m="getCargos" x="3423.8" y="1608.6" width="214" height="13" rx="2" style="fill:var(--patron)" opacity="0"/>
+<text class="miembro" data-m="getCargos" x="3429.8" y="1618.1" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ getCargos() : Set&lt;TipoCargo&gt;</text>
+<rect class="resalte" data-m="desglose" x="3423.8" y="1622.6" width="214" height="13" rx="2" style="fill:var(--patron)" opacity="0"/>
+<text class="miembro" data-m="desglose" x="3429.8" y="1632.1" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ desglose() : List&lt;Renglon&gt;</text>
 </g>
 <g class="clase" data-id="Cartera">
 <rect x="2781.5666666666666" y="721" width="364" height="149" rx="6" fill="#ffffff" stroke="#5e7a9b" stroke-width="1.2"/>
@@ -186,13 +230,18 @@
 <text x="2852.5666666666666" y="737.5" text-anchor="middle" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="8.5" font-weight="600" fill="#ffffff" letter-spacing="0.3">COMPOSITE · Composite</text>
 <text x="2963.5666666666666" y="760" text-anchor="middle" font-family="'Geist', -apple-system, 'Helvetica Neue', sans-serif" font-size="12.5" font-weight="600" fill="#2d3142">Cartera</text>
 <line x1="2781.5666666666666" y1="770" x2="3145.5666666666666" y2="770" stroke="#2d3142" stroke-width="0.6" stroke-opacity="0.45"/>
-<text x="2789.5666666666666" y="784.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >- deudas : List&lt;Deuda&gt;</text>
+<text class="miembro" x="2789.5666666666666" y="784.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >- deudas : List&lt;Deuda&gt;</text>
 <line x1="2781.5666666666666" y1="792" x2="3145.5666666666666" y2="792" stroke="#2d3142" stroke-width="0.6" stroke-opacity="0.45"/>
-<text x="2789.5666666666666" y="806.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >- Cartera(deudas : List&lt;Deuda&gt;)</text>
-<text x="2789.5666666666666" y="820.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" text-decoration="underline">+ de(deudas : List&lt;? extends Deuda&gt;) : Cartera</text>
-<text x="2789.5666666666666" y="834.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ saldo() : BigDecimal</text>
-<text x="2789.5666666666666" y="848.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ montoVencido() : BigDecimal</text>
-<text x="2789.5666666666666" y="862.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >- sumar(monto : Function&lt;Deuda, BigDecimal&gt;) : BigDecimal</text>
+<rect class="resalte" data-m="Cartera" x="2783.5666666666666" y="797" width="360" height="13" rx="2" style="fill:var(--patron)" opacity="0"/>
+<text class="miembro" data-m="Cartera" x="2789.5666666666666" y="806.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >- Cartera(deudas : List&lt;Deuda&gt;)</text>
+<rect class="resalte" data-m="de" x="2783.5666666666666" y="811" width="360" height="13" rx="2" style="fill:var(--patron)" opacity="0"/>
+<text class="miembro" data-m="de" x="2789.5666666666666" y="820.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" text-decoration="underline">+ de(deudas : List&lt;? extends Deuda&gt;) : Cartera</text>
+<rect class="resalte" data-m="saldo" x="2783.5666666666666" y="825" width="360" height="13" rx="2" style="fill:var(--patron)" opacity="0"/>
+<text class="miembro" data-m="saldo" x="2789.5666666666666" y="834.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ saldo() : BigDecimal</text>
+<rect class="resalte" data-m="montoVencido" x="2783.5666666666666" y="839" width="360" height="13" rx="2" style="fill:var(--patron)" opacity="0"/>
+<text class="miembro" data-m="montoVencido" x="2789.5666666666666" y="848.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ montoVencido() : BigDecimal</text>
+<rect class="resalte" data-m="sumar" x="2783.5666666666666" y="853" width="360" height="13" rx="2" style="fill:var(--patron)" opacity="0"/>
+<text class="miembro" data-m="sumar" x="2789.5666666666666" y="862.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >- sumar(monto : Function&lt;Deuda, BigDecimal&gt;) : BigDecimal</text>
 </g>
 <g class="clase" data-id="Credito">
 <rect x="2144" y="1271" width="572" height="427" rx="6" fill="#ffffff" stroke="#5e7a9b" stroke-width="1.2"/>
@@ -202,32 +251,51 @@
 <text x="2430" y="1306" text-anchor="middle" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="8.5" fill="#5a6580" letter-spacing="0.4">«Entity»</text>
 <text x="2430" y="1322" text-anchor="middle" font-family="'Geist', -apple-system, 'Helvetica Neue', sans-serif" font-size="12.5" font-weight="600" fill="#2d3142">Credito</text>
 <line x1="2144" y1="1332" x2="2716" y2="1332" stroke="#2d3142" stroke-width="0.6" stroke-opacity="0.45"/>
-<text x="2152" y="1346.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >- id : Long</text>
-<text x="2152" y="1360.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >- cliente : Cliente</text>
-<text x="2152" y="1374.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >- fecha : LocalDate</text>
-<text x="2152" y="1388.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >- condiciones : CondicionesDeCredito</text>
-<text x="2152" y="1402.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >- anulado : boolean</text>
-<text x="2152" y="1416.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >- cuotas : List&lt;Cuota&gt;</text>
+<text class="miembro" x="2152" y="1346.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >- id : Long</text>
+<text class="miembro" x="2152" y="1360.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >- cliente : Cliente</text>
+<text class="miembro" x="2152" y="1374.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >- fecha : LocalDate</text>
+<text class="miembro" x="2152" y="1388.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >- condiciones : CondicionesDeCredito</text>
+<text class="miembro" x="2152" y="1402.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >- anulado : boolean</text>
+<text class="miembro" x="2152" y="1416.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >- cuotas : List&lt;Cuota&gt;</text>
 <line x1="2144" y1="1424" x2="2716" y2="1424" stroke="#2d3142" stroke-width="0.6" stroke-opacity="0.45"/>
-<text x="2152" y="1438.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >- Credito(cliente : Cliente, fecha : LocalDate, condiciones : CondicionesDeCredito)</text>
-<text x="2152" y="1452.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" text-decoration="underline">+ nuevo(cliente : Cliente, fecha : LocalDate, condiciones : CondicionesDeCredito) : Credito</text>
-<text x="2152" y="1466.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ getId() : Long</text>
-<text x="2152" y="1480.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ getCliente() : Cliente</text>
-<text x="2152" y="1494.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ getFecha() : LocalDate</text>
-<text x="2152" y="1508.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ getCondiciones() : CondicionesDeCredito</text>
-<text x="2152" y="1522.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ isAnulado() : boolean</text>
-<text x="2152" y="1536.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ getCuotas() : List&lt;Cuota&gt;</text>
-<text x="2152" y="1550.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ totalADevolver() : BigDecimal</text>
-<text x="2152" y="1564.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ importeCuota() : BigDecimal</text>
-<text x="2152" y="1578.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >- generarPlanDeCuotas() : void</text>
-<text x="2152" y="1592.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ estado() : EstadoCredito</text>
-<text x="2152" y="1606.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ saldo() : BigDecimal</text>
-<text x="2152" y="1620.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ montoVencido() : BigDecimal</text>
-<text x="2152" y="1634.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >- sumar(monto : Function&lt;Cuota, BigDecimal&gt;) : BigDecimal</text>
-<text x="2152" y="1648.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >- estaCancelado() : boolean</text>
-<text x="2152" y="1662.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >- tieneCobranzas() : boolean</text>
-<text x="2152" y="1676.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ puedeAnularse() : boolean</text>
-<text x="2152" y="1690.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ anular() : void</text>
+<rect class="resalte" data-m="Credito" x="2146" y="1429" width="568" height="13" rx="2" style="fill:var(--patron)" opacity="0"/>
+<text class="miembro" data-m="Credito" x="2152" y="1438.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >- Credito(cliente : Cliente, fecha : LocalDate, condiciones : CondicionesDeCredito)</text>
+<rect class="resalte" data-m="nuevo" x="2146" y="1443" width="568" height="13" rx="2" style="fill:var(--patron)" opacity="0"/>
+<text class="miembro" data-m="nuevo" x="2152" y="1452.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" text-decoration="underline">+ nuevo(cliente : Cliente, fecha : LocalDate, condiciones : CondicionesDeCredito) : Credito</text>
+<rect class="resalte" data-m="getId" x="2146" y="1457" width="568" height="13" rx="2" style="fill:var(--patron)" opacity="0"/>
+<text class="miembro" data-m="getId" x="2152" y="1466.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ getId() : Long</text>
+<rect class="resalte" data-m="getCliente" x="2146" y="1471" width="568" height="13" rx="2" style="fill:var(--patron)" opacity="0"/>
+<text class="miembro" data-m="getCliente" x="2152" y="1480.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ getCliente() : Cliente</text>
+<rect class="resalte" data-m="getFecha" x="2146" y="1485" width="568" height="13" rx="2" style="fill:var(--patron)" opacity="0"/>
+<text class="miembro" data-m="getFecha" x="2152" y="1494.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ getFecha() : LocalDate</text>
+<rect class="resalte" data-m="getCondiciones" x="2146" y="1499" width="568" height="13" rx="2" style="fill:var(--patron)" opacity="0"/>
+<text class="miembro" data-m="getCondiciones" x="2152" y="1508.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ getCondiciones() : CondicionesDeCredito</text>
+<rect class="resalte" data-m="isAnulado" x="2146" y="1513" width="568" height="13" rx="2" style="fill:var(--patron)" opacity="0"/>
+<text class="miembro" data-m="isAnulado" x="2152" y="1522.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ isAnulado() : boolean</text>
+<rect class="resalte" data-m="getCuotas" x="2146" y="1527" width="568" height="13" rx="2" style="fill:var(--patron)" opacity="0"/>
+<text class="miembro" data-m="getCuotas" x="2152" y="1536.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ getCuotas() : List&lt;Cuota&gt;</text>
+<rect class="resalte" data-m="totalADevolver" x="2146" y="1541" width="568" height="13" rx="2" style="fill:var(--patron)" opacity="0"/>
+<text class="miembro" data-m="totalADevolver" x="2152" y="1550.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ totalADevolver() : BigDecimal</text>
+<rect class="resalte" data-m="importeCuota" x="2146" y="1555" width="568" height="13" rx="2" style="fill:var(--patron)" opacity="0"/>
+<text class="miembro" data-m="importeCuota" x="2152" y="1564.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ importeCuota() : BigDecimal</text>
+<rect class="resalte" data-m="generarPlanDeCuotas" x="2146" y="1569" width="568" height="13" rx="2" style="fill:var(--patron)" opacity="0"/>
+<text class="miembro" data-m="generarPlanDeCuotas" x="2152" y="1578.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >- generarPlanDeCuotas() : void</text>
+<rect class="resalte" data-m="estado" x="2146" y="1583" width="568" height="13" rx="2" style="fill:var(--patron)" opacity="0"/>
+<text class="miembro" data-m="estado" x="2152" y="1592.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ estado() : EstadoCredito</text>
+<rect class="resalte" data-m="saldo" x="2146" y="1597" width="568" height="13" rx="2" style="fill:var(--patron)" opacity="0"/>
+<text class="miembro" data-m="saldo" x="2152" y="1606.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ saldo() : BigDecimal</text>
+<rect class="resalte" data-m="montoVencido" x="2146" y="1611" width="568" height="13" rx="2" style="fill:var(--patron)" opacity="0"/>
+<text class="miembro" data-m="montoVencido" x="2152" y="1620.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ montoVencido() : BigDecimal</text>
+<rect class="resalte" data-m="sumar" x="2146" y="1625" width="568" height="13" rx="2" style="fill:var(--patron)" opacity="0"/>
+<text class="miembro" data-m="sumar" x="2152" y="1634.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >- sumar(monto : Function&lt;Cuota, BigDecimal&gt;) : BigDecimal</text>
+<rect class="resalte" data-m="estaCancelado" x="2146" y="1639" width="568" height="13" rx="2" style="fill:var(--patron)" opacity="0"/>
+<text class="miembro" data-m="estaCancelado" x="2152" y="1648.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >- estaCancelado() : boolean</text>
+<rect class="resalte" data-m="tieneCobranzas" x="2146" y="1653" width="568" height="13" rx="2" style="fill:var(--patron)" opacity="0"/>
+<text class="miembro" data-m="tieneCobranzas" x="2152" y="1662.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >- tieneCobranzas() : boolean</text>
+<rect class="resalte" data-m="puedeAnularse" x="2146" y="1667" width="568" height="13" rx="2" style="fill:var(--patron)" opacity="0"/>
+<text class="miembro" data-m="puedeAnularse" x="2152" y="1676.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ puedeAnularse() : boolean</text>
+<rect class="resalte" data-m="anular" x="2146" y="1681" width="568" height="13" rx="2" style="fill:var(--patron)" opacity="0"/>
+<text class="miembro" data-m="anular" x="2152" y="1690.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ anular() : void</text>
 </g>
 <g class="clase" data-id="Cuota">
 <rect x="1449" y="1801" width="602" height="329" rx="6" fill="#ffffff" stroke="#5e7a9b" stroke-width="1.2"/>
@@ -237,25 +305,37 @@
 <text x="1750" y="1836" text-anchor="middle" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="8.5" fill="#5a6580" letter-spacing="0.4">«Entity»</text>
 <text x="1750" y="1852" text-anchor="middle" font-family="'Geist', -apple-system, 'Helvetica Neue', sans-serif" font-size="12.5" font-weight="600" fill="#2d3142">Cuota</text>
 <line x1="1449" y1="1862" x2="2051" y2="1862" stroke="#2d3142" stroke-width="0.6" stroke-opacity="0.45"/>
-<text x="1457" y="1876.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >- id : Long</text>
-<text x="1457" y="1890.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >- credito : Credito</text>
-<text x="1457" y="1904.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >- numero : Integer</text>
-<text x="1457" y="1918.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >- importe : BigDecimal</text>
-<text x="1457" y="1932.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >- fechaVencimiento : LocalDate</text>
-<text x="1457" y="1946.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >- cobranzas : List&lt;Cobranza&gt;</text>
+<text class="miembro" x="1457" y="1876.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >- id : Long</text>
+<text class="miembro" x="1457" y="1890.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >- credito : Credito</text>
+<text class="miembro" x="1457" y="1904.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >- numero : Integer</text>
+<text class="miembro" x="1457" y="1918.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >- importe : BigDecimal</text>
+<text class="miembro" x="1457" y="1932.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >- fechaVencimiento : LocalDate</text>
+<text class="miembro" x="1457" y="1946.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >- cobranzas : List&lt;Cobranza&gt;</text>
 <line x1="1449" y1="1954" x2="2051" y2="1954" stroke="#2d3142" stroke-width="0.6" stroke-opacity="0.45"/>
-<text x="1457" y="1968.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >~ Cuota(credito : Credito, numero : Integer, importe : BigDecimal, fechaVencimiento : LocalDate)</text>
-<text x="1457" y="1982.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ getId() : Long</text>
-<text x="1457" y="1996.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ getCredito() : Credito</text>
-<text x="1457" y="2010.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ getNumero() : Integer</text>
-<text x="1457" y="2024.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ getImporte() : BigDecimal</text>
-<text x="1457" y="2038.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ getFechaVencimiento() : LocalDate</text>
-<text x="1457" y="2052.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ estaPagada() : boolean</text>
-<text x="1457" y="2066.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ estaVencida() : boolean</text>
-<text x="1457" y="2080.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ estaVencida(hoy : LocalDate) : boolean</text>
-<text x="1457" y="2094.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ saldo() : BigDecimal</text>
-<text x="1457" y="2108.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ montoVencido() : BigDecimal</text>
-<text x="1457" y="2122.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ registrarCobranza(importe : BigDecimal) : Cobranza</text>
+<rect class="resalte" data-m="Cuota" x="1451" y="1959" width="598" height="13" rx="2" style="fill:var(--patron)" opacity="0"/>
+<text class="miembro" data-m="Cuota" x="1457" y="1968.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >~ Cuota(credito : Credito, numero : Integer, importe : BigDecimal, fechaVencimiento : LocalDate)</text>
+<rect class="resalte" data-m="getId" x="1451" y="1973" width="598" height="13" rx="2" style="fill:var(--patron)" opacity="0"/>
+<text class="miembro" data-m="getId" x="1457" y="1982.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ getId() : Long</text>
+<rect class="resalte" data-m="getCredito" x="1451" y="1987" width="598" height="13" rx="2" style="fill:var(--patron)" opacity="0"/>
+<text class="miembro" data-m="getCredito" x="1457" y="1996.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ getCredito() : Credito</text>
+<rect class="resalte" data-m="getNumero" x="1451" y="2001" width="598" height="13" rx="2" style="fill:var(--patron)" opacity="0"/>
+<text class="miembro" data-m="getNumero" x="1457" y="2010.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ getNumero() : Integer</text>
+<rect class="resalte" data-m="getImporte" x="1451" y="2015" width="598" height="13" rx="2" style="fill:var(--patron)" opacity="0"/>
+<text class="miembro" data-m="getImporte" x="1457" y="2024.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ getImporte() : BigDecimal</text>
+<rect class="resalte" data-m="getFechaVencimiento" x="1451" y="2029" width="598" height="13" rx="2" style="fill:var(--patron)" opacity="0"/>
+<text class="miembro" data-m="getFechaVencimiento" x="1457" y="2038.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ getFechaVencimiento() : LocalDate</text>
+<rect class="resalte" data-m="estaPagada" x="1451" y="2043" width="598" height="13" rx="2" style="fill:var(--patron)" opacity="0"/>
+<text class="miembro" data-m="estaPagada" x="1457" y="2052.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ estaPagada() : boolean</text>
+<rect class="resalte" data-m="estaVencida" x="1451" y="2057" width="598" height="13" rx="2" style="fill:var(--patron)" opacity="0"/>
+<text class="miembro" data-m="estaVencida" x="1457" y="2066.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ estaVencida() : boolean</text>
+<rect class="resalte" data-m="estaVencida" x="1451" y="2071" width="598" height="13" rx="2" style="fill:var(--patron)" opacity="0"/>
+<text class="miembro" data-m="estaVencida" x="1457" y="2080.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ estaVencida(hoy : LocalDate) : boolean</text>
+<rect class="resalte" data-m="saldo" x="1451" y="2085" width="598" height="13" rx="2" style="fill:var(--patron)" opacity="0"/>
+<text class="miembro" data-m="saldo" x="1457" y="2094.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ saldo() : BigDecimal</text>
+<rect class="resalte" data-m="montoVencido" x="1451" y="2099" width="598" height="13" rx="2" style="fill:var(--patron)" opacity="0"/>
+<text class="miembro" data-m="montoVencido" x="1457" y="2108.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ montoVencido() : BigDecimal</text>
+<rect class="resalte" data-m="registrarCobranza" x="1451" y="2113" width="598" height="13" rx="2" style="fill:var(--patron)" opacity="0"/>
+<text class="miembro" data-m="registrarCobranza" x="1457" y="2122.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ registrarCobranza(importe : BigDecimal) : Cobranza</text>
 </g>
 <g class="clase" data-id="Cobranza">
 <rect x="1250" y="2213" width="376" height="255" rx="6" fill="#ffffff" stroke="#5e7a9b" stroke-width="1.2"/>
@@ -263,21 +343,30 @@
 <text x="1438" y="2230" text-anchor="middle" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="8.5" fill="#5a6580" letter-spacing="0.4">«Entity»</text>
 <text x="1438" y="2246" text-anchor="middle" font-family="'Geist', -apple-system, 'Helvetica Neue', sans-serif" font-size="12.5" font-weight="600" fill="#2d3142">Cobranza</text>
 <line x1="1250" y1="2256" x2="1626" y2="2256" stroke="#2d3142" stroke-width="0.6" stroke-opacity="0.45"/>
-<text x="1258" y="2270.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >- id : Long</text>
-<text x="1258" y="2284.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >- cuota : Cuota</text>
-<text x="1258" y="2298.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >- importe : BigDecimal</text>
-<text x="1258" y="2312.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >- fechaCobranza : LocalDate</text>
-<text x="1258" y="2326.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >- anulada : boolean</text>
+<text class="miembro" x="1258" y="2270.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >- id : Long</text>
+<text class="miembro" x="1258" y="2284.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >- cuota : Cuota</text>
+<text class="miembro" x="1258" y="2298.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >- importe : BigDecimal</text>
+<text class="miembro" x="1258" y="2312.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >- fechaCobranza : LocalDate</text>
+<text class="miembro" x="1258" y="2326.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >- anulada : boolean</text>
 <line x1="1250" y1="2334" x2="1626" y2="2334" stroke="#2d3142" stroke-width="0.6" stroke-opacity="0.45"/>
-<text x="1258" y="2348.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >- Cobranza(cuota : Cuota, importe : BigDecimal)</text>
-<text x="1258" y="2362.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" text-decoration="underline">~ registrar(cuota : Cuota, importe : BigDecimal) : Cobranza</text>
-<text x="1258" y="2376.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ getId() : Long</text>
-<text x="1258" y="2390.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ getCuota() : Cuota</text>
-<text x="1258" y="2404.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ getImporte() : BigDecimal</text>
-<text x="1258" y="2418.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ getFechaCobranza() : LocalDate</text>
-<text x="1258" y="2432.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ isAnulada() : boolean</text>
-<text x="1258" y="2446.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ anular() : void</text>
-<text x="1258" y="2460.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ anular(hoy : LocalDate) : void</text>
+<rect class="resalte" data-m="Cobranza" x="1252" y="2339" width="372" height="13" rx="2" style="fill:var(--patron)" opacity="0"/>
+<text class="miembro" data-m="Cobranza" x="1258" y="2348.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >- Cobranza(cuota : Cuota, importe : BigDecimal)</text>
+<rect class="resalte" data-m="registrar" x="1252" y="2353" width="372" height="13" rx="2" style="fill:var(--patron)" opacity="0"/>
+<text class="miembro" data-m="registrar" x="1258" y="2362.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" text-decoration="underline">~ registrar(cuota : Cuota, importe : BigDecimal) : Cobranza</text>
+<rect class="resalte" data-m="getId" x="1252" y="2367" width="372" height="13" rx="2" style="fill:var(--patron)" opacity="0"/>
+<text class="miembro" data-m="getId" x="1258" y="2376.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ getId() : Long</text>
+<rect class="resalte" data-m="getCuota" x="1252" y="2381" width="372" height="13" rx="2" style="fill:var(--patron)" opacity="0"/>
+<text class="miembro" data-m="getCuota" x="1258" y="2390.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ getCuota() : Cuota</text>
+<rect class="resalte" data-m="getImporte" x="1252" y="2395" width="372" height="13" rx="2" style="fill:var(--patron)" opacity="0"/>
+<text class="miembro" data-m="getImporte" x="1258" y="2404.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ getImporte() : BigDecimal</text>
+<rect class="resalte" data-m="getFechaCobranza" x="1252" y="2409" width="372" height="13" rx="2" style="fill:var(--patron)" opacity="0"/>
+<text class="miembro" data-m="getFechaCobranza" x="1258" y="2418.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ getFechaCobranza() : LocalDate</text>
+<rect class="resalte" data-m="isAnulada" x="1252" y="2423" width="372" height="13" rx="2" style="fill:var(--patron)" opacity="0"/>
+<text class="miembro" data-m="isAnulada" x="1258" y="2432.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ isAnulada() : boolean</text>
+<rect class="resalte" data-m="anular" x="1252" y="2437" width="372" height="13" rx="2" style="fill:var(--patron)" opacity="0"/>
+<text class="miembro" data-m="anular" x="1258" y="2446.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ anular() : void</text>
+<rect class="resalte" data-m="anular" x="1252" y="2451" width="372" height="13" rx="2" style="fill:var(--patron)" opacity="0"/>
+<text class="miembro" data-m="anular" x="1258" y="2460.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ anular(hoy : LocalDate) : void</text>
 </g>
 <g class="clase" data-id="CondicionesDeCredito">
 <rect x="2623.6000000000004" y="1833" width="919" height="273" rx="6" fill="#ffffff" stroke="#5e7a9b" stroke-width="1.2"/>
@@ -289,21 +378,30 @@
 <text x="3083.1000000000004" y="1868" text-anchor="middle" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="8.5" fill="#5a6580" letter-spacing="0.4">«Embeddable»</text>
 <text x="3083.1000000000004" y="1884" text-anchor="middle" font-family="'Geist', -apple-system, 'Helvetica Neue', sans-serif" font-size="12.5" font-weight="600" fill="#2d3142">CondicionesDeCredito</text>
 <line x1="2623.6000000000004" y1="1894" x2="3542.6000000000004" y2="1894" stroke="#2d3142" stroke-width="0.6" stroke-opacity="0.45"/>
-<text x="2631.6000000000004" y="1908.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >- deudaOriginal : BigDecimal</text>
-<text x="2631.6000000000004" y="1922.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >- tasaInteres : BigDecimal</text>
-<text x="2631.6000000000004" y="1936.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >- cantidadCuotas : Integer</text>
-<text x="2631.6000000000004" y="1950.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >- tipoPlan : TipoPlan</text>
-<text x="2631.6000000000004" y="1964.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >- cargos : Set&lt;TipoCargo&gt;</text>
+<text class="miembro" x="2631.6000000000004" y="1908.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >- deudaOriginal : BigDecimal</text>
+<text class="miembro" x="2631.6000000000004" y="1922.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >- tasaInteres : BigDecimal</text>
+<text class="miembro" x="2631.6000000000004" y="1936.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >- cantidadCuotas : Integer</text>
+<text class="miembro" x="2631.6000000000004" y="1950.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >- tipoPlan : TipoPlan</text>
+<text class="miembro" x="2631.6000000000004" y="1964.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >- cargos : Set&lt;TipoCargo&gt;</text>
 <line x1="2623.6000000000004" y1="1972" x2="3542.6000000000004" y2="1972" stroke="#2d3142" stroke-width="0.6" stroke-opacity="0.45"/>
-<text x="2631.6000000000004" y="1986.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ CondicionesDeCredito(deudaOriginal : BigDecimal, tasaInteres : BigDecimal, cantidadCuotas : Integer, tipoPlan : TipoPlan, cargos : Set&lt;TipoCargo&gt;)</text>
-<text x="2631.6000000000004" y="2000.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ getDeudaOriginal() : BigDecimal</text>
-<text x="2631.6000000000004" y="2014.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ getTasaInteres() : BigDecimal</text>
-<text x="2631.6000000000004" y="2028.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ getCantidadCuotas() : Integer</text>
-<text x="2631.6000000000004" y="2042.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ getTipoPlan() : TipoPlan</text>
-<text x="2631.6000000000004" y="2056.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ getCargos() : Set&lt;TipoCargo&gt;</text>
-<text x="2631.6000000000004" y="2070.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >~ importeCuota() : BigDecimal</text>
-<text x="2631.6000000000004" y="2084.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ desglose() : List&lt;Renglon&gt;</text>
-<text x="2631.6000000000004" y="2098.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >- calculo() : CalculoDeCuota</text>
+<rect class="resalte" data-m="CondicionesDeCredito" x="2625.6000000000004" y="1977" width="915" height="13" rx="2" style="fill:var(--patron)" opacity="0"/>
+<text class="miembro" data-m="CondicionesDeCredito" x="2631.6000000000004" y="1986.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ CondicionesDeCredito(deudaOriginal : BigDecimal, tasaInteres : BigDecimal, cantidadCuotas : Integer, tipoPlan : TipoPlan, cargos : Set&lt;TipoCargo&gt;)</text>
+<rect class="resalte" data-m="getDeudaOriginal" x="2625.6000000000004" y="1991" width="915" height="13" rx="2" style="fill:var(--patron)" opacity="0"/>
+<text class="miembro" data-m="getDeudaOriginal" x="2631.6000000000004" y="2000.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ getDeudaOriginal() : BigDecimal</text>
+<rect class="resalte" data-m="getTasaInteres" x="2625.6000000000004" y="2005" width="915" height="13" rx="2" style="fill:var(--patron)" opacity="0"/>
+<text class="miembro" data-m="getTasaInteres" x="2631.6000000000004" y="2014.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ getTasaInteres() : BigDecimal</text>
+<rect class="resalte" data-m="getCantidadCuotas" x="2625.6000000000004" y="2019" width="915" height="13" rx="2" style="fill:var(--patron)" opacity="0"/>
+<text class="miembro" data-m="getCantidadCuotas" x="2631.6000000000004" y="2028.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ getCantidadCuotas() : Integer</text>
+<rect class="resalte" data-m="getTipoPlan" x="2625.6000000000004" y="2033" width="915" height="13" rx="2" style="fill:var(--patron)" opacity="0"/>
+<text class="miembro" data-m="getTipoPlan" x="2631.6000000000004" y="2042.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ getTipoPlan() : TipoPlan</text>
+<rect class="resalte" data-m="getCargos" x="2625.6000000000004" y="2047" width="915" height="13" rx="2" style="fill:var(--patron)" opacity="0"/>
+<text class="miembro" data-m="getCargos" x="2631.6000000000004" y="2056.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ getCargos() : Set&lt;TipoCargo&gt;</text>
+<rect class="resalte" data-m="importeCuota" x="2625.6000000000004" y="2061" width="915" height="13" rx="2" style="fill:var(--patron)" opacity="0"/>
+<text class="miembro" data-m="importeCuota" x="2631.6000000000004" y="2070.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >~ importeCuota() : BigDecimal</text>
+<rect class="resalte" data-m="desglose" x="2625.6000000000004" y="2075" width="915" height="13" rx="2" style="fill:var(--patron)" opacity="0"/>
+<text class="miembro" data-m="desglose" x="2631.6000000000004" y="2084.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ desglose() : List&lt;Renglon&gt;</text>
+<rect class="resalte" data-m="calculo" x="2625.6000000000004" y="2089" width="915" height="13" rx="2" style="fill:var(--patron)" opacity="0"/>
+<text class="miembro" data-m="calculo" x="2631.6000000000004" y="2098.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >- calculo() : CalculoDeCuota</text>
 </g>
 <g class="clase" data-id="EstadoCredito">
 <rect x="2084.666666666667" y="1801" width="115" height="93" rx="6" fill="#ffffff" stroke="#5e7a9b" stroke-width="1.2"/>
@@ -311,9 +409,9 @@
 <text x="2142.166666666667" y="1818" text-anchor="middle" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="8.5" fill="#5a6580" letter-spacing="0.4">«enumeration»</text>
 <text x="2142.166666666667" y="1834" text-anchor="middle" font-family="'Geist', -apple-system, 'Helvetica Neue', sans-serif" font-size="12.5" font-weight="600" fill="#2d3142">EstadoCredito</text>
 <line x1="2084.666666666667" y1="1844" x2="2199.666666666667" y2="1844" stroke="#2d3142" stroke-width="0.6" stroke-opacity="0.45"/>
-<text x="2092.666666666667" y="1858.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >VIGENTE</text>
-<text x="2092.666666666667" y="1872.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >CANCELADO</text>
-<text x="2092.666666666667" y="1886.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >ANULADO</text>
+<text class="miembro" x="2092.666666666667" y="1858.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >VIGENTE</text>
+<text class="miembro" x="2092.666666666667" y="1872.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >CANCELADO</text>
+<text class="miembro" x="2092.666666666667" y="1886.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >ANULADO</text>
 </g>
 <g class="clase" data-id="CalculoDeCuota">
 <rect x="2097.6666666666665" y="2977.375" width="608" height="97" rx="6" fill="#ffffff" stroke="#7c8f6f" stroke-width="1.2"/>
@@ -325,8 +423,10 @@
 <text x="2401.6666666666665" y="3012.375" text-anchor="middle" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="8.5" fill="#5a6580" letter-spacing="0.4">«interface»</text>
 <text x="2401.6666666666665" y="3028.375" text-anchor="middle" font-family="'Geist', -apple-system, 'Helvetica Neue', sans-serif" font-size="12.5" font-weight="600" fill="#2d3142" font-style="italic">CalculoDeCuota</text>
 <line x1="2097.6666666666665" y1="3038.375" x2="2705.6666666666665" y2="3038.375" stroke="#2d3142" stroke-width="0.6" stroke-opacity="0.45"/>
-<text x="2105.6666666666665" y="3052.875" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ importeCuota(capital : BigDecimal, tasaInteres : BigDecimal, cantidadCuotas : int) : BigDecimal</text>
-<text x="2105.6666666666665" y="3066.875" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ desglose(capital : BigDecimal, tasaInteres : BigDecimal, cantidadCuotas : int) : List&lt;Renglon&gt;</text>
+<rect class="resalte" data-m="importeCuota" x="2099.6666666666665" y="3043.375" width="604" height="13" rx="2" style="fill:var(--patron)" opacity="0"/>
+<text class="miembro" data-m="importeCuota" x="2105.6666666666665" y="3052.875" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ importeCuota(capital : BigDecimal, tasaInteres : BigDecimal, cantidadCuotas : int) : BigDecimal</text>
+<rect class="resalte" data-m="desglose" x="2099.6666666666665" y="3057.375" width="604" height="13" rx="2" style="fill:var(--patron)" opacity="0"/>
+<text class="miembro" data-m="desglose" x="2105.6666666666665" y="3066.875" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ desglose(capital : BigDecimal, tasaInteres : BigDecimal, cantidadCuotas : int) : List&lt;Renglon&gt;</text>
 </g>
 <g class="clase" data-id="TipoPlan">
 <rect x="1924.6666666666665" y="2706" width="236" height="155" rx="6" fill="#ffffff" stroke="#7c8f6f" stroke-width="1.2"/>
@@ -336,13 +436,15 @@
 <text x="2042.6666666666665" y="2741" text-anchor="middle" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="8.5" fill="#5a6580" letter-spacing="0.4">«enumeration»</text>
 <text x="2042.6666666666665" y="2757" text-anchor="middle" font-family="'Geist', -apple-system, 'Helvetica Neue', sans-serif" font-size="12.5" font-weight="600" fill="#2d3142">TipoPlan</text>
 <line x1="1924.6666666666665" y1="2767" x2="2160.6666666666665" y2="2767" stroke="#2d3142" stroke-width="0.6" stroke-opacity="0.45"/>
-<text x="1932.6666666666665" y="2781.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >INTERES_SIMPLE</text>
-<text x="1932.6666666666665" y="2795.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >SISTEMA_FRANCES</text>
+<text class="miembro" x="1932.6666666666665" y="2781.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >INTERES_SIMPLE</text>
+<text class="miembro" x="1932.6666666666665" y="2795.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >SISTEMA_FRANCES</text>
 <line x1="1924.6666666666665" y1="2803" x2="2160.6666666666665" y2="2803" stroke="#2d3142" stroke-width="0.6" stroke-opacity="0.45"/>
-<text x="1932.6666666666665" y="2817.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >- calculo : CalculoDeCuota</text>
+<text class="miembro" x="1932.6666666666665" y="2817.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >- calculo : CalculoDeCuota</text>
 <line x1="1924.6666666666665" y1="2825" x2="2160.6666666666665" y2="2825" stroke="#2d3142" stroke-width="0.6" stroke-opacity="0.45"/>
-<text x="1932.6666666666665" y="2839.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >- TipoPlan(calculo : CalculoDeCuota)</text>
-<text x="1932.6666666666665" y="2853.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ calculo() : CalculoDeCuota</text>
+<rect class="resalte" data-m="TipoPlan" x="1926.6666666666665" y="2830" width="232" height="13" rx="2" style="fill:var(--patron)" opacity="0"/>
+<text class="miembro" data-m="TipoPlan" x="1932.6666666666665" y="2839.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >- TipoPlan(calculo : CalculoDeCuota)</text>
+<rect class="resalte" data-m="calculo" x="1926.6666666666665" y="2844" width="232" height="13" rx="2" style="fill:var(--patron)" opacity="0"/>
+<text class="miembro" data-m="calculo" x="1932.6666666666665" y="2853.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ calculo() : CalculoDeCuota</text>
 </g>
 <g class="clase" data-id="TipoCargo">
 <rect x="3309.8333333333335" y="2727.6" width="364" height="119" rx="6" fill="#ffffff" stroke="#7c8f6f" stroke-width="1.2"/>
@@ -352,10 +454,11 @@
 <text x="3491.8333333333335" y="2762.6" text-anchor="middle" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="8.5" fill="#5a6580" letter-spacing="0.4">«enumeration»</text>
 <text x="3491.8333333333335" y="2778.6" text-anchor="middle" font-family="'Geist', -apple-system, 'Helvetica Neue', sans-serif" font-size="12.5" font-weight="600" fill="#2d3142">TipoCargo</text>
 <line x1="3309.8333333333335" y1="2788.6" x2="3673.8333333333335" y2="2788.6" stroke="#2d3142" stroke-width="0.6" stroke-opacity="0.45"/>
-<text x="3317.8333333333335" y="2803.1" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >SEGURO_DE_VIDA</text>
-<text x="3317.8333333333335" y="2817.1" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >GASTO_DE_ADMINISTRACION</text>
+<text class="miembro" x="3317.8333333333335" y="2803.1" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >SEGURO_DE_VIDA</text>
+<text class="miembro" x="3317.8333333333335" y="2817.1" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >GASTO_DE_ADMINISTRACION</text>
 <line x1="3309.8333333333335" y1="2824.6" x2="3673.8333333333335" y2="2824.6" stroke="#2d3142" stroke-width="0.6" stroke-opacity="0.45"/>
-<text x="3317.8333333333335" y="2839.1" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" font-style="italic">+ aplicarSobre(calculo : CalculoDeCuota) : CalculoDeCuota</text>
+<rect class="resalte" data-m="aplicarSobre" x="3311.8333333333335" y="2829.6" width="360" height="13" rx="2" style="fill:var(--patron)" opacity="0"/>
+<text class="miembro" data-m="aplicarSobre" x="3317.8333333333335" y="2839.1" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" font-style="italic">+ aplicarSobre(calculo : CalculoDeCuota) : CalculoDeCuota</text>
 </g>
 <g class="clase" data-id="InteresSimple">
 <rect x="2409" y="3193" width="620" height="121" rx="6" fill="#ffffff" stroke="#7c8f6f" stroke-width="1.2"/>
@@ -366,11 +469,14 @@
 <text x="2663.5" y="3209.5" text-anchor="middle" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="8.5" font-weight="600" fill="#ffffff" letter-spacing="0.3">DECORATOR · ConcreteComponent</text>
 <text x="2719" y="3232" text-anchor="middle" font-family="'Geist', -apple-system, 'Helvetica Neue', sans-serif" font-size="12.5" font-weight="600" fill="#2d3142">InteresSimple</text>
 <line x1="2409" y1="3242" x2="3029" y2="3242" stroke="#2d3142" stroke-width="0.6" stroke-opacity="0.45"/>
-<text x="2417" y="3256.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" text-decoration="underline">- CIEN : BigDecimal</text>
+<text class="miembro" x="2417" y="3256.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" text-decoration="underline">- CIEN : BigDecimal</text>
 <line x1="2409" y1="3264" x2="3029" y2="3264" stroke="#2d3142" stroke-width="0.6" stroke-opacity="0.45"/>
-<text x="2417" y="3278.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >- totalADevolver(capital : BigDecimal, tasaInteres : BigDecimal, cantidadCuotas : int) : BigDecimal</text>
-<text x="2417" y="3292.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ importeCuota(capital : BigDecimal, tasaInteres : BigDecimal, cantidadCuotas : int) : BigDecimal</text>
-<text x="2417" y="3306.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ desglose(capital : BigDecimal, tasaInteres : BigDecimal, cantidadCuotas : int) : List&lt;Renglon&gt;</text>
+<rect class="resalte" data-m="totalADevolver" x="2411" y="3269" width="616" height="13" rx="2" style="fill:var(--patron)" opacity="0"/>
+<text class="miembro" data-m="totalADevolver" x="2417" y="3278.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >- totalADevolver(capital : BigDecimal, tasaInteres : BigDecimal, cantidadCuotas : int) : BigDecimal</text>
+<rect class="resalte" data-m="importeCuota" x="2411" y="3283" width="616" height="13" rx="2" style="fill:var(--patron)" opacity="0"/>
+<text class="miembro" data-m="importeCuota" x="2417" y="3292.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ importeCuota(capital : BigDecimal, tasaInteres : BigDecimal, cantidadCuotas : int) : BigDecimal</text>
+<rect class="resalte" data-m="desglose" x="2411" y="3297" width="616" height="13" rx="2" style="fill:var(--patron)" opacity="0"/>
+<text class="miembro" data-m="desglose" x="2417" y="3306.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ desglose(capital : BigDecimal, tasaInteres : BigDecimal, cantidadCuotas : int) : List&lt;Renglon&gt;</text>
 </g>
 <g class="clase" data-id="SistemaFrances">
 <rect x="1781" y="3193" width="608" height="121" rx="6" fill="#ffffff" stroke="#7c8f6f" stroke-width="1.2"/>
@@ -381,11 +487,13 @@
 <text x="2035.5" y="3209.5" text-anchor="middle" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="8.5" font-weight="600" fill="#ffffff" letter-spacing="0.3">DECORATOR · ConcreteComponent</text>
 <text x="2085" y="3232" text-anchor="middle" font-family="'Geist', -apple-system, 'Helvetica Neue', sans-serif" font-size="12.5" font-weight="600" fill="#2d3142">SistemaFrances</text>
 <line x1="1781" y1="3242" x2="2389" y2="3242" stroke="#2d3142" stroke-width="0.6" stroke-opacity="0.45"/>
-<text x="1789" y="3256.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" text-decoration="underline">- CIEN : BigDecimal</text>
-<text x="1789" y="3270.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" text-decoration="underline">- PRECISION : MathContext</text>
+<text class="miembro" x="1789" y="3256.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" text-decoration="underline">- CIEN : BigDecimal</text>
+<text class="miembro" x="1789" y="3270.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" text-decoration="underline">- PRECISION : MathContext</text>
 <line x1="1781" y1="3278" x2="2389" y2="3278" stroke="#2d3142" stroke-width="0.6" stroke-opacity="0.45"/>
-<text x="1789" y="3292.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ importeCuota(capital : BigDecimal, tasaInteres : BigDecimal, cantidadCuotas : int) : BigDecimal</text>
-<text x="1789" y="3306.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ desglose(capital : BigDecimal, tasaInteres : BigDecimal, cantidadCuotas : int) : List&lt;Renglon&gt;</text>
+<rect class="resalte" data-m="importeCuota" x="1783" y="3283" width="604" height="13" rx="2" style="fill:var(--patron)" opacity="0"/>
+<text class="miembro" data-m="importeCuota" x="1789" y="3292.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ importeCuota(capital : BigDecimal, tasaInteres : BigDecimal, cantidadCuotas : int) : BigDecimal</text>
+<rect class="resalte" data-m="desglose" x="1783" y="3297" width="604" height="13" rx="2" style="fill:var(--patron)" opacity="0"/>
+<text class="miembro" data-m="desglose" x="1789" y="3306.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ desglose(capital : BigDecimal, tasaInteres : BigDecimal, cantidadCuotas : int) : List&lt;Renglon&gt;</text>
 </g>
 <g class="clase" data-id="CargoSobreCuota">
 <rect x="2280.0666666666666" y="2700" width="608" height="161" rx="6" fill="#ffffff" stroke="#7c8f6f" stroke-width="1.2"/>
@@ -395,13 +503,18 @@
 <text x="2584.0666666666666" y="2735" text-anchor="middle" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="8.5" fill="#5a6580" letter-spacing="0.4">«abstract»</text>
 <text x="2584.0666666666666" y="2751" text-anchor="middle" font-family="'Geist', -apple-system, 'Helvetica Neue', sans-serif" font-size="12.5" font-weight="600" fill="#2d3142" font-style="italic">CargoSobreCuota</text>
 <line x1="2280.0666666666666" y1="2761" x2="2888.0666666666666" y2="2761" stroke="#2d3142" stroke-width="0.6" stroke-opacity="0.45"/>
-<text x="2288.0666666666666" y="2775.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >- envuelto : CalculoDeCuota</text>
+<text class="miembro" x="2288.0666666666666" y="2775.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >- envuelto : CalculoDeCuota</text>
 <line x1="2280.0666666666666" y1="2783" x2="2888.0666666666666" y2="2783" stroke="#2d3142" stroke-width="0.6" stroke-opacity="0.45"/>
-<text x="2288.0666666666666" y="2797.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" ># CargoSobreCuota(envuelto : CalculoDeCuota)</text>
-<text x="2288.0666666666666" y="2811.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ importeCuota(capital : BigDecimal, tasaInteres : BigDecimal, cantidadCuotas : int) : BigDecimal</text>
-<text x="2288.0666666666666" y="2825.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ desglose(capital : BigDecimal, tasaInteres : BigDecimal, cantidadCuotas : int) : List&lt;Renglon&gt;</text>
-<text x="2288.0666666666666" y="2839.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" font-style="italic"># nombre() : String</text>
-<text x="2288.0666666666666" y="2853.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" font-style="italic"># cargo(capital : BigDecimal, cantidadCuotas : int) : BigDecimal</text>
+<rect class="resalte" data-m="CargoSobreCuota" x="2282.0666666666666" y="2788" width="604" height="13" rx="2" style="fill:var(--patron)" opacity="0"/>
+<text class="miembro" data-m="CargoSobreCuota" x="2288.0666666666666" y="2797.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" ># CargoSobreCuota(envuelto : CalculoDeCuota)</text>
+<rect class="resalte" data-m="importeCuota" x="2282.0666666666666" y="2802" width="604" height="13" rx="2" style="fill:var(--patron)" opacity="0"/>
+<text class="miembro" data-m="importeCuota" x="2288.0666666666666" y="2811.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ importeCuota(capital : BigDecimal, tasaInteres : BigDecimal, cantidadCuotas : int) : BigDecimal</text>
+<rect class="resalte" data-m="desglose" x="2282.0666666666666" y="2816" width="604" height="13" rx="2" style="fill:var(--patron)" opacity="0"/>
+<text class="miembro" data-m="desglose" x="2288.0666666666666" y="2825.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ desglose(capital : BigDecimal, tasaInteres : BigDecimal, cantidadCuotas : int) : List&lt;Renglon&gt;</text>
+<rect class="resalte" data-m="nombre" x="2282.0666666666666" y="2830" width="604" height="13" rx="2" style="fill:var(--patron)" opacity="0"/>
+<text class="miembro" data-m="nombre" x="2288.0666666666666" y="2839.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" font-style="italic"># nombre() : String</text>
+<rect class="resalte" data-m="cargo" x="2282.0666666666666" y="2844" width="604" height="13" rx="2" style="fill:var(--patron)" opacity="0"/>
+<text class="miembro" data-m="cargo" x="2288.0666666666666" y="2853.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" font-style="italic"># cargo(capital : BigDecimal, cantidadCuotas : int) : BigDecimal</text>
 </g>
 <g class="clase" data-id="SeguroDeVida">
 <rect x="3220.5" y="2974" width="407" height="121" rx="6" fill="#ffffff" stroke="#7c8f6f" stroke-width="1.2"/>
@@ -410,11 +523,14 @@
 <text x="3313" y="2990.5" text-anchor="middle" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="8.5" font-weight="600" fill="#ffffff" letter-spacing="0.3">DECORATOR · ConcreteDecorator</text>
 <text x="3424" y="3013" text-anchor="middle" font-family="'Geist', -apple-system, 'Helvetica Neue', sans-serif" font-size="12.5" font-weight="600" fill="#2d3142">SeguroDeVida</text>
 <line x1="3220.5" y1="3023" x2="3627.5" y2="3023" stroke="#2d3142" stroke-width="0.6" stroke-opacity="0.45"/>
-<text x="3228.5" y="3037.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" text-decoration="underline">- PORCENTAJE_POR_CUOTA : BigDecimal</text>
+<text class="miembro" x="3228.5" y="3037.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" text-decoration="underline">- PORCENTAJE_POR_CUOTA : BigDecimal</text>
 <line x1="3220.5" y1="3045" x2="3627.5" y2="3045" stroke="#2d3142" stroke-width="0.6" stroke-opacity="0.45"/>
-<text x="3228.5" y="3059.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ SeguroDeVida(envuelto : CalculoDeCuota)</text>
-<text x="3228.5" y="3073.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" ># nombre() : String</text>
-<text x="3228.5" y="3087.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" ># cargo(capital : BigDecimal, cantidadCuotas : int) : BigDecimal</text>
+<rect class="resalte" data-m="SeguroDeVida" x="3222.5" y="3050" width="403" height="13" rx="2" style="fill:var(--patron)" opacity="0"/>
+<text class="miembro" data-m="SeguroDeVida" x="3228.5" y="3059.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ SeguroDeVida(envuelto : CalculoDeCuota)</text>
+<rect class="resalte" data-m="nombre" x="3222.5" y="3064" width="403" height="13" rx="2" style="fill:var(--patron)" opacity="0"/>
+<text class="miembro" data-m="nombre" x="3228.5" y="3073.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" ># nombre() : String</text>
+<rect class="resalte" data-m="cargo" x="3222.5" y="3078" width="403" height="13" rx="2" style="fill:var(--patron)" opacity="0"/>
+<text class="miembro" data-m="cargo" x="3228.5" y="3087.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" ># cargo(capital : BigDecimal, cantidadCuotas : int) : BigDecimal</text>
 </g>
 <g class="clase" data-id="GastoDeAdministracion">
 <rect x="3647.5" y="2974" width="407" height="121" rx="6" fill="#ffffff" stroke="#7c8f6f" stroke-width="1.2"/>
@@ -423,11 +539,14 @@
 <text x="3740" y="2990.5" text-anchor="middle" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="8.5" font-weight="600" fill="#ffffff" letter-spacing="0.3">DECORATOR · ConcreteDecorator</text>
 <text x="3851" y="3013" text-anchor="middle" font-family="'Geist', -apple-system, 'Helvetica Neue', sans-serif" font-size="12.5" font-weight="600" fill="#2d3142">GastoDeAdministracion</text>
 <line x1="3647.5" y1="3023" x2="4054.5" y2="3023" stroke="#2d3142" stroke-width="0.6" stroke-opacity="0.45"/>
-<text x="3655.5" y="3037.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" text-decoration="underline">- MONTO_POR_CUOTA : BigDecimal</text>
+<text class="miembro" x="3655.5" y="3037.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" text-decoration="underline">- MONTO_POR_CUOTA : BigDecimal</text>
 <line x1="3647.5" y1="3045" x2="4054.5" y2="3045" stroke="#2d3142" stroke-width="0.6" stroke-opacity="0.45"/>
-<text x="3655.5" y="3059.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ GastoDeAdministracion(envuelto : CalculoDeCuota)</text>
-<text x="3655.5" y="3073.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" ># nombre() : String</text>
-<text x="3655.5" y="3087.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" ># cargo(capital : BigDecimal, cantidadCuotas : int) : BigDecimal</text>
+<rect class="resalte" data-m="GastoDeAdministracion" x="3649.5" y="3050" width="403" height="13" rx="2" style="fill:var(--patron)" opacity="0"/>
+<text class="miembro" data-m="GastoDeAdministracion" x="3655.5" y="3059.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ GastoDeAdministracion(envuelto : CalculoDeCuota)</text>
+<rect class="resalte" data-m="nombre" x="3649.5" y="3064" width="403" height="13" rx="2" style="fill:var(--patron)" opacity="0"/>
+<text class="miembro" data-m="nombre" x="3655.5" y="3073.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" ># nombre() : String</text>
+<rect class="resalte" data-m="cargo" x="3649.5" y="3078" width="403" height="13" rx="2" style="fill:var(--patron)" opacity="0"/>
+<text class="miembro" data-m="cargo" x="3655.5" y="3087.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" ># cargo(capital : BigDecimal, cantidadCuotas : int) : BigDecimal</text>
 </g>
 <g class="clase" data-id="Renglon">
 <rect x="3049" y="3193" width="321" height="129" rx="6" fill="#ffffff" stroke="#7c8f6f" stroke-width="1.2"/>
@@ -435,12 +554,15 @@
 <text x="3209.5" y="3210" text-anchor="middle" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="8.5" fill="#5a6580" letter-spacing="0.4">«record»</text>
 <text x="3209.5" y="3226" text-anchor="middle" font-family="'Geist', -apple-system, 'Helvetica Neue', sans-serif" font-size="12.5" font-weight="600" fill="#2d3142">Renglon</text>
 <line x1="3049" y1="3236" x2="3370" y2="3236" stroke="#2d3142" stroke-width="0.6" stroke-opacity="0.45"/>
-<text x="3057" y="3250.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >- concepto : String</text>
-<text x="3057" y="3264.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >- importe : BigDecimal</text>
+<text class="miembro" x="3057" y="3250.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >- concepto : String</text>
+<text class="miembro" x="3057" y="3264.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >- importe : BigDecimal</text>
 <line x1="3049" y1="3272" x2="3370" y2="3272" stroke="#2d3142" stroke-width="0.6" stroke-opacity="0.45"/>
-<text x="3057" y="3286.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ Renglon(concepto : String, importe : BigDecimal)</text>
-<text x="3057" y="3300.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ concepto() : String</text>
-<text x="3057" y="3314.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ importe() : BigDecimal</text>
+<rect class="resalte" data-m="Renglon" x="3051" y="3277" width="317" height="13" rx="2" style="fill:var(--patron)" opacity="0"/>
+<text class="miembro" data-m="Renglon" x="3057" y="3286.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ Renglon(concepto : String, importe : BigDecimal)</text>
+<rect class="resalte" data-m="concepto" x="3051" y="3291" width="317" height="13" rx="2" style="fill:var(--patron)" opacity="0"/>
+<text class="miembro" data-m="concepto" x="3057" y="3300.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ concepto() : String</text>
+<rect class="resalte" data-m="importe" x="3051" y="3305" width="317" height="13" rx="2" style="fill:var(--patron)" opacity="0"/>
+<text class="miembro" data-m="importe" x="3057" y="3314.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ importe() : BigDecimal</text>
 </g>
 <g class="clase" data-id="IUsuario">
 <rect x="766.5" y="522" width="297" height="219" rx="6" fill="#ffffff" stroke="#9c6b50" stroke-width="1.2"/>
@@ -448,18 +570,30 @@
 <text x="915" y="539" text-anchor="middle" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="8.5" fill="#5a6580" letter-spacing="0.4">«interface»</text>
 <text x="915" y="555" text-anchor="middle" font-family="'Geist', -apple-system, 'Helvetica Neue', sans-serif" font-size="12.5" font-weight="600" fill="#2d3142" font-style="italic">IUsuario</text>
 <line x1="766.5" y1="565" x2="1063.5" y2="565" stroke="#2d3142" stroke-width="0.6" stroke-opacity="0.45"/>
-<text x="774.5" y="579.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ getId() : Long</text>
-<text x="774.5" y="593.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ getUsername() : String</text>
-<text x="774.5" y="607.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ getPassword() : String</text>
-<text x="774.5" y="621.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ getRol() : Rol</text>
-<text x="774.5" y="635.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ getPermisos() : IPermisos</text>
-<text x="774.5" y="649.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ isActivo() : boolean</text>
-<text x="774.5" y="663.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ puedeAnularCredito() : boolean</text>
-<text x="774.5" y="677.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ puedeAnularCobranza() : boolean</text>
-<text x="774.5" y="691.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ otorgarPermisos(permisos : IPermisos) : void</text>
-<text x="774.5" y="705.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ asignarRol(rol : Rol) : void</text>
-<text x="774.5" y="719.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ desactivar() : void</text>
-<text x="774.5" y="733.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ reactivar() : void</text>
+<rect class="resalte" data-m="getId" x="768.5" y="570" width="293" height="13" rx="2" style="fill:var(--patron)" opacity="0"/>
+<text class="miembro" data-m="getId" x="774.5" y="579.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ getId() : Long</text>
+<rect class="resalte" data-m="getUsername" x="768.5" y="584" width="293" height="13" rx="2" style="fill:var(--patron)" opacity="0"/>
+<text class="miembro" data-m="getUsername" x="774.5" y="593.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ getUsername() : String</text>
+<rect class="resalte" data-m="getPassword" x="768.5" y="598" width="293" height="13" rx="2" style="fill:var(--patron)" opacity="0"/>
+<text class="miembro" data-m="getPassword" x="774.5" y="607.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ getPassword() : String</text>
+<rect class="resalte" data-m="getRol" x="768.5" y="612" width="293" height="13" rx="2" style="fill:var(--patron)" opacity="0"/>
+<text class="miembro" data-m="getRol" x="774.5" y="621.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ getRol() : Rol</text>
+<rect class="resalte" data-m="getPermisos" x="768.5" y="626" width="293" height="13" rx="2" style="fill:var(--patron)" opacity="0"/>
+<text class="miembro" data-m="getPermisos" x="774.5" y="635.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ getPermisos() : IPermisos</text>
+<rect class="resalte" data-m="isActivo" x="768.5" y="640" width="293" height="13" rx="2" style="fill:var(--patron)" opacity="0"/>
+<text class="miembro" data-m="isActivo" x="774.5" y="649.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ isActivo() : boolean</text>
+<rect class="resalte" data-m="puedeAnularCredito" x="768.5" y="654" width="293" height="13" rx="2" style="fill:var(--patron)" opacity="0"/>
+<text class="miembro" data-m="puedeAnularCredito" x="774.5" y="663.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ puedeAnularCredito() : boolean</text>
+<rect class="resalte" data-m="puedeAnularCobranza" x="768.5" y="668" width="293" height="13" rx="2" style="fill:var(--patron)" opacity="0"/>
+<text class="miembro" data-m="puedeAnularCobranza" x="774.5" y="677.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ puedeAnularCobranza() : boolean</text>
+<rect class="resalte" data-m="otorgarPermisos" x="768.5" y="682" width="293" height="13" rx="2" style="fill:var(--patron)" opacity="0"/>
+<text class="miembro" data-m="otorgarPermisos" x="774.5" y="691.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ otorgarPermisos(permisos : IPermisos) : void</text>
+<rect class="resalte" data-m="asignarRol" x="768.5" y="696" width="293" height="13" rx="2" style="fill:var(--patron)" opacity="0"/>
+<text class="miembro" data-m="asignarRol" x="774.5" y="705.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ asignarRol(rol : Rol) : void</text>
+<rect class="resalte" data-m="desactivar" x="768.5" y="710" width="293" height="13" rx="2" style="fill:var(--patron)" opacity="0"/>
+<text class="miembro" data-m="desactivar" x="774.5" y="719.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ desactivar() : void</text>
+<rect class="resalte" data-m="reactivar" x="768.5" y="724" width="293" height="13" rx="2" style="fill:var(--patron)" opacity="0"/>
+<text class="miembro" data-m="reactivar" x="774.5" y="733.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ reactivar() : void</text>
 </g>
 <g class="clase" data-id="IPermisos">
 <rect x="467.25" y="1243" width="230" height="79" rx="6" fill="#ffffff" stroke="#9c6b50" stroke-width="1.2"/>
@@ -467,8 +601,10 @@
 <text x="582.25" y="1260" text-anchor="middle" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="8.5" fill="#5a6580" letter-spacing="0.4">«interface»</text>
 <text x="582.25" y="1276" text-anchor="middle" font-family="'Geist', -apple-system, 'Helvetica Neue', sans-serif" font-size="12.5" font-weight="600" fill="#2d3142" font-style="italic">IPermisos</text>
 <line x1="467.25" y1="1286" x2="697.25" y2="1286" stroke="#2d3142" stroke-width="0.6" stroke-opacity="0.45"/>
-<text x="475.25" y="1300.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ isPuedeAnularCredito() : boolean</text>
-<text x="475.25" y="1314.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ isPuedeAnularCobranza() : boolean</text>
+<rect class="resalte" data-m="isPuedeAnularCredito" x="469.25" y="1291" width="226" height="13" rx="2" style="fill:var(--patron)" opacity="0"/>
+<text class="miembro" data-m="isPuedeAnularCredito" x="475.25" y="1300.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ isPuedeAnularCredito() : boolean</text>
+<rect class="resalte" data-m="isPuedeAnularCobranza" x="469.25" y="1305" width="226" height="13" rx="2" style="fill:var(--patron)" opacity="0"/>
+<text class="miembro" data-m="isPuedeAnularCobranza" x="475.25" y="1314.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ isPuedeAnularCobranza() : boolean</text>
 </g>
 <g class="clase" data-id="IRol">
 <rect x="652" y="1068" width="151" height="65" rx="6" fill="#ffffff" stroke="#9c6b50" stroke-width="1.2"/>
@@ -476,7 +612,8 @@
 <text x="727.5" y="1085" text-anchor="middle" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="8.5" fill="#5a6580" letter-spacing="0.4">«interface»</text>
 <text x="727.5" y="1101" text-anchor="middle" font-family="'Geist', -apple-system, 'Helvetica Neue', sans-serif" font-size="12.5" font-weight="600" fill="#2d3142" font-style="italic">IRol</text>
 <line x1="652" y1="1111" x2="803" y2="1111" stroke="#2d3142" stroke-width="0.6" stroke-opacity="0.45"/>
-<text x="660" y="1125.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ autoridad() : String</text>
+<rect class="resalte" data-m="autoridad" x="654" y="1116" width="147" height="13" rx="2" style="fill:var(--patron)" opacity="0"/>
+<text class="miembro" data-m="autoridad" x="660" y="1125.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ autoridad() : String</text>
 </g>
 <g class="clase" data-id="Usuario">
 <rect x="36" y="794" width="596" height="339" rx="6" fill="#ffffff" stroke="#9c6b50" stroke-width="1.2"/>
@@ -484,27 +621,41 @@
 <text x="334" y="811" text-anchor="middle" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="8.5" fill="#5a6580" letter-spacing="0.4">«Entity»</text>
 <text x="334" y="827" text-anchor="middle" font-family="'Geist', -apple-system, 'Helvetica Neue', sans-serif" font-size="12.5" font-weight="600" fill="#2d3142">Usuario</text>
 <line x1="36" y1="837" x2="632" y2="837" stroke="#2d3142" stroke-width="0.6" stroke-opacity="0.45"/>
-<text x="44" y="851.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >- id : Long</text>
-<text x="44" y="865.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >- username : String</text>
-<text x="44" y="879.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >- password : String</text>
-<text x="44" y="893.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >- rol : Rol</text>
-<text x="44" y="907.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >- permisos : Permisos</text>
-<text x="44" y="921.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >- activo : boolean</text>
+<text class="miembro" x="44" y="851.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >- id : Long</text>
+<text class="miembro" x="44" y="865.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >- username : String</text>
+<text class="miembro" x="44" y="879.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >- password : String</text>
+<text class="miembro" x="44" y="893.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >- rol : Rol</text>
+<text class="miembro" x="44" y="907.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >- permisos : Permisos</text>
+<text class="miembro" x="44" y="921.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >- activo : boolean</text>
 <line x1="36" y1="929" x2="632" y2="929" stroke="#2d3142" stroke-width="0.6" stroke-opacity="0.45"/>
-<text x="44" y="943.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >- Usuario(username : String, passwordHasheado : String, rol : Rol, permisos : Permisos)</text>
-<text x="44" y="957.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" text-decoration="underline">+ nuevo(username : String, passwordHasheado : String, rol : Rol, permisos : Permisos) : Usuario</text>
-<text x="44" y="971.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ getId() : Long</text>
-<text x="44" y="985.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ getUsername() : String</text>
-<text x="44" y="999.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ getPassword() : String</text>
-<text x="44" y="1013.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ getRol() : Rol</text>
-<text x="44" y="1027.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ getPermisos() : Permisos</text>
-<text x="44" y="1041.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ isActivo() : boolean</text>
-<text x="44" y="1055.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ puedeAnularCredito() : boolean</text>
-<text x="44" y="1069.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ puedeAnularCobranza() : boolean</text>
-<text x="44" y="1083.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ otorgarPermisos(permisos : IPermisos) : void</text>
-<text x="44" y="1097.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ asignarRol(rol : Rol) : void</text>
-<text x="44" y="1111.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ desactivar() : void</text>
-<text x="44" y="1125.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ reactivar() : void</text>
+<rect class="resalte" data-m="Usuario" x="38" y="934" width="592" height="13" rx="2" style="fill:var(--patron)" opacity="0"/>
+<text class="miembro" data-m="Usuario" x="44" y="943.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >- Usuario(username : String, passwordHasheado : String, rol : Rol, permisos : Permisos)</text>
+<rect class="resalte" data-m="nuevo" x="38" y="948" width="592" height="13" rx="2" style="fill:var(--patron)" opacity="0"/>
+<text class="miembro" data-m="nuevo" x="44" y="957.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" text-decoration="underline">+ nuevo(username : String, passwordHasheado : String, rol : Rol, permisos : Permisos) : Usuario</text>
+<rect class="resalte" data-m="getId" x="38" y="962" width="592" height="13" rx="2" style="fill:var(--patron)" opacity="0"/>
+<text class="miembro" data-m="getId" x="44" y="971.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ getId() : Long</text>
+<rect class="resalte" data-m="getUsername" x="38" y="976" width="592" height="13" rx="2" style="fill:var(--patron)" opacity="0"/>
+<text class="miembro" data-m="getUsername" x="44" y="985.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ getUsername() : String</text>
+<rect class="resalte" data-m="getPassword" x="38" y="990" width="592" height="13" rx="2" style="fill:var(--patron)" opacity="0"/>
+<text class="miembro" data-m="getPassword" x="44" y="999.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ getPassword() : String</text>
+<rect class="resalte" data-m="getRol" x="38" y="1004" width="592" height="13" rx="2" style="fill:var(--patron)" opacity="0"/>
+<text class="miembro" data-m="getRol" x="44" y="1013.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ getRol() : Rol</text>
+<rect class="resalte" data-m="getPermisos" x="38" y="1018" width="592" height="13" rx="2" style="fill:var(--patron)" opacity="0"/>
+<text class="miembro" data-m="getPermisos" x="44" y="1027.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ getPermisos() : Permisos</text>
+<rect class="resalte" data-m="isActivo" x="38" y="1032" width="592" height="13" rx="2" style="fill:var(--patron)" opacity="0"/>
+<text class="miembro" data-m="isActivo" x="44" y="1041.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ isActivo() : boolean</text>
+<rect class="resalte" data-m="puedeAnularCredito" x="38" y="1046" width="592" height="13" rx="2" style="fill:var(--patron)" opacity="0"/>
+<text class="miembro" data-m="puedeAnularCredito" x="44" y="1055.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ puedeAnularCredito() : boolean</text>
+<rect class="resalte" data-m="puedeAnularCobranza" x="38" y="1060" width="592" height="13" rx="2" style="fill:var(--patron)" opacity="0"/>
+<text class="miembro" data-m="puedeAnularCobranza" x="44" y="1069.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ puedeAnularCobranza() : boolean</text>
+<rect class="resalte" data-m="otorgarPermisos" x="38" y="1074" width="592" height="13" rx="2" style="fill:var(--patron)" opacity="0"/>
+<text class="miembro" data-m="otorgarPermisos" x="44" y="1083.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ otorgarPermisos(permisos : IPermisos) : void</text>
+<rect class="resalte" data-m="asignarRol" x="38" y="1088" width="592" height="13" rx="2" style="fill:var(--patron)" opacity="0"/>
+<text class="miembro" data-m="asignarRol" x="44" y="1097.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ asignarRol(rol : Rol) : void</text>
+<rect class="resalte" data-m="desactivar" x="38" y="1102" width="592" height="13" rx="2" style="fill:var(--patron)" opacity="0"/>
+<text class="miembro" data-m="desactivar" x="44" y="1111.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ desactivar() : void</text>
+<rect class="resalte" data-m="reactivar" x="38" y="1116" width="592" height="13" rx="2" style="fill:var(--patron)" opacity="0"/>
+<text class="miembro" data-m="reactivar" x="44" y="1125.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ reactivar() : void</text>
 </g>
 <g class="clase" data-id="Permisos">
 <rect x="71" y="1419" width="480" height="171" rx="6" fill="#ffffff" stroke="#9c6b50" stroke-width="1.2"/>
@@ -512,15 +663,21 @@
 <text x="311" y="1436" text-anchor="middle" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="8.5" fill="#5a6580" letter-spacing="0.4">«Embeddable»</text>
 <text x="311" y="1452" text-anchor="middle" font-family="'Geist', -apple-system, 'Helvetica Neue', sans-serif" font-size="12.5" font-weight="600" fill="#2d3142">Permisos</text>
 <line x1="71" y1="1462" x2="551" y2="1462" stroke="#2d3142" stroke-width="0.6" stroke-opacity="0.45"/>
-<text x="79" y="1476.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >- puedeAnularCredito : boolean</text>
-<text x="79" y="1490.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >- puedeAnularCobranza : boolean</text>
+<text class="miembro" x="79" y="1476.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >- puedeAnularCredito : boolean</text>
+<text class="miembro" x="79" y="1490.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >- puedeAnularCobranza : boolean</text>
 <line x1="71" y1="1498" x2="551" y2="1498" stroke="#2d3142" stroke-width="0.6" stroke-opacity="0.45"/>
-<text x="79" y="1512.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >- Permisos(puedeAnularCredito : boolean, puedeAnularCobranza : boolean)</text>
-<text x="79" y="1526.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" text-decoration="underline">+ de(puedeAnularCredito : boolean, puedeAnularCobranza : boolean) : Permisos</text>
-<text x="79" y="1540.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" text-decoration="underline">+ ninguno() : Permisos</text>
-<text x="79" y="1554.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" text-decoration="underline">+ todos() : Permisos</text>
-<text x="79" y="1568.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ isPuedeAnularCredito() : boolean</text>
-<text x="79" y="1582.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ isPuedeAnularCobranza() : boolean</text>
+<rect class="resalte" data-m="Permisos" x="73" y="1503" width="476" height="13" rx="2" style="fill:var(--patron)" opacity="0"/>
+<text class="miembro" data-m="Permisos" x="79" y="1512.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >- Permisos(puedeAnularCredito : boolean, puedeAnularCobranza : boolean)</text>
+<rect class="resalte" data-m="de" x="73" y="1517" width="476" height="13" rx="2" style="fill:var(--patron)" opacity="0"/>
+<text class="miembro" data-m="de" x="79" y="1526.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" text-decoration="underline">+ de(puedeAnularCredito : boolean, puedeAnularCobranza : boolean) : Permisos</text>
+<rect class="resalte" data-m="ninguno" x="73" y="1531" width="476" height="13" rx="2" style="fill:var(--patron)" opacity="0"/>
+<text class="miembro" data-m="ninguno" x="79" y="1540.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" text-decoration="underline">+ ninguno() : Permisos</text>
+<rect class="resalte" data-m="todos" x="73" y="1545" width="476" height="13" rx="2" style="fill:var(--patron)" opacity="0"/>
+<text class="miembro" data-m="todos" x="79" y="1554.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" text-decoration="underline">+ todos() : Permisos</text>
+<rect class="resalte" data-m="isPuedeAnularCredito" x="73" y="1559" width="476" height="13" rx="2" style="fill:var(--patron)" opacity="0"/>
+<text class="miembro" data-m="isPuedeAnularCredito" x="79" y="1568.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ isPuedeAnularCredito() : boolean</text>
+<rect class="resalte" data-m="isPuedeAnularCobranza" x="73" y="1573" width="476" height="13" rx="2" style="fill:var(--patron)" opacity="0"/>
+<text class="miembro" data-m="isPuedeAnularCobranza" x="79" y="1582.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ isPuedeAnularCobranza() : boolean</text>
 </g>
 <g class="clase" data-id="Rol">
 <rect x="296.25" y="1236" width="151" height="115" rx="6" fill="#ffffff" stroke="#9c6b50" stroke-width="1.2"/>
@@ -528,11 +685,12 @@
 <text x="371.75" y="1253" text-anchor="middle" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="8.5" fill="#5a6580" letter-spacing="0.4">«enumeration»</text>
 <text x="371.75" y="1269" text-anchor="middle" font-family="'Geist', -apple-system, 'Helvetica Neue', sans-serif" font-size="12.5" font-weight="600" fill="#2d3142">Rol</text>
 <line x1="296.25" y1="1279" x2="447.25" y2="1279" stroke="#2d3142" stroke-width="0.6" stroke-opacity="0.45"/>
-<text x="304.25" y="1293.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >ADMIN</text>
-<text x="304.25" y="1307.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >SUPERVISOR</text>
-<text x="304.25" y="1321.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >USER</text>
+<text class="miembro" x="304.25" y="1293.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >ADMIN</text>
+<text class="miembro" x="304.25" y="1307.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >SUPERVISOR</text>
+<text class="miembro" x="304.25" y="1321.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >USER</text>
 <line x1="296.25" y1="1329" x2="447.25" y2="1329" stroke="#2d3142" stroke-width="0.6" stroke-opacity="0.45"/>
-<text x="304.25" y="1343.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ autoridad() : String</text>
+<rect class="resalte" data-m="autoridad" x="298.25" y="1334" width="147" height="13" rx="2" style="fill:var(--patron)" opacity="0"/>
+<text class="miembro" data-m="autoridad" x="304.25" y="1343.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ autoridad() : String</text>
 </g>
 <g class="clase" data-id="CreditoServiceImpl">
 <rect x="1178" y="52" width="401" height="203" rx="6" fill="#ffffff" stroke="#6e6479" stroke-width="1.2"/>
@@ -542,16 +700,23 @@
 <text x="1378.5" y="87" text-anchor="middle" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="8.5" fill="#5a6580" letter-spacing="0.4">«Service»</text>
 <text x="1378.5" y="103" text-anchor="middle" font-family="'Geist', -apple-system, 'Helvetica Neue', sans-serif" font-size="12.5" font-weight="600" fill="#2d3142">CreditoServiceImpl</text>
 <line x1="1178" y1="113" x2="1579" y2="113" stroke="#2d3142" stroke-width="0.6" stroke-opacity="0.45"/>
-<text x="1186" y="127.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >- creditoRepository : CreditoRepository</text>
-<text x="1186" y="141.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >- clienteRepository : ClienteRepository</text>
+<text class="miembro" x="1186" y="127.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >- creditoRepository : CreditoRepository</text>
+<text class="miembro" x="1186" y="141.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >- clienteRepository : ClienteRepository</text>
 <line x1="1178" y1="149" x2="1579" y2="149" stroke="#2d3142" stroke-width="0.6" stroke-opacity="0.45"/>
-<text x="1186" y="163.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ crear(request : CreditoRequest) : CreditoResponse</text>
-<text x="1186" y="177.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ buscarPorId(id : Long) : CreditoResponse</text>
-<text x="1186" y="191.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ listarTodos() : List&lt;CreditoResponse&gt;</text>
-<text x="1186" y="205.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ listarPorCliente(dniCliente : String) : List&lt;CreditoResponse&gt;</text>
-<text x="1186" y="219.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ anularCredito(id : Long, usuario : IUsuario) : void</text>
-<text x="1186" y="233.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >- buscarCliente(dni : String) : Cliente</text>
-<text x="1186" y="247.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >- buscarCredito(id : Long) : Credito</text>
+<rect class="resalte" data-m="crear" x="1180" y="154" width="397" height="13" rx="2" style="fill:var(--patron)" opacity="0"/>
+<text class="miembro" data-m="crear" x="1186" y="163.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ crear(request : CreditoRequest) : CreditoResponse</text>
+<rect class="resalte" data-m="buscarPorId" x="1180" y="168" width="397" height="13" rx="2" style="fill:var(--patron)" opacity="0"/>
+<text class="miembro" data-m="buscarPorId" x="1186" y="177.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ buscarPorId(id : Long) : CreditoResponse</text>
+<rect class="resalte" data-m="listarTodos" x="1180" y="182" width="397" height="13" rx="2" style="fill:var(--patron)" opacity="0"/>
+<text class="miembro" data-m="listarTodos" x="1186" y="191.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ listarTodos() : List&lt;CreditoResponse&gt;</text>
+<rect class="resalte" data-m="listarPorCliente" x="1180" y="196" width="397" height="13" rx="2" style="fill:var(--patron)" opacity="0"/>
+<text class="miembro" data-m="listarPorCliente" x="1186" y="205.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ listarPorCliente(dniCliente : String) : List&lt;CreditoResponse&gt;</text>
+<rect class="resalte" data-m="anularCredito" x="1180" y="210" width="397" height="13" rx="2" style="fill:var(--patron)" opacity="0"/>
+<text class="miembro" data-m="anularCredito" x="1186" y="219.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ anularCredito(id : Long, usuario : IUsuario) : void</text>
+<rect class="resalte" data-m="buscarCliente" x="1180" y="224" width="397" height="13" rx="2" style="fill:var(--patron)" opacity="0"/>
+<text class="miembro" data-m="buscarCliente" x="1186" y="233.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >- buscarCliente(dni : String) : Cliente</text>
+<rect class="resalte" data-m="buscarCredito" x="1180" y="238" width="397" height="13" rx="2" style="fill:var(--patron)" opacity="0"/>
+<text class="miembro" data-m="buscarCredito" x="1186" y="247.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >- buscarCredito(id : Long) : Credito</text>
 </g>
 <g class="clase" data-id="CobranzaServiceImpl">
 <rect x="769" y="112" width="389" height="143" rx="6" fill="#ffffff" stroke="#6e6479" stroke-width="1.2"/>
@@ -559,13 +724,16 @@
 <text x="963.5" y="129" text-anchor="middle" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="8.5" fill="#5a6580" letter-spacing="0.4">«Service»</text>
 <text x="963.5" y="145" text-anchor="middle" font-family="'Geist', -apple-system, 'Helvetica Neue', sans-serif" font-size="12.5" font-weight="600" fill="#2d3142">CobranzaServiceImpl</text>
 <line x1="769" y1="155" x2="1158" y2="155" stroke="#2d3142" stroke-width="0.6" stroke-opacity="0.45"/>
-<text x="777" y="169.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >- cobranzaRepository : CobranzaRepository</text>
-<text x="777" y="183.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >- cuotaRepository : CuotaRepository</text>
-<text x="777" y="197.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >- creditoRepository : CreditoRepository</text>
+<text class="miembro" x="777" y="169.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >- cobranzaRepository : CobranzaRepository</text>
+<text class="miembro" x="777" y="183.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >- cuotaRepository : CuotaRepository</text>
+<text class="miembro" x="777" y="197.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >- creditoRepository : CreditoRepository</text>
 <line x1="769" y1="205" x2="1158" y2="205" stroke="#2d3142" stroke-width="0.6" stroke-opacity="0.45"/>
-<text x="777" y="219.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ registrar(request : CobranzaRequest) : CobranzaResponse</text>
-<text x="777" y="233.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ listarPorCredito(idCredito : Long) : List&lt;CobranzaResponse&gt;</text>
-<text x="777" y="247.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ anularCobranza(id : Long, usuario : IUsuario) : void</text>
+<rect class="resalte" data-m="registrar" x="771" y="210" width="385" height="13" rx="2" style="fill:var(--patron)" opacity="0"/>
+<text class="miembro" data-m="registrar" x="777" y="219.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ registrar(request : CobranzaRequest) : CobranzaResponse</text>
+<rect class="resalte" data-m="listarPorCredito" x="771" y="224" width="385" height="13" rx="2" style="fill:var(--patron)" opacity="0"/>
+<text class="miembro" data-m="listarPorCredito" x="777" y="233.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ listarPorCredito(idCredito : Long) : List&lt;CobranzaResponse&gt;</text>
+<rect class="resalte" data-m="anularCobranza" x="771" y="238" width="385" height="13" rx="2" style="fill:var(--patron)" opacity="0"/>
+<text class="miembro" data-m="anularCobranza" x="777" y="247.5" font-family="'Geist Mono', ui-monospace, Menlo, monospace" font-size="10" fill="#2d3142" >+ anularCobranza(id : Long, usuario : IUsuario) : void</text>
 </g>
 <g class="rel" data-a="ICliente" data-b="Cliente"><polygon points="1530.5,2770 1537.5,2783 1523.5,2783" fill="#ffffff" stroke="#2d3142" stroke-width="1.2" stroke-linejoin="miter"/></g>
 <g class="rel" data-a="Deuda" data-b="ICredito"><polygon points="3590.2000000000003,618 3597.2000000000003,631 3583.2000000000003,631" fill="#ffffff" stroke="#2d3142" stroke-width="1.2" stroke-linejoin="miter"/></g>
@@ -864,6 +1032,8 @@ svg[data-dominio] .btn-patron { cursor: pointer; }
 svg[data-dominio] .btn-patron.elegido rect { stroke: #2d3142; stroke-width: 2.5; }
 svg[data-dominio].patron .rel.activa path { stroke: var(--patron); stroke-width: 2.6; }
 svg[data-dominio].patron .clase.activa > rect:first-child { stroke: var(--patron); stroke-width: 2.4; }
+svg[data-dominio].patron .resalte.marcado { opacity: .2; }
+svg[data-dominio].patron text.miembro.marcado { fill: var(--patron); font-weight: 600; }
 </style>
 <script><![CDATA[
 (function () {
@@ -889,7 +1059,7 @@ svg[data-dominio].patron .clase.activa > rect:first-child { stroke: var(--patron
   function limpiar(svg) {
     svg.classList.remove("foco", "patron");
     svg.querySelectorAll(".btn-patron.elegido").forEach(function (b) { b.classList.remove("elegido"); });
-    svg.querySelectorAll(".activa, .elegida").forEach(function (e) { e.classList.remove("activa", "elegida"); });
+    svg.querySelectorAll(".activa, .elegida, .marcado").forEach(function (e) { e.classList.remove("activa", "elegida", "marcado"); });
     if (panel) panel.style.display = "none";
   }
   function enfocar(svg, id) {
@@ -926,7 +1096,12 @@ svg[data-dominio].patron .clase.activa > rect:first-child { stroke: var(--patron
     var en = {};
     btn.getAttribute("data-clases").split(",").forEach(function (id) { en[id] = true; });
     svg.querySelectorAll(".clase").forEach(function (c) { if (en[c.getAttribute("data-id")]) c.classList.add("activa"); });
-    svg.querySelectorAll(".rel").forEach(function (r) { if (en[r.getAttribute("data-a")] && en[r.getAttribute("data-b")]) r.classList.add("activa"); });
+    if (btn.getAttribute("data-rel") === "1")
+      svg.querySelectorAll(".rel").forEach(function (r) { if (en[r.getAttribute("data-a")] && en[r.getAttribute("data-b")]) r.classList.add("activa"); });
+    (btn.getAttribute("data-metodos") || "").split(",").filter(Boolean).forEach(function (cm) {
+      var p = cm.split(".");
+      svg.querySelectorAll(".clase[data-id='" + p[0] + "'] [data-m='" + p[1] + "']").forEach(function (e) { e.classList.add("marcado"); });
+    });
     if (!document.body) return;
     mostrarPanel("", []);
     panel.innerHTML = btn.getAttribute("data-ficha") + "<div style='margin-top:6px;color:#5a6580'>Esc o clic afuera para salir</div>";
