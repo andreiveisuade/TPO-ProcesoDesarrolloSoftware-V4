@@ -14,6 +14,16 @@ const C = {
   paper: "#f5f5f5", paper2: "#ececec", ink: "#2d3142", muted: "#4f5d75",
   soft: "#5a6580", rule: "#bfc0c0", box: "#ffffff",
 };
+// Un color por paquete (paleta series de diagram-design) y uno por familia de relacion
+const PAQUETE = {
+  "model.credito": "#5e7a9b", "model.plan": "#7c8f6f", "model.usuario": "#9c6b50",
+  "model.cliente": "#b8915a", "service.impl": "#6e6479",
+};
+const FAMILIA = {
+  herencia: { color: "#2d3142", nombre: "implementa / extiende" },
+  estructura: { color: "#2e5aa8", nombre: "composición / agregación / asociación" },
+  uso: { color: "#8b93a7", nombre: "dependencia" },
+};
 const MONO = "'Geist Mono', ui-monospace, Menlo, monospace";
 const SANS = "'Geist', -apple-system, 'Helvetica Neue', sans-serif";
 const SERIF = "'Instrument Serif', Georgia, serif";
@@ -92,13 +102,13 @@ const limpiar = (l) => l.replace(/\{(static|abstract)\}\s*/g, "");
 
 // ---------- tipos de relacion ----------
 const TIPOS = {
-  "<|..": { trazo: "5,4", inicio: "triangulo", fin: null, verbo: true },
-  "<|--": { trazo: null, inicio: "triangulo", fin: null, verbo: true },
-  "o-->": { trazo: null, inicio: "rombo-vacio", fin: "punta" },
-  "*-->": { trazo: null, inicio: "rombo-lleno", fin: "punta" },
-  "*--": { trazo: null, inicio: "rombo-lleno", fin: null },
-  "-->": { trazo: null, inicio: null, fin: "punta" },
-  "..>": { trazo: "4,3", inicio: null, fin: "punta" },
+  "<|..": { familia: "herencia", trazo: "5,4", inicio: "triangulo", fin: null, verbo: true },
+  "<|--": { familia: "herencia", trazo: null, inicio: "triangulo", fin: null, verbo: true },
+  "o-->": { familia: "estructura", trazo: null, inicio: "rombo-vacio", fin: "punta" },
+  "*-->": { familia: "estructura", trazo: null, inicio: "rombo-lleno", fin: "punta" },
+  "*--": { familia: "estructura", trazo: null, inicio: "rombo-lleno", fin: null },
+  "-->": { familia: "estructura", trazo: null, inicio: null, fin: "punta" },
+  "..>": { familia: "uso", trazo: "4,3", inicio: null, fin: "punta" },
 };
 
 // ---------- layout ----------
@@ -147,8 +157,10 @@ async function disponer(modelo, medidas) {
 const esc = (t) => t.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 
 function caja(c, m, x, y) {
+  const col = PAQUETE[c.paquete];
   const s = [`<g class="clase" data-id="${c.id}">`];
-  s.push(`<rect x="${x}" y="${y}" width="${m.ancho}" height="${m.alto}" rx="6" fill="${C.box}" stroke="${C.ink}" stroke-width="1"/>`);
+  s.push(`<rect x="${x}" y="${y}" width="${m.ancho}" height="${m.alto}" rx="6" fill="${C.box}" stroke="${col}" stroke-width="1.2"/>`);
+  s.push(`<path d="M${x + 0.6},${y + m.altoCab} V${y + 6} Q${x + 0.6},${y + 0.6} ${x + 6},${y + 0.6} H${x + m.ancho - 6} Q${x + m.ancho - 0.6},${y + 0.6} ${x + m.ancho - 0.6},${y + 6} V${y + m.altoCab} Z" fill="${col}" fill-opacity="0.32"/>`);
   let cy = y + PAD;
   const cx = x + m.ancho / 2;
   if (m.est) {
@@ -192,20 +204,20 @@ function trazo(p, r = 7) {
 }
 
 // Marca en el extremo `punta`, apuntando desde `previo` hacia `punta`
-function marca(tipo, punta, previo) {
+function marca(tipo, punta, previo, color) {
   const L = Math.hypot(punta.x - previo.x, punta.y - previo.y) || 1;
   const ux = (punta.x - previo.x) / L, uy = (punta.y - previo.y) / L;
   const nx = -uy, ny = ux;
   const pt = (a, b) => `${punta.x - ux * a + nx * b},${punta.y - uy * a + ny * b}`;
   if (tipo === "triangulo") {
-    return `<polygon points="${pt(0, 0)} ${pt(13, 7)} ${pt(13, -7)}" fill="${C.box}" stroke="${C.ink}" stroke-width="1.1" stroke-linejoin="miter"/>`;
+    return `<polygon points="${pt(0, 0)} ${pt(13, 7)} ${pt(13, -7)}" fill="${C.box}" stroke="${color}" stroke-width="1.2" stroke-linejoin="miter"/>`;
   }
   if (tipo === "rombo-lleno" || tipo === "rombo-vacio") {
-    const relleno = tipo === "rombo-lleno" ? C.ink : C.box;
-    return `<polygon points="${pt(0, 0)} ${pt(8, 5)} ${pt(16, 0)} ${pt(8, -5)}" fill="${relleno}" stroke="${C.ink}" stroke-width="1.1"/>`;
+    const relleno = tipo === "rombo-lleno" ? color : C.box;
+    return `<polygon points="${pt(0, 0)} ${pt(8, 5)} ${pt(16, 0)} ${pt(8, -5)}" fill="${relleno}" stroke="${color}" stroke-width="1.2"/>`;
   }
   if (tipo === "punta") {
-    return `<polyline points="${pt(10, 5)} ${pt(0, 0)} ${pt(10, -5)}" fill="none" stroke="${C.ink}" stroke-width="1.2" stroke-linejoin="miter"/>`;
+    return `<polyline points="${pt(10, 5)} ${pt(0, 0)} ${pt(10, -5)}" fill="none" stroke="${color}" stroke-width="1.3" stroke-linejoin="miter"/>`;
   }
   return "";
 }
@@ -227,13 +239,19 @@ function dibujar(modelo, medidas, g) {
   out.push(`<rect width="${W}" height="${H}" fill="${C.paper}"/>`);
   out.push(`<text x="${MARGEN}" y="${MARGEN + 22}" font-family="${SERIF}" font-size="30" fill="${C.ink}">Diagrama de clases del dominio</text>`);
   out.push(`<text x="${MARGEN}" y="${MARGEN + 42}" font-family="${MONO}" font-size="10" fill="${C.soft}" letter-spacing="1">DASHBOARD DE PRÉSTAMOS · V4 · CADA RELACIÓN SE LEE COMO ORACIÓN, DEL ORIGEN AL DESTINO</text>`);
+  let lx = W - MARGEN - 760;
+  for (const f of Object.values(FAMILIA)) {
+    out.push(`<line x1="${lx}" y1="${MARGEN + 18}" x2="${lx + 28}" y2="${MARGEN + 18}" stroke="${f.color}" stroke-width="2"${f === FAMILIA.uso ? ` stroke-dasharray="4,3"` : ""}/>`);
+    out.push(`<text x="${lx + 36}" y="${MARGEN + 22}" font-family="${MONO}" font-size="11" fill="${C.ink}">${esc(f.nombre)}</text>`);
+    lx += 64 + f.nombre.length * 6.6;
+  }
   out.push(`<g transform="translate(${MARGEN},${MARGEN + TITULO})">`);
 
   // paquetes
   for (const p of g.children) {
     const a = abs.get(p.id);
-    out.push(`<rect x="${a.x}" y="${a.y}" width="${a.w}" height="${a.h}" rx="8" fill="${C.paper2}" stroke="${C.rule}" stroke-width="1"/>`);
-    out.push(`<text x="${a.x + 16}" y="${a.y + 24}" font-family="${MONO}" font-size="11" fill="${C.muted}" letter-spacing="1.2">${esc(p.id.slice(4).toUpperCase())}</text>`);
+    out.push(`<rect x="${a.x}" y="${a.y}" width="${a.w}" height="${a.h}" rx="8" fill="${PAQUETE[p.id.slice(4)]}" fill-opacity="0.11" stroke="${PAQUETE[p.id.slice(4)]}" stroke-opacity="0.55" stroke-width="1.2"/>`);
+    out.push(`<text x="${a.x + 16}" y="${a.y + 24}" font-family="${MONO}" font-size="11" font-weight="600" fill="${PAQUETE[p.id.slice(4)]}" letter-spacing="1.2">${esc(p.id.slice(4).toUpperCase())}</text>`);
   }
 
   // relaciones (antes que las cajas)
@@ -243,20 +261,21 @@ function dibujar(modelo, medidas, g) {
     const o = abs.get(e.container || "raiz") || { x: 0, y: 0 };
     const sec = e.sections[0];
     const pts = [sec.startPoint, ...(sec.bendPoints || []), sec.endPoint].map((q) => ({ x: q.x + o.x, y: q.y + o.y }));
+    const col = FAMILIA[t.familia].color;
     const guion = t.trazo ? ` stroke-dasharray="${t.trazo}"` : "";
     const sujeto = r.flecha.startsWith("<|") ? r.b : r.a;
     const attrs = `data-a="${r.a}" data-b="${r.b}" data-sujeto="${sujeto}" data-frase="${esc(frase(r))}"`;
-    out.push(`<g class="rel" ${attrs}><path d="${trazo(pts)}" fill="none" stroke="${C.muted}" stroke-width="1.15"${guion}/></g>`);
+    out.push(`<g class="rel" ${attrs}><path d="${trazo(pts)}" fill="none" stroke="${col}" stroke-width="${t.familia === "uso" ? 1.1 : 1.4}"${guion}/></g>`);
     marcas.push(`<g class="rel" data-a="${r.a}" data-b="${r.b}">` +
-      (t.inicio ? marca(t.inicio, pts[0], pts[1]) : "") +
-      (t.fin ? marca(t.fin, pts[pts.length - 1], pts[pts.length - 2]) : "") + `</g>`);
+      (t.inicio ? marca(t.inicio, pts[0], pts[1], col) : "") +
+      (t.fin ? marca(t.fin, pts[pts.length - 1], pts[pts.length - 2], col) : "") + `</g>`);
     etiquetas.push(`<g class="rel" data-a="${r.a}" data-b="${r.b}">`);
     for (const l of e.labels || []) {
       const x = l.x + o.x, y = l.y + o.y;
       const esMult = l.text !== r.verbo;
       etiquetas.push(
         `<rect x="${x}" y="${y}" width="${l.width}" height="${l.height}" rx="2" fill="${C.paper}" fill-opacity="0.92"/>` +
-        `<text x="${x + l.width / 2}" y="${y + l.height - 3.5}" text-anchor="middle" font-family="${MONO}" font-size="${ETIQUETA.size}" fill="${esMult ? C.ink : C.muted}"${esMult ? ` font-weight="600"` : ` font-style="italic"`}>${esc(l.text)}</text>`,
+        `<text x="${x + l.width / 2}" y="${y + l.height - 3.5}" text-anchor="middle" font-family="${MONO}" font-size="${ETIQUETA.size}" fill="${esMult ? C.ink : t.familia === "uso" ? C.soft : col}"${esMult ? ` font-weight="600"` : ` font-style="italic"`}>${esc(l.text)}</text>`,
       );
     }
     etiquetas.push(`</g>`);
@@ -285,7 +304,7 @@ const ESTILO = `
 svg[data-dominio] .clase { cursor: pointer; }
 svg[data-dominio] .clase, svg[data-dominio] .rel { transition: opacity .15s; }
 svg[data-dominio].foco .clase:not(.activa), svg[data-dominio].foco .rel:not(.activa) { opacity: .1; }
-svg[data-dominio].foco .rel.activa path { stroke: ${C.ink}; stroke-width: 1.8; }
+svg[data-dominio].foco .rel.activa path { stroke-width: 2.4; }
 svg[data-dominio] .clase.elegida > rect:first-child { stroke: #bf4520; stroke-width: 2; }
 `;
 
