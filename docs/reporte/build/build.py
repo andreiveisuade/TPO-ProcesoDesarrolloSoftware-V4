@@ -467,6 +467,7 @@ LIGHTBOX = """<div class="lightbox" id="lb" role="dialog" aria-modal="true" aria
     document.getElementById("lbTitle").textContent = title;
     lb.classList.add("open"); document.body.classList.add("lb-locked"); fit();
   }
+  canvas.addEventListener("dominio-vista", function (e) { var d = size(e.target); w = d[0]; h = d[1]; fit(); });
   function close() { lb.classList.remove("open"); document.body.classList.remove("lb-locked"); canvas.innerHTML = ""; }
   function titulo(box) {
     var fig = box.closest("figure"), cap = fig && fig.querySelector("figcaption");
@@ -572,12 +573,8 @@ doc = f'''<!doctype html>
 
 <section id="clases"><h2>Diagramas de clases y DER</h2>
 <p>Fuente: <code>docs/diagramas/clases-v4.puml</code> y <code>der-v4.py</code>.</p>
-<h3>Capas MVC</h3>
-<div class="clases">{clases("mvc")}</div>
-<h3>Seguridad: Facade y Adapter</h3>
-<div class="clases">{clases("seguridad")}</div>
-<h3>Dominio: Composite, Strategy y Decorator</h3>
-<p>Cada relación tiene semántica (el verbo, que se lee del origen al destino), multiplicidad en ambos extremos y tipo; las realizaciones y herencias no llevan multiplicidad. Se genera con <code>docs/diagramas/dominio/build.mjs</code> a partir del bloque <code>clases-v4-modelo</code>.</p>
+<h3>Diagrama de clases: dominio y capas</h3>
+<p>Un solo diagrama con el dominio siempre a la vista; los toggles de <em>Capas</em> suman, cada uno por separado, la seguridad (Facade y Adapter), las capas MVC, los DTOs, las excepciones, la configuración y el frontend. Cada relación tiene semántica (el verbo, que se lee del origen al destino), multiplicidad en ambos extremos y tipo; las realizaciones y herencias no llevan multiplicidad. Las clases de Spring y jjwt muestran solo los métodos que usa el sistema. Se genera con <code>docs/diagramas/dominio/build.mjs</code> a partir de los bloques <code>clases-v4-*</code> de <code>clases-v4.puml</code>; la vista de dominio viene dibujada y el resto lo calcula el navegador al prender cada capa.</p>
 <div class="clases">{clases("dominio")}</div>
 <h3>Paquetes del Modelo</h3>
 <div class="clases">{clases("paquetes")}</div>

@@ -4,351 +4,1186 @@ skinparam classAttributeIconSize 0
 skinparam packageStyle rectangle
 skinparam shadowing false
 skinparam linetype ortho
-skinparam nodesep 30
-skinparam ranksep 60
-hide <<component>> members
 
-package "Vista (React, frontend/src/api)" as Vista {
-  class "auth.js" as VAuth <<component>>
-  class "clientes.js" as VClientes <<component>>
-  class "creditos.js" as VCreditos <<component>>
-  class "cobranzas.js" as VCobranzas <<component>>
-  class "admin.js" as VAdmin <<component>>
-  class "supervisor.js" as VSupervisor <<component>>
-  class "dashboard.js" as VDashboard <<component>>
-}
-
-package "Controlador (controller)" as Controlador {
-  class AuthController <<RestController>> {
-    - authService : AuthService
-    + registrar(RegisterRequest) : AuthResponse
-    + login(LoginRequest) : AuthResponse
-    + actual(IUsuario) : AuthResponse
-  }
+package "controller" {
+  class AuthController
   class ClienteController <<RestController>> {
     - clienteService : ClienteService
-    + crear(ClienteRequest) : ClienteResponse
-    + buscarPorDni(String) : ClienteResponse
-    + listarTodos() : List<ClienteResponse>
-    + deuda(String) : DeudaClienteResponse
+    + crear(request : ClienteRequest) : ResponseEntity<ClienteResponse>
+    + buscarPorDni(dni : String) : ResponseEntity<ClienteResponse>
+    + deuda(dni : String) : ResponseEntity<DeudaClienteResponse>
+    + listarTodos() : ResponseEntity<List<ClienteResponse>>
   }
   class CreditoController <<RestController>> {
     - creditoService : CreditoService
-    + crear(CreditoRequest) : CreditoResponse
-    + buscarPorId(Long) : CreditoResponse
-    + listarTodos() : List<CreditoResponse>
-    + listarPorCliente(String) : List<CreditoResponse>
-    + anularCredito(Long, IUsuario) : void
+    + crear(request : CreditoRequest) : ResponseEntity<CreditoResponse>
+    + listarTodos() : ResponseEntity<List<CreditoResponse>>
+    + buscarPorId(id : Long) : ResponseEntity<CreditoResponse>
+    + listarPorCliente(dni : String) : ResponseEntity<List<CreditoResponse>>
+    + anularCredito(id : Long, usuario : IUsuario) : ResponseEntity<Void>
   }
   class CobranzaController <<RestController>> {
     - cobranzaService : CobranzaService
-    + registrar(CobranzaRequest) : CobranzaResponse
-    + listarPorCredito(Long) : List<CobranzaResponse>
-    + anularCobranza(Long, IUsuario) : void
+    + registrar(request : CobranzaRequest) : ResponseEntity<CobranzaResponse>
+    + listarPorCredito(idCredito : Long) : ResponseEntity<List<CobranzaResponse>>
+    + anularCobranza(id : Long, usuario : IUsuario) : ResponseEntity<Void>
   }
   class AdminController <<RestController>> {
     - adminService : AdminService
     + listarUsuarios() : List<UsuarioResponse>
-    + crearUsuario(AltaUsuarioRequest) : UsuarioResponse
-    + actualizarPermisos(Long, PermisosRequest) : UsuarioResponse
-    + actualizarRol(Long, RolRequest) : UsuarioResponse
-    + actualizarActivo(Long, ActivoRequest) : UsuarioResponse
+    + crearUsuario(request : AltaUsuarioRequest) : ResponseEntity<UsuarioResponse>
+    + actualizarPermisos(id : Long, request : PermisosRequest) : UsuarioResponse
+    + actualizarRol(id : Long, request : RolRequest) : UsuarioResponse
+    + actualizarActivo(id : Long, request : ActivoRequest) : UsuarioResponse
   }
   class SupervisorController <<RestController>> {
     - adminService : AdminService
     + listarUsuarios() : List<UsuarioResponse>
-    + actualizarPermisosAnulacion(Long, PermisosRequest) : UsuarioResponse
+    + actualizarPermisosAnulacion(id : Long, request : PermisosRequest) : UsuarioResponse
   }
   class DashboardController <<RestController>> {
     - dashboardService : DashboardService
-    + obtenerEstadisticas() : DashboardStatsResponse
+    + obtenerEstadisticas() : ResponseEntity<DashboardStatsResponse>
   }
 }
 
-package "Modelo: servicios (service)" as Servicios {
-  interface AuthService <<Facade>> {
-    + registrar(RegisterRequest) : AuthResponse
-    + registrarConRol(RegisterRequest, Rol) : UsuarioResponse
-    + login(LoginRequest) : AuthResponse
-    + actual(String) : AuthResponse
-  }
+package "service" {
+  interface AuthService
   interface ClienteService {
-    + crear(ClienteRequest) : ClienteResponse
-    + buscarPorDni(String) : ClienteResponse
+    + crear(request : ClienteRequest) : ClienteResponse
+    + buscarPorDni(dni : String) : ClienteResponse
     + listarTodos() : List<ClienteResponse>
-    + deuda(String) : DeudaClienteResponse
+    + deuda(dni : String) : DeudaClienteResponse
   }
   interface CreditoService {
-    + crear(CreditoRequest) : CreditoResponse
-    + buscarPorId(Long) : CreditoResponse
+    + crear(request : CreditoRequest) : CreditoResponse
+    + buscarPorId(id : Long) : CreditoResponse
     + listarTodos() : List<CreditoResponse>
-    + listarPorCliente(String) : List<CreditoResponse>
-    + anularCredito(Long, IUsuario) : void
+    + listarPorCliente(dniCliente : String) : List<CreditoResponse>
+    + anularCredito(id : Long, usuario : IUsuario) : void
   }
   interface CobranzaService {
-    + registrar(CobranzaRequest) : CobranzaResponse
-    + listarPorCredito(Long) : List<CobranzaResponse>
-    + anularCobranza(Long, IUsuario) : void
+    + registrar(request : CobranzaRequest) : CobranzaResponse
+    + listarPorCredito(idCredito : Long) : List<CobranzaResponse>
+    + anularCobranza(id : Long, usuario : IUsuario) : void
   }
   interface AdminService {
     + listarUsuarios() : List<UsuarioResponse>
-    + crearUsuario(AltaUsuarioRequest) : UsuarioResponse
-    + actualizarPermisos(Long, PermisosRequest) : UsuarioResponse
-    + actualizarRol(Long, RolRequest) : UsuarioResponse
-    + actualizarActivo(Long, ActivoRequest) : UsuarioResponse
+    + crearUsuario(request : AltaUsuarioRequest) : UsuarioResponse
+    + actualizarPermisos(id : Long, request : PermisosRequest) : UsuarioResponse
+    + actualizarRol(id : Long, request : RolRequest) : UsuarioResponse
+    + actualizarActivo(id : Long, request : ActivoRequest) : UsuarioResponse
   }
   interface DashboardService {
     + obtenerEstadisticasGenerales() : DashboardStatsResponse
   }
-  class AuthServiceImpl <<Facade>> {
-    - usuarioRepository : UsuarioRepository
-    - passwordEncoder : PasswordEncoder
-    - authenticationManager : AuthenticationManager
-    - tokenService : TokenService
-  }
-  class ClienteServiceImpl {
+}
+
+package "service.impl" {
+  class AuthServiceImpl
+  class CreditoServiceImpl
+  class CobranzaServiceImpl
+  class ClienteServiceImpl <<Service>> {
     - clienteRepository : ClienteRepository
     - creditoRepository : CreditoRepository
+    + crear(request : ClienteRequest) : ClienteResponse
+    + buscarPorDni(dni : String) : ClienteResponse
+    + listarTodos() : List<ClienteResponse>
+    + deuda(dni : String) : DeudaClienteResponse
   }
-  class CreditoServiceImpl {
-    - creditoRepository : CreditoRepository
-    - clienteRepository : ClienteRepository
-  }
-  class CobranzaServiceImpl {
-    - cobranzaRepository : CobranzaRepository
-    - cuotaRepository : CuotaRepository
-    - creditoRepository : CreditoRepository
-  }
-  class AdminServiceImpl {
+  class AdminServiceImpl <<Service>> {
     - usuarioRepository : UsuarioRepository
     - authService : AuthService
+    + listarUsuarios() : List<UsuarioResponse>
+    + crearUsuario(request : AltaUsuarioRequest) : UsuarioResponse
+    + actualizarPermisos(id : Long, request : PermisosRequest) : UsuarioResponse
+    + actualizarRol(id : Long, request : RolRequest) : UsuarioResponse
+    + actualizarActivo(id : Long, request : ActivoRequest) : UsuarioResponse
+    - buscar(id : Long) : Usuario
   }
-  class DashboardServiceImpl {
+  class DashboardServiceImpl <<Service>> {
     - clienteRepository : ClienteRepository
     - creditoRepository : CreditoRepository
     - cobranzaRepository : CobranzaRepository
+    + obtenerEstadisticasGenerales() : DashboardStatsResponse
   }
 }
 
-package "Modelo: persistencia (repository, Spring Data JPA)" as Repos {
-  interface ClienteRepository <<JpaRepository<Cliente, String>>> {
-    + findById(String) : Optional<Cliente>
-    + existsById(String) : boolean
+package "repository" {
+  interface ClienteRepository <<JpaRepository · Cliente, String>> {
   }
-  interface CreditoRepository <<JpaRepository<Credito, Long>>> {
-    + findById(Long) : Optional<Credito>
-    + findAll() : List<Credito>
-    + buscarPorCliente(String) : List<Credito>
-    + bloquearPorId(Long) : Optional<Credito>
+  interface CreditoRepository <<JpaRepository · Credito, Long>> {
+    + buscarPorCliente(dni : String) : List<Credito>
+    + bloquearPorId(id : Long) : Optional<Credito>
     + sumarDeudaOriginalNoAnulada() : BigDecimal
   }
-  interface CuotaRepository <<JpaRepository<Cuota, Long>>> {
-    + buscarPorCreditoYNumero(Long, Integer) : Optional<Cuota>
+  interface CuotaRepository <<JpaRepository · Cuota, Long>> {
+    + buscarPorCreditoYNumero(idCredito : Long, numero : Integer) : Optional<Cuota>
   }
-  interface CobranzaRepository <<JpaRepository<Cobranza, Long>>> {
-    + buscarPorCredito(Long) : List<Cobranza>
+  interface CobranzaRepository <<JpaRepository · Cobranza, Long>> {
+    + buscarPorCredito(idCredito : Long) : List<Cobranza>
     + sumarImporteNoAnulado() : BigDecimal
   }
-  interface UsuarioRepository <<JpaRepository<Usuario, Long>>> {
-    + findByUsername(String) : Optional<Usuario>
-    + existsByUsername(String) : boolean
+  interface UsuarioRepository <<JpaRepository · Usuario, Long>> {
+    + findByUsername(username : String) : Optional<Usuario>
+    + existsByUsername(username : String) : boolean
   }
 }
 
-VAuth ..> AuthController
-VClientes ..> ClienteController
-VCreditos ..> CreditoController
-VCobranzas ..> CobranzaController
-VAdmin ..> AdminController
-VSupervisor ..> SupervisorController
-VDashboard ..> DashboardController
+ClienteController "0..*" --> "1" ClienteService : delega en
+CreditoController "0..*" --> "1" CreditoService : delega en
+CobranzaController "0..*" --> "1" CobranzaService : delega en
+AdminController "0..*" --> "1" AdminService : delega en
+SupervisorController "0..*" --> "1" AdminService : delega en
+DashboardController "0..*" --> "1" DashboardService : delega en
+CreditoController "1" ..> "1" IUsuario : recibe al autenticado como
+CobranzaController "1" ..> "1" IUsuario : recibe al autenticado como
 
-AuthController --> "1" AuthService
-ClienteController --> "1" ClienteService
-CreditoController --> "1" CreditoService
-CobranzaController --> "1" CobranzaService
-AdminController --> "1" AdminService
-SupervisorController --> "1" AdminService
-DashboardController --> "1" DashboardService
+ClienteService <|.. ClienteServiceImpl : implementa
+CreditoService <|.. CreditoServiceImpl : implementa
+CobranzaService <|.. CobranzaServiceImpl : implementa
+AdminService <|.. AdminServiceImpl : implementa
+DashboardService <|.. DashboardServiceImpl : implementa
+CreditoService ..> IUsuario : recibe
+CobranzaService ..> IUsuario : recibe
 
-AuthService <|.. AuthServiceImpl
-ClienteService <|.. ClienteServiceImpl
-CreditoService <|.. CreditoServiceImpl
-CobranzaService <|.. CobranzaServiceImpl
-AdminService <|.. AdminServiceImpl
-AdminServiceImpl --> "1" AuthService : alta por la Facade
-DashboardService <|.. DashboardServiceImpl
+ClienteServiceImpl "0..*" --> "1" ClienteRepository : guarda y busca en
+ClienteServiceImpl "0..*" --> "1" CreditoRepository : busca créditos en
+CreditoServiceImpl "0..*" --> "1" CreditoRepository : guarda y busca en
+CreditoServiceImpl "0..*" --> "1" ClienteRepository : busca al cliente en
+CobranzaServiceImpl "0..*" --> "1" CobranzaRepository : guarda y busca en
+CobranzaServiceImpl "0..*" --> "1" CuotaRepository : busca la cuota en
+CobranzaServiceImpl "0..*" --> "1" CreditoRepository : bloquea el crédito en
+AdminServiceImpl "0..*" --> "1" UsuarioRepository : guarda y busca en
+DashboardServiceImpl "0..*" --> "1" ClienteRepository : cuenta en
+DashboardServiceImpl "0..*" --> "1" CreditoRepository : suma en
+DashboardServiceImpl "0..*" --> "1" CobranzaRepository : suma en
 
-Servicios ..down.> Repos : cada *ServiceImpl usa los\nrepositories de sus atributos
+ClienteServiceImpl "1" ..> "0..*" Cliente : da de alta
+ClienteServiceImpl "1" ..> "1" Cartera : consulta la deuda en
+DashboardServiceImpl "1" ..> "1" Cartera : consulta saldo y mora en
+DashboardServiceImpl "1" ..> "1" EstadoCredito : cuenta vigentes según
+AdminServiceImpl "1" ..> "0..*" Usuario : administra
+AdminServiceImpl "1" ..> "1" Permisos : otorga
 
-note as Leyenda
-  Cada módulo de frontend/src/api llama por HTTP a /api/<recurso>.
-  Cada *ServiceImpl implementa las operaciones de su interfaz.
-  Las entidades del modelo (Credito, Cuota, Cartera, ...) están en clases-v4-modelo;
-  JWT, Spring Security y la Facade de autenticación, en clases-v4-seguridad.
-  CreditoServiceImpl, ClienteServiceImpl y DashboardServiceImpl son Client del Composite (tipan Deuda).
-  Omitidos: DTOs (estructuras sin comportamiento), excepciones,
-  configuración y GlobalExceptionHandler (@RestControllerAdvice).
-end note
+ClienteRepository ..> Cliente : persiste
+CreditoRepository ..> Credito : persiste
+CuotaRepository ..> Cuota : persiste
+CobranzaRepository ..> Cobranza : persiste
+UsuarioRepository ..> Usuario : persiste
 @enduml
 
 @startuml clases-v4-seguridad
-title Dashboard de préstamos V4 — seguridad, Facade y Adapter
+title Dashboard de préstamos V4 — seguridad: Facade y Adapter
 skinparam classAttributeIconSize 0
 skinparam packageStyle rectangle
 skinparam shadowing false
 skinparam linetype ortho
-skinparam nodesep 40
-skinparam ranksep 60
 
-package "Facade: autenticación" {
-  class AuthController <<Client>> {
+package "controller" {
+  class AuthController <<RestController>> {
     - authService : AuthService
-    + registrar(RegisterRequest) : AuthResponse
-    + login(LoginRequest) : AuthResponse
-    + actual(IUsuario) : AuthResponse
+    + registrar(request : RegisterRequest) : ResponseEntity<AuthResponse>
+    + login(request : LoginRequest) : ResponseEntity<AuthResponse>
+    + actual(usuario : IUsuario) : ResponseEntity<AuthResponse>
   }
-  interface AuthService <<Facade>> {
-    + registrar(RegisterRequest) : AuthResponse
-    + registrarConRol(RegisterRequest, Rol) : UsuarioResponse
-    + login(LoginRequest) : AuthResponse
-    + actual(String) : AuthResponse
+}
+
+package "service" {
+  interface AuthService {
+    + registrar(request : RegisterRequest) : AuthResponse
+    + registrarConRol(request : RegisterRequest, rol : Rol) : UsuarioResponse
+    + login(request : LoginRequest) : AuthResponse
+    + actual(username : String) : AuthResponse
   }
-  class AuthServiceImpl <<Facade>> {
+  interface TokenService {
+    + generarToken(username : String) : String
+    + extraerUsername(token : String) : Optional<String>
+  }
+}
+
+package "service.impl" {
+  class AuthServiceImpl <<Service>> {
     - usuarioRepository : UsuarioRepository
     - passwordEncoder : PasswordEncoder
     - authenticationManager : AuthenticationManager
     - tokenService : TokenService
-    + registrar(RegisterRequest) : AuthResponse
-    + registrarConRol(RegisterRequest, Rol) : UsuarioResponse
-    + login(LoginRequest) : AuthResponse
-    + actual(String) : AuthResponse
-    - crear(RegisterRequest, Rol) : Usuario
-    - buscar(String) : Usuario
+    + registrar(request : RegisterRequest) : AuthResponse
+    + registrarConRol(request : RegisterRequest, rol : Rol) : UsuarioResponse
+    + login(request : LoginRequest) : AuthResponse
+    + actual(username : String) : AuthResponse
+    - crear(request : RegisterRequest, rol : Rol) : Usuario
+    - buscar(username : String) : Usuario
   }
-  class AdminServiceImpl <<Client>> {
-    - authService : AuthService
-    + crearUsuario(AltaUsuarioRequest) : UsuarioResponse
-  }
+  class AdminServiceImpl
 }
 
-package "Subsistema (no conoce a la Facade)" {
-  interface "AuthenticationManager (Spring)" as AuthenticationManager {
-    + authenticate(Authentication) : Authentication
-  }
-  interface "PasswordEncoder (Spring)" as PasswordEncoder {
-    + encode(CharSequence) : String
-  }
-  interface UsuarioRepository <<JpaRepository<Usuario, Long>>> {
-    + findByUsername(String) : Optional<Usuario>
-    + existsByUsername(String) : boolean
-  }
-  package "Adapter 1: JWT (jjwt)" {
-    interface TokenService <<Target>> {
-      + generarToken(String) : String
-      + extraerUsername(String) : Optional<String>
-    }
-    class JwtUtil <<Adapter>> {
-      - key : SecretKey
-      - parser : JwtParser
-      - expirationMs : long
-      + generarToken(String) : String
-      + extraerUsername(String) : Optional<String>
-    }
-    interface "JwtParser (jjwt)" as JwtParser <<Adaptee>> {
-      + parseSignedClaims(CharSequence) : Jws<Claims>
-    }
-    class "Jwts (jjwt)" as Jwts <<Adaptee>> {
-      + {static} builder() : JwtBuilder
-    }
-    interface "SecretKey (javax.crypto)" as SecretKey {
-      + getAlgorithm() : String
-      + getEncoded() : byte[]
-    }
-  }
+package "repository" {
+  interface UsuarioRepository
 }
 
-class JwtAuthFilter <<Client>> {
-  - tokenService : TokenService
-  - userDetailsService : UserDetailsService
-  # doFilterInternal(HttpServletRequest, HttpServletResponse, FilterChain) : void
-}
-
-package "Adapter 2: usuario para Spring Security" {
-  interface "UserDetailsService (Spring)" as UserDetailsService {
-    + loadUserByUsername(String) : UserDetails
+package "security" {
+  class JwtAuthFilter <<Component>> {
+    - {static} PREFIJO_BEARER : String
+    - tokenService : TokenService
+    - userDetailsService : UserDetailsService
+    # doFilterInternal(request : HttpServletRequest, response : HttpServletResponse, filterChain : FilterChain) : void
+    - extraerToken(request : HttpServletRequest) : String
+    - faltaAutenticar() : boolean
+    - autenticar(token : String, request : HttpServletRequest) : void
   }
-  class UserDetailsServiceImpl {
+  class JwtUtil <<Component>> {
+    - key : SecretKey
+    - parser : JwtParser
+    - expirationMs : long
+    + JwtUtil(secret : String, expirationMs : long)
+    + generarToken(username : String) : String
+    + extraerUsername(token : String) : Optional<String>
+    - <T> extraerClaim(token : String, resolver : Function<Claims, T>) : T
+  }
+  class UserDetailsServiceImpl <<Service>> {
     - usuarioRepository : UsuarioRepository
-    + loadUserByUsername(String) : UserDetails
+    + loadUserByUsername(username : String) : UserDetails
   }
-  interface "UserDetails (Spring)" as UserDetails <<Target>> {
-    + getAuthorities() : Collection<GrantedAuthority>
-    + getPassword() : String
-    + getUsername() : String
-    + isEnabled() : boolean
-  }
-  class UsuarioDetails <<Adapter>> {
+  class UsuarioDetails {
     - usuario : IUsuario
+    + UsuarioDetails(usuario : IUsuario)
+    + getUsuario() : IUsuario
     + getAuthorities() : Collection<GrantedAuthority>
     + getPassword() : String
     + getUsername() : String
     + isEnabled() : boolean
-  }
-  interface IUsuario <<Adaptee>> {
-    + getUsername() : String
-    + getPassword() : String
-    + getRol() : Rol
-    + isActivo() : boolean
-    + desactivar() : void
-    + reactivar() : void
   }
 }
 
-AuthController --> "1" AuthService : authService
-AdminServiceImpl --> "1" AuthService : authService
-AuthService <|.. AuthServiceImpl
-AuthServiceImpl --> "1" AuthenticationManager
-AuthServiceImpl --> "1" PasswordEncoder
-AuthServiceImpl --> "1" UsuarioRepository
-AuthServiceImpl --> "1" TokenService
+package "spring y jjwt" {
+  abstract class OncePerRequestFilter <<Spring Web>> {
+    # {abstract} doFilterInternal(request : HttpServletRequest, response : HttpServletResponse, filterChain : FilterChain) : void
+  }
+  interface AuthenticationManager <<Spring Security>> {
+    + authenticate(authentication : Authentication) : Authentication
+  }
+  interface PasswordEncoder <<Spring Security>> {
+    + encode(rawPassword : CharSequence) : String
+    + matches(rawPassword : CharSequence, encodedPassword : String) : boolean
+  }
+  interface UserDetailsService <<Spring Security>> {
+    + loadUserByUsername(username : String) : UserDetails
+  }
+  interface UserDetails <<Spring Security>> {
+    + getAuthorities() : Collection<GrantedAuthority>
+    + getPassword() : String
+    + getUsername() : String
+    + isEnabled() : boolean
+  }
+  interface JwtParser <<jjwt>> {
+    + parseSignedClaims(jws : CharSequence) : Jws<Claims>
+  }
+  class Jwts <<jjwt>> {
+    + {static} builder() : JwtBuilder
+    + {static} parser() : JwtParserBuilder
+  }
+  interface SecretKey <<javax.crypto>> {
+    + getAlgorithm() : String
+    + getEncoded() : byte[]
+  }
+}
 
-JwtAuthFilter --> "1" TokenService
-TokenService <|.. JwtUtil
-JwtUtil *-- "1" JwtParser : parser
-JwtUtil *-- "1" SecretKey : key
-JwtUtil ..> Jwts : builder()
+AuthService <|.. AuthServiceImpl : implementa
+TokenService <|.. JwtUtil : implementa
+UserDetailsService <|.. UserDetailsServiceImpl : implementa
+UserDetails <|.. UsuarioDetails : implementa
+OncePerRequestFilter <|-- JwtAuthFilter : extiende
 
-JwtAuthFilter --> "1" UserDetailsService
-UserDetailsService <|.. UserDetailsServiceImpl
-UserDetailsServiceImpl --> "1" UsuarioRepository
-UserDetailsServiceImpl ..> UsuarioDetails : crea
-UserDetails <|.. UsuarioDetails
-UsuarioDetails o--> "1" IUsuario : usuario
+AuthController "0..*" --> "1" AuthService : delega en
+AuthController "1" ..> "1" IUsuario : recibe al autenticado como
+AdminServiceImpl "0..*" --> "1" AuthService : da de alta con
+AuthService ..> Rol : recibe
 
-note right of AuthServiceImpl
-  Facade: cuatro operaciones de negocio sobre
-  Spring Security, BCrypt, el repositorio y JWT.
-  Dos clientes: AuthController (registro, login)
-  y AdminServiceImpl (alta con rol); un solo crear().
-  Ningún controlador importa el subsistema.
-  También es Client del Adapter 1.
-end note
-note left of JwtUtil
-  Object Adapter: implementa el Target,
-  compone el JwtParser de jjwt y firma
-  con Jwts.builder().
-  Única clase que importa jjwt.
-end note
-note bottom of IUsuario
-  Object Adapter: Spring Security pide
-  UserDetails; envuelve al IUsuario
-  del dominio. Los controllers reciben
-  el IUsuario, no el Adapter:
-  @AuthenticationPrincipal(expression = "usuario").
-  isEnabled() traduce isActivo() (baja lógica):
-  login 401 y JwtAuthFilter descarta el token.
-end note
+AuthServiceImpl "0..*" --> "1" AuthenticationManager : autentica con
+AuthServiceImpl "0..*" --> "1" PasswordEncoder : cifra la clave con
+AuthServiceImpl "0..*" --> "1" UsuarioRepository : guarda y busca en
+AuthServiceImpl "0..*" --> "1" TokenService : emite el token con
+AuthServiceImpl "1" ..> "0..*" Usuario : crea
+AuthServiceImpl "1" ..> "1" Permisos : inicializa
+
+ApiClient "1" ..> "1" JwtAuthFilter : envía el token Bearer a
+JwtAuthFilter "0..*" --> "1" TokenService : valida el token con
+JwtAuthFilter "0..*" --> "1" UserDetailsService : carga al usuario con
+JwtAuthFilter "1" ..> "0..1" UserDetails : autentica a
+
+JwtUtil "1" *--> "1" JwtParser : valida con
+JwtUtil "1" *--> "1" SecretKey : firma con
+JwtUtil "1" ..> "1" Jwts : arma el token con
+
+UserDetailsServiceImpl "0..*" --> "1" UsuarioRepository : busca en
+UserDetailsServiceImpl "1" ..> "0..*" UsuarioDetails : crea
+UserDetailsService ..> UserDetails : devuelve
+UsuarioDetails "0..*" o--> "1" IUsuario : adapta a
+@enduml
+
+@startuml clases-v4-dtos
+title Dashboard de préstamos V4 — DTOs de request y response
+skinparam classAttributeIconSize 0
+skinparam packageStyle rectangle
+skinparam shadowing false
+skinparam linetype ortho
+
+package "dto.request" {
+  class ActivoRequest {
+    - activo : Boolean
+    + getActivo() : Boolean
+    + setActivo(activo : Boolean) : void
+  }
+  class RegisterRequest {
+    - username : String
+    - password : String
+    + getUsername() : String
+    + setUsername(username : String) : void
+    + getPassword() : String
+    + setPassword(password : String) : void
+  }
+  class AltaUsuarioRequest {
+    - rol : Rol
+    + getRol() : Rol
+    + setRol(rol : Rol) : void
+  }
+  class ClienteRequest {
+    - dni : String
+    - nombre : String
+    + getDni() : String
+    + setDni(dni : String) : void
+    + getNombre() : String
+    + setNombre(nombre : String) : void
+  }
+  class CobranzaRequest {
+    - idCredito : Long
+    - numeroCuota : Integer
+    - importe : BigDecimal
+    + getIdCredito() : Long
+    + setIdCredito(idCredito : Long) : void
+    + getNumeroCuota() : Integer
+    + setNumeroCuota(numeroCuota : Integer) : void
+    + getImporte() : BigDecimal
+    + setImporte(importe : BigDecimal) : void
+  }
+  class CreditoRequest {
+    - dniCliente : String
+    - deudaOriginal : BigDecimal
+    - fecha : LocalDate
+    - tasaInteres : BigDecimal
+    - cantidadCuotas : Integer
+    - tipoPlan : TipoPlan
+    - cargos : Set<TipoCargo>
+    + getDniCliente() : String
+    + setDniCliente(dniCliente : String) : void
+    + getDeudaOriginal() : BigDecimal
+    + setDeudaOriginal(deudaOriginal : BigDecimal) : void
+    + getFecha() : LocalDate
+    + setFecha(fecha : LocalDate) : void
+    + getTasaInteres() : BigDecimal
+    + setTasaInteres(tasaInteres : BigDecimal) : void
+    + getCantidadCuotas() : Integer
+    + setCantidadCuotas(cantidadCuotas : Integer) : void
+    + getTipoPlan() : TipoPlan
+    + setTipoPlan(tipoPlan : TipoPlan) : void
+    + getCargos() : Set<TipoCargo>
+    + setCargos(cargos : Set<TipoCargo>) : void
+  }
+  class LoginRequest {
+    - username : String
+    - password : String
+    + getUsername() : String
+    + setUsername(username : String) : void
+    + getPassword() : String
+    + setPassword(password : String) : void
+  }
+  class PermisosRequest {
+    - puedeAnularCredito : Boolean
+    - puedeAnularCobranza : Boolean
+    + PermisosRequest()
+    + PermisosRequest(puedeAnularCredito : Boolean, puedeAnularCobranza : Boolean)
+    + getPuedeAnularCredito() : Boolean
+    + setPuedeAnularCredito(puedeAnularCredito : Boolean) : void
+    + getPuedeAnularCobranza() : Boolean
+    + setPuedeAnularCobranza(puedeAnularCobranza : Boolean) : void
+  }
+  class RolRequest {
+    - rol : Rol
+    + getRol() : Rol
+    + setRol(rol : Rol) : void
+  }
+}
+
+package "dto.response" {
+  class AuthResponse {
+    - token : String
+    - username : String
+    - rol : Rol
+    - puedeAnularCredito : boolean
+    - puedeAnularCobranza : boolean
+    + AuthResponse(token : String, username : String, rol : Rol, puedeAnularCredito : boolean, puedeAnularCobranza : boolean)
+    + {static} desde(token : String, usuario : IUsuario) : AuthResponse
+    + getToken() : String
+    + setToken(token : String) : void
+    + getUsername() : String
+    + setUsername(username : String) : void
+    + getRol() : Rol
+    + setRol(rol : Rol) : void
+    + isPuedeAnularCredito() : boolean
+    + setPuedeAnularCredito(puedeAnularCredito : boolean) : void
+    + isPuedeAnularCobranza() : boolean
+    + setPuedeAnularCobranza(puedeAnularCobranza : boolean) : void
+  }
+  class ClienteResponse {
+    - dni : String
+    - nombre : String
+    + ClienteResponse(dni : String, nombre : String)
+    + {static} desde(cliente : ICliente) : ClienteResponse
+    + getDni() : String
+    + setDni(dni : String) : void
+    + getNombre() : String
+    + setNombre(nombre : String) : void
+  }
+  class CobranzaResponse {
+    - id : Long
+    - idCredito : Long
+    - numeroCuota : Integer
+    - importe : BigDecimal
+    - fechaCobranza : LocalDate
+    - anulada : boolean
+    - CobranzaResponse(id : Long, idCredito : Long, numeroCuota : Integer, importe : BigDecimal, fechaCobranza : LocalDate, anulada : boolean)
+    + {static} builder() : CobranzaResponseBuilder
+    + {static} desde(cobranza : ICobranza) : CobranzaResponse
+    + getId() : Long
+    + setId(id : Long) : void
+    + getIdCredito() : Long
+    + setIdCredito(idCredito : Long) : void
+    + getNumeroCuota() : Integer
+    + setNumeroCuota(numeroCuota : Integer) : void
+    + getImporte() : BigDecimal
+    + setImporte(importe : BigDecimal) : void
+    + getFechaCobranza() : LocalDate
+    + setFechaCobranza(fechaCobranza : LocalDate) : void
+    + isAnulada() : boolean
+    + setAnulada(anulada : boolean) : void
+  }
+  class CreditoResponse {
+    - id : Long
+    - dniCliente : String
+    - nombreCliente : String
+    - deudaOriginal : BigDecimal
+    - fecha : LocalDate
+    - tasaInteres : BigDecimal
+    - tipoPlan : TipoPlan
+    - cargos : Set<TipoCargo>
+    - totalADevolver : BigDecimal
+    - importeCuota : BigDecimal
+    - desgloseCuota : List<Renglon>
+    - cantidadCuotas : Integer
+    - cuotas : List<CuotaResponse>
+    - anulado : boolean
+    - estado : EstadoCredito
+    - saldo : BigDecimal
+    - puedeAnularse : boolean
+    - CreditoResponse(id : Long, dniCliente : String, nombreCliente : String, deudaOriginal : BigDecimal, fecha : LocalDate, tasaInteres : BigDecimal, tipoPlan : TipoPlan, cargos : Set<TipoCargo>, totalADevolver : BigDecimal, importeCuota : BigDecimal, desgloseCuota : List<Renglon>, cantidadCuotas : Integer, cuotas : List<CuotaResponse>, anulado : boolean, estado : EstadoCredito, saldo : BigDecimal, puedeAnularse : boolean)
+    + {static} builder() : CreditoResponseBuilder
+    + {static} desde(credito : ICredito) : CreditoResponse
+    + getId() : Long
+    + setId(id : Long) : void
+    + getDniCliente() : String
+    + setDniCliente(dniCliente : String) : void
+    + getNombreCliente() : String
+    + setNombreCliente(nombreCliente : String) : void
+    + getDeudaOriginal() : BigDecimal
+    + setDeudaOriginal(deudaOriginal : BigDecimal) : void
+    + getFecha() : LocalDate
+    + setFecha(fecha : LocalDate) : void
+    + getTasaInteres() : BigDecimal
+    + setTasaInteres(tasaInteres : BigDecimal) : void
+    + getTipoPlan() : TipoPlan
+    + setTipoPlan(tipoPlan : TipoPlan) : void
+    + getCargos() : Set<TipoCargo>
+    + setCargos(cargos : Set<TipoCargo>) : void
+    + getTotalADevolver() : BigDecimal
+    + setTotalADevolver(totalADevolver : BigDecimal) : void
+    + getImporteCuota() : BigDecimal
+    + setImporteCuota(importeCuota : BigDecimal) : void
+    + getDesgloseCuota() : List<Renglon>
+    + setDesgloseCuota(desgloseCuota : List<Renglon>) : void
+    + getCantidadCuotas() : Integer
+    + setCantidadCuotas(cantidadCuotas : Integer) : void
+    + getCuotas() : List<CuotaResponse>
+    + setCuotas(cuotas : List<CuotaResponse>) : void
+    + isAnulado() : boolean
+    + setAnulado(anulado : boolean) : void
+    + getEstado() : EstadoCredito
+    + setEstado(estado : EstadoCredito) : void
+    + getSaldo() : BigDecimal
+    + setSaldo(saldo : BigDecimal) : void
+    + isPuedeAnularse() : boolean
+    + setPuedeAnularse(puedeAnularse : boolean) : void
+  }
+  class CuotaResponse {
+    - idCredito : Long
+    - numeroCuota : Integer
+    - importe : BigDecimal
+    - fechaVencimiento : LocalDate
+    - pagada : boolean
+    - vencida : boolean
+    + CuotaResponse(idCredito : Long, numeroCuota : Integer, importe : BigDecimal, fechaVencimiento : LocalDate, pagada : boolean, vencida : boolean)
+    + {static} desde(cuota : ICuota) : CuotaResponse
+    + getIdCredito() : Long
+    + setIdCredito(idCredito : Long) : void
+    + getNumeroCuota() : Integer
+    + setNumeroCuota(numeroCuota : Integer) : void
+    + getImporte() : BigDecimal
+    + setImporte(importe : BigDecimal) : void
+    + getFechaVencimiento() : LocalDate
+    + setFechaVencimiento(fechaVencimiento : LocalDate) : void
+    + isPagada() : boolean
+    + setPagada(pagada : boolean) : void
+    + isVencida() : boolean
+    + setVencida(vencida : boolean) : void
+  }
+  class DashboardStatsResponse {
+    - cantidadClientes : Long
+    - cantidadCreditos : Long
+    - montoTotalFinanciado : BigDecimal
+    - montoTotalCobrado : BigDecimal
+    - saldoPendiente : BigDecimal
+    - montoVencido : BigDecimal
+    + DashboardStatsResponse()
+    + DashboardStatsResponse(cantidadClientes : Long, cantidadCreditos : Long, montoTotalFinanciado : BigDecimal, montoTotalCobrado : BigDecimal, saldoPendiente : BigDecimal, montoVencido : BigDecimal)
+    + getCantidadClientes() : Long
+    + setCantidadClientes(cantidadClientes : Long) : void
+    + getCantidadCreditos() : Long
+    + setCantidadCreditos(cantidadCreditos : Long) : void
+    + getMontoTotalFinanciado() : BigDecimal
+    + setMontoTotalFinanciado(montoTotalFinanciado : BigDecimal) : void
+    + getMontoTotalCobrado() : BigDecimal
+    + setMontoTotalCobrado(montoTotalCobrado : BigDecimal) : void
+    + getSaldoPendiente() : BigDecimal
+    + setSaldoPendiente(saldoPendiente : BigDecimal) : void
+    + getMontoVencido() : BigDecimal
+    + setMontoVencido(montoVencido : BigDecimal) : void
+  }
+  class DeudaClienteResponse {
+    - dni : String
+    - saldo : BigDecimal
+    - montoVencido : BigDecimal
+    + DeudaClienteResponse(dni : String, saldo : BigDecimal, montoVencido : BigDecimal)
+    + getDni() : String
+    + setDni(dni : String) : void
+    + getSaldo() : BigDecimal
+    + setSaldo(saldo : BigDecimal) : void
+    + getMontoVencido() : BigDecimal
+    + setMontoVencido(montoVencido : BigDecimal) : void
+  }
+  class ErrorResponse {
+    - status : int
+    - error : String
+    - mensajes : List<String>
+    - timestamp : LocalDateTime
+    + ErrorResponse(status : int, error : String, mensajes : List<String>, timestamp : LocalDateTime)
+    + getStatus() : int
+    + setStatus(status : int) : void
+    + getError() : String
+    + setError(error : String) : void
+    + getMensajes() : List<String>
+    + setMensajes(mensajes : List<String>) : void
+    + getTimestamp() : LocalDateTime
+    + setTimestamp(timestamp : LocalDateTime) : void
+  }
+  class UsuarioResponse {
+    - id : Long
+    - username : String
+    - rol : Rol
+    - puedeAnularCredito : boolean
+    - puedeAnularCobranza : boolean
+    - activo : boolean
+    + UsuarioResponse()
+    + UsuarioResponse(id : Long, username : String, rol : Rol, puedeAnularCredito : boolean, puedeAnularCobranza : boolean, activo : boolean)
+    + {static} desde(usuario : IUsuario) : UsuarioResponse
+    + getId() : Long
+    + setId(id : Long) : void
+    + getUsername() : String
+    + setUsername(username : String) : void
+    + getRol() : Rol
+    + setRol(rol : Rol) : void
+    + isPuedeAnularCredito() : boolean
+    + setPuedeAnularCredito(puedeAnularCredito : boolean) : void
+    + isPuedeAnularCobranza() : boolean
+    + setPuedeAnularCobranza(puedeAnularCobranza : boolean) : void
+    + isActivo() : boolean
+    + setActivo(activo : boolean) : void
+  }
+}
+
+RegisterRequest <|-- AltaUsuarioRequest : extiende
+
+AuthController "1" ..> "1" RegisterRequest : recibe
+AuthController "1" ..> "1" LoginRequest : recibe
+ClienteController "1" ..> "1" ClienteRequest : recibe
+CreditoController "1" ..> "1" CreditoRequest : recibe
+CobranzaController "1" ..> "1" CobranzaRequest : recibe
+AdminController "1" ..> "1" AltaUsuarioRequest : recibe
+AdminController "1" ..> "1" PermisosRequest : recibe
+AdminController "1" ..> "1" RolRequest : recibe
+AdminController "1" ..> "1" ActivoRequest : recibe
+SupervisorController "1" ..> "1" PermisosRequest : recibe
+
+AuthController "1" ..> "1" AuthResponse : devuelve
+ClienteController "1" ..> "0..*" ClienteResponse : devuelve
+ClienteController "1" ..> "1" DeudaClienteResponse : devuelve
+CreditoController "1" ..> "0..*" CreditoResponse : devuelve
+CobranzaController "1" ..> "0..*" CobranzaResponse : devuelve
+AdminController "1" ..> "0..*" UsuarioResponse : devuelve
+SupervisorController "1" ..> "0..*" UsuarioResponse : devuelve
+DashboardController "1" ..> "1" DashboardStatsResponse : devuelve
+
+AuthResponse "0..*" ..> "1" IUsuario : se arma desde
+UsuarioResponse "0..*" ..> "1" IUsuario : se arma desde
+ClienteResponse "0..*" ..> "1" ICliente : se arma desde
+CreditoResponse "0..*" ..> "1" ICredito : se arma desde
+CuotaResponse "0..*" ..> "1" ICuota : se arma desde
+CobranzaResponse "0..*" ..> "1" ICobranza : se arma desde
+
+CreditoResponse "1" *--> "1..*" CuotaResponse : contiene
+
+AltaUsuarioRequest "0..*" --> "1" Rol : pide el rol
+RolRequest "0..*" --> "1" Rol : pide el rol
+CreditoRequest "0..*" --> "1" TipoPlan : pide el plan
+CreditoRequest "0..*" --> "0..*" TipoCargo : pide los cargos
+AuthResponse "0..*" --> "1" Rol : informa el rol
+UsuarioResponse "0..*" --> "1" Rol : informa el rol
+CreditoResponse "0..*" --> "1" TipoPlan : informa el plan
+CreditoResponse "0..*" --> "0..*" TipoCargo : informa los cargos
+CreditoResponse "0..*" --> "1..*" Renglon : informa el desglose en
+CreditoResponse "0..*" --> "1" EstadoCredito : informa el estado
+@enduml
+
+@startuml clases-v4-excepciones
+title Dashboard de préstamos V4 — excepciones y su traducción a HTTP
+skinparam classAttributeIconSize 0
+skinparam packageStyle rectangle
+skinparam shadowing false
+skinparam linetype ortho
+
+package "exception" {
+  class BusinessException {
+    + BusinessException(message : String)
+  }
+  class ResourceNotFoundException {
+    + ResourceNotFoundException(recurso : String, campo : String, valor : Object)
+  }
+  class GlobalExceptionHandler <<RestControllerAdvice>> {
+    - {static} log : Logger
+    + handleNoEncontrado(ex : ResourceNotFoundException) : ResponseEntity<ErrorResponse>
+    + handleNegocio(ex : BusinessException) : ResponseEntity<ErrorResponse>
+    + handleValidacion(ex : MethodArgumentNotValidException) : ResponseEntity<ErrorResponse>
+    + handleSolicitudInvalida(ex : Exception) : ResponseEntity<ErrorResponse>
+    + handleDesactivado(ex : DisabledException) : ResponseEntity<ErrorResponse>
+    + handleNoAutenticado(ex : AuthenticationException) : ResponseEntity<ErrorResponse>
+    + handleAccesoDenegado(ex : AccessDeniedException) : ResponseEntity<ErrorResponse>
+    + handleRutaNoEncontrada(ex : NoResourceFoundException) : ResponseEntity<ErrorResponse>
+    + handleMetodoNoPermitido(ex : HttpRequestMethodNotSupportedException) : ResponseEntity<ErrorResponse>
+    + handleTipoNoSoportado(ex : HttpMediaTypeNotSupportedException) : ResponseEntity<ErrorResponse>
+    + handleNoAceptable(ex : HttpMediaTypeNotAcceptableException) : ResponseEntity<ErrorResponse>
+    + handleGeneral(ex : Exception) : ResponseEntity<ErrorResponse>
+    - error(status : HttpStatus, titulo : String, mensajes : List<String>) : ResponseEntity<ErrorResponse>
+  }
+}
+
+package "java" {
+  class Exception <<JDK>> {
+    + getMessage() : String
+  }
+  class RuntimeException <<JDK>> {
+    + RuntimeException(message : String)
+  }
+}
+
+package "spring y jjwt" {
+  class MethodArgumentNotValidException <<Spring Web>> {
+    + getBindingResult() : BindingResult
+  }
+  class HttpMessageNotReadableException <<Spring Web>> {
+  }
+  class MethodArgumentTypeMismatchException <<Spring Web>> {
+  }
+  class NoResourceFoundException <<Spring Web>> {
+    + getMessage() : String
+  }
+  class HttpRequestMethodNotSupportedException <<Spring Web>> {
+    + getMessage() : String
+  }
+  class HttpMediaTypeNotSupportedException <<Spring Web>> {
+    + getMessage() : String
+  }
+  class HttpMediaTypeNotAcceptableException <<Spring Web>> {
+    + getMessage() : String
+  }
+  abstract class AuthenticationException <<Spring Security>> {
+    + getMessage() : String
+  }
+  class DisabledException <<Spring Security>> {
+  }
+  class AccessDeniedException <<Spring Security>> {
+    + AccessDeniedException(msg : String)
+    + getMessage() : String
+  }
+}
+
+Exception <|-- RuntimeException : extiende
+RuntimeException <|-- BusinessException : extiende
+RuntimeException <|-- ResourceNotFoundException : extiende
+AuthenticationException <|-- DisabledException : extiende
+
+Usuario "1" ..> "0..*" BusinessException : lanza
+CondicionesDeCredito "1" ..> "0..*" BusinessException : lanza
+Credito "1" ..> "0..*" BusinessException : lanza
+Cuota "1" ..> "0..*" BusinessException : lanza
+Cobranza "1" ..> "0..*" BusinessException : lanza
+AuthServiceImpl "1" ..> "0..*" BusinessException : lanza
+ClienteServiceImpl "1" ..> "0..*" BusinessException : lanza
+CreditoServiceImpl "1" ..> "0..*" BusinessException : lanza
+AuthServiceImpl "1" ..> "0..*" ResourceNotFoundException : lanza
+AdminServiceImpl "1" ..> "0..*" ResourceNotFoundException : lanza
+ClienteServiceImpl "1" ..> "0..*" ResourceNotFoundException : lanza
+CreditoServiceImpl "1" ..> "0..*" ResourceNotFoundException : lanza
+CobranzaServiceImpl "1" ..> "0..*" ResourceNotFoundException : lanza
+CreditoServiceImpl "1" ..> "0..*" AccessDeniedException : lanza
+CobranzaServiceImpl "1" ..> "0..*" AccessDeniedException : lanza
+
+GlobalExceptionHandler "1" ..> "0..*" ResourceNotFoundException : traduce a 404
+GlobalExceptionHandler "1" ..> "0..*" BusinessException : traduce a 400
+GlobalExceptionHandler "1" ..> "0..*" MethodArgumentNotValidException : traduce a 400
+GlobalExceptionHandler "1" ..> "0..*" HttpMessageNotReadableException : traduce a 400
+GlobalExceptionHandler "1" ..> "0..*" MethodArgumentTypeMismatchException : traduce a 400
+GlobalExceptionHandler "1" ..> "0..*" DisabledException : traduce a 401
+GlobalExceptionHandler "1" ..> "0..*" AuthenticationException : traduce a 401
+GlobalExceptionHandler "1" ..> "0..*" AccessDeniedException : traduce a 403
+GlobalExceptionHandler "1" ..> "0..*" NoResourceFoundException : traduce a 404
+GlobalExceptionHandler "1" ..> "0..*" HttpRequestMethodNotSupportedException : traduce a 405
+GlobalExceptionHandler "1" ..> "0..*" HttpMediaTypeNotSupportedException : traduce a 415
+GlobalExceptionHandler "1" ..> "0..*" HttpMediaTypeNotAcceptableException : traduce a 406
+GlobalExceptionHandler "1" ..> "0..*" Exception : traduce a 500
+GlobalExceptionHandler "1" ..> "0..*" ErrorResponse : devuelve
+@enduml
+
+@startuml clases-v4-config
+title Dashboard de préstamos V4 — configuración y arranque
+skinparam classAttributeIconSize 0
+skinparam packageStyle rectangle
+skinparam shadowing false
+skinparam linetype ortho
+
+package "(raíz)" {
+  class TpEjemploApplication <<SpringBootApplication>> {
+    + {static} main(args : String[]) : void
+  }
+}
+
+package "config" {
+  class SecurityConfig <<Configuration>> {
+    - jwtAuthFilter : JwtAuthFilter
+    - corsOrigin : String
+    + SecurityConfig(jwtAuthFilter : JwtAuthFilter)
+    + webSecurityCustomizer() : WebSecurityCustomizer
+    + filterChain(http : HttpSecurity) : SecurityFilterChain
+    + corsConfigurationSource() : CorsConfigurationSource
+    + authenticationManager(config : AuthenticationConfiguration) : AuthenticationManager
+    + passwordEncoder() : PasswordEncoder
+  }
+  class DataInitializer <<Component>> {
+    - {static} log : Logger
+    - usuarioRepository : UsuarioRepository
+    - passwordEncoder : PasswordEncoder
+    + DataInitializer(usuarioRepository : UsuarioRepository, passwordEncoder : PasswordEncoder)
+    + run(args : String[]) : void
+    - crearSiNoExiste(username : String, rol : Rol, permisos : Permisos) : void
+  }
+  class OpenApiConfig <<Configuration>> {
+  }
+}
+
+package "spring y jjwt" {
+  class SpringApplication <<Spring Boot>> {
+    + {static} run(primarySource : Class, args : String[]) : ConfigurableApplicationContext
+  }
+  interface CommandLineRunner <<Spring Boot>> {
+    + run(args : String[]) : void
+  }
+  class HttpSecurity <<Spring Security>> {
+    + cors(customizer : Customizer) : HttpSecurity
+    + csrf(customizer : Customizer) : HttpSecurity
+    + sessionManagement(customizer : Customizer) : HttpSecurity
+    + authorizeHttpRequests(customizer : Customizer) : HttpSecurity
+    + exceptionHandling(customizer : Customizer) : HttpSecurity
+    + addFilterBefore(filter : Filter, beforeFilter : Class) : HttpSecurity
+    + build() : SecurityFilterChain
+  }
+  interface SecurityFilterChain <<Spring Security>> {
+  }
+  interface WebSecurityCustomizer <<Spring Security>> {
+    + customize(web : WebSecurity) : void
+  }
+  class AuthenticationConfiguration <<Spring Security>> {
+    + getAuthenticationManager() : AuthenticationManager
+  }
+  class BCryptPasswordEncoder <<Spring Security>> {
+    + BCryptPasswordEncoder()
+  }
+  interface CorsConfigurationSource <<Spring Web>> {
+    + getCorsConfiguration(request : HttpServletRequest) : CorsConfiguration
+  }
+}
+
+CommandLineRunner <|.. DataInitializer : implementa
+PasswordEncoder <|.. BCryptPasswordEncoder : implementa
+
+TpEjemploApplication "1" ..> "1" SpringApplication : arranca con
+
+SecurityConfig "1" --> "1" JwtAuthFilter : inserta en la cadena a
+SecurityConfig "1" ..> "1" HttpSecurity : configura
+SecurityConfig "1" ..> "1" SecurityFilterChain : publica
+SecurityConfig "1" ..> "1" WebSecurityCustomizer : publica
+SecurityConfig "1" ..> "1" CorsConfigurationSource : publica
+SecurityConfig "1" ..> "1" AuthenticationConfiguration : obtiene el manager de
+SecurityConfig "1" ..> "1" AuthenticationManager : publica
+SecurityConfig "1" ..> "1" BCryptPasswordEncoder : crea
+SecurityConfig "1" ..> "1" PasswordEncoder : publica
+HttpSecurity "1" ..> "1" SecurityFilterChain : construye
+
+DataInitializer "1" --> "1" UsuarioRepository : guarda en
+DataInitializer "1" --> "1" PasswordEncoder : cifra la clave con
+DataInitializer "1" ..> "3" Usuario : crea
+DataInitializer "1" ..> "1..*" Rol : asigna
+DataInitializer "1" ..> "1..*" Permisos : otorga
+@enduml
+
+@startuml clases-v4-frontend
+title Dashboard de préstamos V4 — frontend React
+skinparam classAttributeIconSize 0
+skinparam packageStyle rectangle
+skinparam shadowing false
+skinparam linetype ortho
+
+package "frontend/src" {
+  class "main.jsx" as MainJsx <<módulo JS>> {
+  }
+  class "App.jsx" as AppJsx <<componente React>> {
+  }
+}
+
+package "frontend/src/pages" {
+  class "Login.jsx" as LoginPage <<componente React>> {
+    - form : object
+    - styles : object
+    + handleSubmit(e : object) : Promise
+  }
+  class "Register.jsx" as RegisterPage <<componente React>> {
+    - form : object
+    - styles : object
+    + handleSubmit(e : object) : Promise
+  }
+  class "Clientes.jsx" as ClientesPage <<componente React>> {
+    - FORM_VACIO : object
+    - styles : object
+    - form : object
+    - dniBuscado : string
+    - encontrado : object
+    - deuda : object
+    - errorBusqueda : string
+    + buscar(e : object) : Promise
+    + handleSubmit(e : object) : Promise
+  }
+  class "Creditos.jsx" as CreditosPage <<componente React>> {
+    - ESTADO_CUOTA : object
+    - FORM_VACIO : object
+    - estadoColores : object
+    - styles : object
+    - dni : string
+    - dniBuscado : string
+    - buscado : boolean
+    - errorBusqueda : string
+    - exito : string
+    - idConsulta : string
+    - detalle : object
+    - errorDetalle : string
+    - form : object
+    - estadoCuota(c : object) : object
+    - descripcionPlan(cr : object) : string
+    - descripcionCargos(cr : object) : string
+    + buscar(e : object) : Promise
+    + alternarCargo(cargo : string) : void
+    + handleSubmit(e : object) : Promise
+    + handleAnular(id : number) : Promise
+    + consultar(e : object) : Promise
+    + fichaCredito(cr : object) : JSX
+  }
+  class "Cobranzas.jsx" as CobranzasPage <<componente React>> {
+    - FORM_VACIO : object
+    - styles : object
+    - idCredito : string
+    - idBuscado : string
+    - buscado : boolean
+    - errorBusqueda : string
+    - exito : string
+    - form : object
+    + buscar(e : object) : Promise
+    + handleSubmit(e : object) : Promise
+    + handleAnular(id : number) : Promise
+  }
+  class "Dashboard.jsx" as DashboardPage <<componente React>> {
+    - styles : object
+  }
+  class "GestorPermisos.jsx" as GestorPermisosPage <<componente React>> {
+    - styles : object
+    + handleCheckboxChange(usuario : object, campoPermiso : string) : void
+  }
+  class "PanelAdmin.jsx" as PanelAdminPage <<componente React>> {
+    - FORM_VACIO : object
+    - styles : object
+    - form : object
+    + handleRoleChange(usuarioId : number, nuevoRol : string) : void
+    + handleSubmit(e : object) : Promise
+  }
+}
+
+package "frontend/src/components" {
+  class "Navbar.jsx" as Navbar <<componente React>> {
+    - styles : object
+    + handleLogout() : void
+  }
+  class "PrivateRoute.jsx" as PrivateRoute <<componente React>> {
+    + children : JSX
+  }
+  class "RoleRoute.jsx" as RoleRoute <<componente React>> {
+    + roles : array
+    + children : JSX
+  }
+  class "Aviso.jsx" as Aviso <<componente React>> {
+    + tipo : string
+    + children : JSX
+  }
+}
+
+package "frontend/src/store" {
+  class "store.js" as StoreJs <<store>> {
+    + store : object
+  }
+}
+
+package "frontend/src/store/slices" {
+  class "authSlice.js" as AuthSlice <<store>> {
+    - user : object
+    - loading : boolean
+    - error : string
+    + loginThunk(credentials : object) : Promise
+    + registerThunk(data : object) : Promise
+    + refrescarUsuario() : Promise
+    + logout() : object
+    + reducer(state : object, action : object) : object
+    - onPending(state : object) : void
+    - onFulfilled(state : object, action : object) : void
+    - onRejected(state : object, action : object) : void
+  }
+  class "clientesSlice.js" as ClientesSlice <<store>> {
+    - lista : array
+    - loading : boolean
+    - error : string
+    + fetchClientes() : Promise
+    + addCliente(data : object) : Promise
+    + reducer(state : object, action : object) : object
+  }
+  class "creditosSlice.js" as CreditosSlice <<store>> {
+    - lista : array
+    - loading : boolean
+    - error : string
+    + fetchCreditosPorCliente(dni : string) : Promise
+    + addCredito(data : object) : Promise
+    + anularCreditoThunk(id : number) : Promise
+    + clearCreditos() : object
+    + reducer(state : object, action : object) : object
+  }
+  class "cobranzasSlice.js" as CobranzasSlice <<store>> {
+    - lista : array
+    - loading : boolean
+    - error : string
+    + fetchCobranzasPorCredito(idCredito : number) : Promise
+    + addCobranza(data : object) : Promise
+    + anularCobranzaThunk(id : number) : Promise
+    + clearCobranzas() : object
+    + reducer(state : object, action : object) : object
+  }
+  class "dashboardSlice.js" as DashboardSlice <<store>> {
+    - data : object
+    - loading : boolean
+    - error : string
+    + fetchEstadisticas() : Promise
+    + reducer(state : object, action : object) : object
+  }
+  class "permisosSlice.js" as PermisosSlice <<store>> {
+    - lista : array
+    - loading : boolean
+    - error : string
+    + fetchUsuariosAdmin() : Promise
+    + fetchUsuariosSupervisor() : Promise
+    + actualizarPermisos(id : number, permisos : object) : Promise
+    + cambiarRol(id : number, nuevoRol : string) : Promise
+    + crearUsuario(usuario : object) : Promise
+    + cambiarActivo(id : number, activo : boolean) : Promise
+    + reducer(state : object, action : object) : object
+    - handlePending(state : object) : void
+    - handleFulfilled(state : object, action : object) : void
+    - handleRejected(state : object, action : object) : void
+    - reemplazarUsuario(state : object, action : object) : void
+  }
+}
+
+package "frontend/src/utils" {
+  class "formato.js" as FormatoJs <<módulo JS>> {
+    - moneda : object
+    + formatMoneda(valor : number) : string
+    + formatFecha(iso : string) : string
+  }
+  class "roles.js" as RolesJs <<módulo JS>> {
+    + ROLES : object
+  }
+  class "cargos.js" as CargosJs <<módulo JS>> {
+    + CARGOS : object
+  }
+}
+
+package "frontend/src/api" {
+  class "apiClient.js" as ApiClient <<módulo JS>> {
+    - BASE_URL : string
+    - request(path : string, options : object) : Promise
+    + get(path : string) : Promise
+    + post(path : string, body : object) : Promise
+    + put(path : string, body : object) : Promise
+    + delete(path : string) : Promise
+  }
+  class "auth.js" as AuthJs <<módulo JS>> {
+    + login(data : object) : Promise
+    + register(data : object) : Promise
+    + me() : Promise
+  }
+  class "clientes.js" as ClientesJs <<módulo JS>> {
+    + getClientes() : Promise
+    + getCliente(dni : string) : Promise
+    + getDeudaCliente(dni : string) : Promise
+    + crearCliente(data : object) : Promise
+  }
+  class "creditos.js" as CreditosJs <<módulo JS>> {
+    + getCreditosPorCliente(dni : string) : Promise
+    + getCredito(id : number) : Promise
+    + crearCredito(data : object) : Promise
+    + anularCreditoApi(id : number) : Promise
+  }
+  class "cobranzas.js" as CobranzasJs <<módulo JS>> {
+    + getCobranzasPorCredito(idCredito : number) : Promise
+    + registrarCobranza(data : object) : Promise
+    + anularCobranzaApi(id : number) : Promise
+  }
+  class "admin.js" as AdminJs <<módulo JS>> {
+    + getUsuariosAdmin() : Promise
+    + updateRolUsuario(id : number, nuevoRol : string) : Promise
+    + crearUsuarioAdmin(usuario : object) : Promise
+    + updateActivoUsuario(id : number, activo : boolean) : Promise
+  }
+  class "supervisor.js" as SupervisorJs <<módulo JS>> {
+    + getUsuariosSupervisor() : Promise
+    + updatePermisosSupervisor(id : number, permisos : object) : Promise
+  }
+  class "dashboard.js" as DashboardJs <<módulo JS>> {
+    + getEstadisticas() : Promise
+  }
+
+MainJsx "1" ..> "1" StoreJs : monta el Provider con
+MainJsx "1" ..> "1" AppJsx : renderiza
+AppJsx "1" ..> "1" Navbar : renderiza
+AppJsx "1" ..> "6" PrivateRoute : protege rutas con
+AppJsx "1" ..> "2" RoleRoute : protege rutas por rol con
+AppJsx "1" ..> "1" RolesJs : lee roles de
+AppJsx "1" ..> "1" LoginPage : enruta a
+AppJsx "1" ..> "1" RegisterPage : enruta a
+AppJsx "1" ..> "1" ClientesPage : enruta a
+AppJsx "1" ..> "1" CreditosPage : enruta a
+AppJsx "1" ..> "1" CobranzasPage : enruta a
+AppJsx "1" ..> "1" DashboardPage : enruta a
+AppJsx "1" ..> "1" PanelAdminPage : enruta a
+AppJsx "1" ..> "1" GestorPermisosPage : enruta a
+Navbar "1" ..> "1" AuthSlice : lee y actualiza
+Navbar "1" ..> "1" RolesJs : compara rol con
+Navbar "1" ..> "1" LoginPage : navega a
+Navbar "1" ..> "1" ClientesPage : navega a
+Navbar "1" ..> "1" CreditosPage : navega a
+Navbar "1" ..> "1" CobranzasPage : navega a
+Navbar "1" ..> "0..1" DashboardPage : navega a
+Navbar "1" ..> "0..1" GestorPermisosPage : navega a
+Navbar "1" ..> "0..1" PanelAdminPage : navega a
+PrivateRoute "1" ..> "1" AuthSlice : lee y actualiza
+PrivateRoute "1" ..> "0..1" LoginPage : redirige a
+RoleRoute "1" ..> "1" AuthSlice : lee
+RoleRoute "1" ..> "0..1" LoginPage : redirige a
+RoleRoute "1" ..> "0..1" CreditosPage : redirige a
+LoginPage "1" ..> "1" AuthSlice : lee y actualiza
+LoginPage "1" ..> "0..1" ClientesPage : navega a
+LoginPage "1" ..> "1" RegisterPage : navega a
+RegisterPage "1" ..> "1" AuthSlice : lee y actualiza
+RegisterPage "1" ..> "0..1" ClientesPage : navega a
+RegisterPage "1" ..> "1" LoginPage : navega a
+ClientesPage "1" ..> "1" ClientesSlice : lee y actualiza
+ClientesPage "1" ..> "1" ClientesJs : llama a
+ClientesPage "1" ..> "1" FormatoJs : formatea con
+ClientesPage "1" ..> "0..*" Aviso : renderiza
+CreditosPage "1" ..> "1" AuthSlice : lee
+CreditosPage "1" ..> "1" CreditosSlice : lee y actualiza
+CreditosPage "1" ..> "1" CreditosJs : llama a
+CreditosPage "1" ..> "1" FormatoJs : formatea con
+CreditosPage "1" ..> "1" CargosJs : lee cargos de
+CreditosPage "1" ..> "0..*" Aviso : renderiza
+CobranzasPage "1" ..> "1" AuthSlice : lee
+CobranzasPage "1" ..> "1" CobranzasSlice : lee y actualiza
+CobranzasPage "1" ..> "1" FormatoJs : formatea con
+CobranzasPage "1" ..> "0..*" Aviso : renderiza
+DashboardPage "1" ..> "1" AuthSlice : lee
+DashboardPage "1" ..> "1" DashboardSlice : lee y actualiza
+DashboardPage "1" ..> "1" FormatoJs : formatea con
+DashboardPage "1" ..> "1" RolesJs : compara rol con
+GestorPermisosPage "1" ..> "1" PermisosSlice : lee y actualiza
+PanelAdminPage "1" ..> "1" PermisosSlice : lee y actualiza
+PanelAdminPage "1" ..> "1" RolesJs : lee roles de
+StoreJs "1" --> "1" AuthSlice : combina el reducer de
+StoreJs "1" --> "1" ClientesSlice : combina el reducer de
+StoreJs "1" --> "1" CreditosSlice : combina el reducer de
+StoreJs "1" --> "1" CobranzasSlice : combina el reducer de
+StoreJs "1" --> "1" DashboardSlice : combina el reducer de
+StoreJs "1" --> "1" PermisosSlice : combina el reducer de
+AuthSlice "1" ..> "1" AuthJs : llama a
+ClientesSlice "1" ..> "1" ClientesJs : llama a
+CreditosSlice "1" ..> "1" CreditosJs : llama a
+CobranzasSlice "1" ..> "1" CobranzasJs : llama a
+DashboardSlice "1" ..> "1" DashboardJs : llama a
+PermisosSlice "1" ..> "1" SupervisorJs : llama a
+PermisosSlice "1" ..> "1" AdminJs : llama a
+AuthJs "1" ..> "1" ApiClient : llama con
+ClientesJs "1" ..> "1" ApiClient : llama con
+CreditosJs "1" ..> "1" ApiClient : llama con
+CobranzasJs "1" ..> "1" ApiClient : llama con
+AdminJs "1" ..> "1" ApiClient : llama con
+SupervisorJs "1" ..> "1" ApiClient : llama con
+DashboardJs "1" ..> "1" ApiClient : llama con
+AuthJs "1" ..> "1" AuthController : pide por HTTP a
+ClientesJs "1" ..> "1" ClienteController : pide por HTTP a
+CreditosJs "1" ..> "1" CreditoController : pide por HTTP a
+CobranzasJs "1" ..> "1" CobranzaController : pide por HTTP a
+AdminJs "1" ..> "1" AdminController : pide por HTTP a
+SupervisorJs "1" ..> "1" SupervisorController : pide por HTTP a
+DashboardJs "1" ..> "1" DashboardController : pide por HTTP a
 @enduml
 
 @startuml clases-v4-modelo

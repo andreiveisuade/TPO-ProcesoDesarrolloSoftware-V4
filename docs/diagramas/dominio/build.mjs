@@ -1,7 +1,9 @@
-// Diagrama de clases del dominio: lee el bloque clases-v4-modelo de clases-v4.puml,
-// calcula la disposicion con ELK (lineas ortogonales) y dibuja el SVG con el
-// estilo de diagram-design. Uso: npm install && node build.mjs
+// Diagrama de clases integrado: lee los bloques de clases-v4.puml (dominio y una capa por
+// bloque), dibuja la vista de dominio ya dispuesta y embebe el motor (motor.js + ELK) para que
+// el navegador arme las demas combinaciones de capas al prender los toggles.
+// Uso: npm install && node build.mjs
 import { readFileSync, writeFileSync } from "node:fs";
+import { createRequire } from "node:module";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import ELK from "elkjs/lib/elk.bundled.js";
@@ -9,26 +11,21 @@ import ELK from "elkjs/lib/elk.bundled.js";
 const AQUI = dirname(fileURLToPath(import.meta.url));
 const PUML = join(AQUI, "..", "clases-v4.puml");
 const SALIDA = join(AQUI, "..", "clases-v4-dominio.svg");
+const MOTOR = readFileSync(join(AQUI, "motor.js"), "utf8");
+const ELK_JS = readFileSync(createRequire(import.meta.url).resolve("elkjs/lib/elk.bundled.js"), "utf8");
 
-const C = {
-  paper: "#f5f5f5", paper2: "#ececec", ink: "#2d3142", muted: "#4f5d75",
-  soft: "#5a6580", rule: "#bfc0c0", box: "#ffffff",
+// Bloques del puml y la capa que aporta cada uno; dominio se ve siempre y sale ya dibujado
+const BLOQUES = {
+  "clases-v4-modelo": "dominio", "clases-v4-seguridad": "seguridad", "clases-v4-mvc": "mvc",
+  "clases-v4-dtos": "dtos", "clases-v4-excepciones": "excepciones", "clases-v4-config": "config",
+  "clases-v4-frontend": "frontend",
 };
-// Un color por paquete (paleta series de diagram-design) y uno por familia de relacion
-const PAQUETE = {
-  "model.credito": "#5e7a9b", "model.plan": "#7c8f6f", "model.usuario": "#9c6b50",
-  "model.cliente": "#b8915a", "service.impl": "#6e6479",
-};
-const FAMILIA = {
-  herencia: { color: "#2d3142", nombre: "implementa / extiende" },
-  estructura: { color: "#2e5aa8", nombre: "composición / agregación / asociación" },
-  uso: { color: "#8b93a7", nombre: "dependencia" },
-};
+const CAPAS = { seguridad: "Seguridad", mvc: "MVC", dtos: "DTOs", excepciones: "Excepciones", config: "Config", frontend: "Frontend" };
 // Patrones GoF: rol de cada clase (pastilla en la caja) y ficha del boton de vista
 const PATRONES = {
   Composite: {
     color: "#c2410c",
-    roles: { Deuda: "Component", ICredito: "Component", ICuota: "Component", Credito: "Composite", Cartera: "Composite", Cuota: "Leaf", CreditoServiceImpl: "Client" },
+    roles: { Deuda: "Component", ICredito: "Component", ICuota: "Component", Credito: "Composite", Cartera: "Composite", Cuota: "Leaf", CreditoServiceImpl: "Client", ClienteServiceImpl: "Client", DashboardServiceImpl: "Client" },
     problema: "Saldo y mora se consultan igual en una cuota, un crédito o una cartera: la hoja responde y el compuesto suma a sus hijos.",
   },
   Strategy: {
@@ -40,6 +37,21 @@ const PATRONES = {
     color: "#7c3aed",
     roles: { CalculoDeCuota: "Component", InteresSimple: "ConcreteComponent", SistemaFrances: "ConcreteComponent", CargoSobreCuota: "Decorator", SeguroDeVida: "ConcreteDecorator", GastoDeAdministracion: "ConcreteDecorator", TipoCargo: "Ensambla", CondicionesDeCredito: "Client" },
     problema: "Los cargos opcionales se apilan sobre el cálculo base: cada capa delega en la envuelta y suma su cargo, sin una subclase por combinación.",
+  },
+  Facade: {
+    color: "#a16207", capa: "seguridad",
+    roles: { AuthService: "Facade", AuthServiceImpl: "Facade", AuthController: "Client", AdminServiceImpl: "Client", AuthenticationManager: "Subsistema", PasswordEncoder: "Subsistema", UsuarioRepository: "Subsistema", TokenService: "Subsistema" },
+    problema: "Registrar, dar de alta con rol, loguear y consultar el usuario actual pasan por una sola interfaz: los controladores no conocen Spring Security, BCrypt, el repositorio ni JWT.",
+  },
+  "Adapter JWT": {
+    color: "#4338ca", capa: "seguridad",
+    roles: { TokenService: "Target", JwtUtil: "Adapter", JwtParser: "Adaptee", Jwts: "Adaptee", AuthServiceImpl: "Client", JwtAuthFilter: "Client" },
+    problema: "El sistema pide tokens con TokenService; JwtUtil traduce ese contrato a la API de jjwt y es la única clase que la importa.",
+  },
+  "Adapter Usuario": {
+    color: "#0e7490", capa: "seguridad",
+    roles: { UserDetails: "Target", UsuarioDetails: "Adapter", IUsuario: "Adaptee", UserDetailsServiceImpl: "Crea", JwtAuthFilter: "Client" },
+    problema: "Spring Security pide un UserDetails; UsuarioDetails envuelve al IUsuario del dominio y traduce isActivo() a isEnabled(), sin que el dominio dependa de Spring.",
   },
 };
 // GRASP: se marca a nivel metodo (no es una estructura de clases sino un criterio de asignacion)
@@ -60,443 +72,379 @@ const GRASP = {
     problema: "Cada constante del enum resuelve su caso con su propio método, sin un switch sobre el tipo: TipoCargo elige con qué decorador envolver y TipoPlan qué estrategia usar.",
   },
 };
-const rolesDe = (id) => Object.entries(PATRONES).filter(([, p]) => p.roles[id]).map(([n, p]) => ({ texto: `${n.toUpperCase()} · ${p.roles[id]}`, color: p.color }));
-const anchoPastilla = (t) => Math.ceil(t.length * 5.4) + 12;
-const ROLES_GOF = new Set(["Component", "Composite", "Leaf", "Strategy", "ConcreteStrategy", "ConcreteComponent", "Decorator", "ConcreteDecorator", "Context"]);
-const MONO = "'Geist Mono', ui-monospace, Menlo, monospace";
-const SANS = "'Geist', -apple-system, 'Helvetica Neue', sans-serif";
-const SERIF = "'Instrument Serif', Georgia, serif";
-const MIEMBRO = { size: 10, ancho: 6.1, alto: 14 };
-const NOMBRE = { size: 12.5, ancho: 7.6, alto: 17 };
-const ESTEREO = { size: 8.5, ancho: 5.3, alto: 12 };
-const ETIQUETA = { size: 9.5, ancho: 5.8, alto: 13 };
-const PAD = 8;
 
 // ---------- lectura del puml ----------
+// Una clase puede figurar en varios bloques: la define el que trae cuerpo y los demas
+// solo la nombran (class X sin llaves) para sumarla a su capa.
 function leerModelo() {
   const texto = readFileSync(PUML, "utf8");
-  const ini = texto.indexOf("@startuml clases-v4-modelo");
-  const fin = texto.indexOf("@enduml", ini);
-  const lineas = texto.slice(ini, fin).split("\n").map((l) => l.trim());
-  const paquetes = [], clases = new Map(), relaciones = [];
-  let paquete = null, clase = null;
-  for (const l of lineas) {
-    let m;
-    if (clase) {
-      if (l === "}") { clase = null; continue; }
-      if (l) clase.miembros.push(l);
-      continue;
-    }
-    if ((m = l.match(/^package "([^"]+)" \{$/))) {
-      paquete = { id: m[1], clases: [] };
-      paquetes.push(paquete);
-    } else if (l === "}" && paquete) {
-      paquete = null;
-    } else if ((m = l.match(/^(abstract class|class|interface|enum) (\w+)(?: <<(.+?)>>)? \{$/))) {
-      clase = { id: m[2], tipo: m[1], estereotipo: m[3] || null, miembros: [], paquete: paquete.id };
-      clases.set(clase.id, clase);
-      paquete.clases.push(clase.id);
-    } else if ((m = l.match(/^(\w+)\s+(?:"([^"]+)"\s+)?(<\|\.\.|<\|--|o-->|\*-->|\*--|-->|\.\.>)\s+(?:"([^"]+)"\s+)?(\w+)\s*:\s*(.+?)\s*>?$/))) {
-      relaciones.push({ a: m[1], multA: m[2], flecha: m[3], multB: m[4], b: m[5], verbo: m[6] });
+  const clases = new Map(), relaciones = [], vistas = new Set();
+  for (const [bloque, capa] of Object.entries(BLOQUES)) {
+    const ini = texto.indexOf("@startuml " + bloque);
+    if (ini < 0) continue;
+    const fin = texto.indexOf("@enduml", ini);
+    const lineas = texto.slice(ini, fin).split("\n").map((l) => l.trim());
+    let paquete = null, clase = null;
+    for (const l of lineas) {
+      let m;
+      if (clase) {
+        if (l === "}") { clase = null; continue; }
+        if (l) clase.miembros.push(l);
+        continue;
+      }
+      if ((m = l.match(/^package "([^"]+)" \{$/))) {
+        paquete = m[1];
+      } else if (l === "}" && paquete) {
+        paquete = null;
+      } else if ((m = l.match(/^(abstract class|class|interface|enum) (?:"([^"]+)" as )?(\w+)(?: <<(.+?)>>)?( \{)?$/))) {
+        const id = m[3];
+        const c = clases.get(id) || { id, nombre: id, tipo: m[1], estereotipo: null, miembros: [], paquete, capas: new Set() };
+        c.capas.add(capa);
+        clases.set(id, c);
+        if (!m[5]) continue;
+        // Gana la primera definicion con cuerpo: una capa no puede pisar una clase del dominio
+        if (c.definida) {
+          console.warn(`${id} ya estaba definida; se ignora la definicion de ${bloque}`);
+          clase = { miembros: [] };
+          continue;
+        }
+        Object.assign(c, { nombre: m[2] || id, tipo: m[1], estereotipo: m[4] || null, paquete, definida: true });
+        clase = c;
+      } else if ((m = l.match(/^(\w+)\s+(?:"([^"]+)"\s+)?(<\|\.\.|<\|--|o-->|\*-->|\*--|-->|\.\.>)\s+(?:"([^"]+)"\s+)?(\w+)\s*:\s*(.+?)\s*>?$/))) {
+        const clave = m[1] + m[3] + m[5];
+        if (!vistas.has(clave)) relaciones.push({ a: m[1], multA: m[2], flecha: m[3], multB: m[4], b: m[5], verbo: m[6] });
+        vistas.add(clave);
+      }
     }
   }
-  return { paquetes, clases, relaciones };
+  for (const r of relaciones) for (const id of [r.a, r.b]) if (!clases.has(id)) throw new Error(`Relacion con clase sin declarar: ${id}`);
+  return { clases, relaciones };
 }
 
-// ---------- medidas de cada caja ----------
-function cabecera(c) {
-  const linea = [];
-  if (c.tipo === "interface") linea.push("interface");
-  if (c.tipo === "enum") linea.push("enumeration");
-  if (c.tipo === "abstract class") linea.push("abstract");
-  if (c.estereotipo) linea.push(...c.estereotipo.split(" / ").filter((t) => !ROLES_GOF.has(t)));
-  return linea.length ? "«" + linea.join(" · ") + "»" : null;
-}
 
-function compartimentos(c) {
-  const esMetodo = (l) => l.includes("(");
-  if (c.tipo === "enum") {
-    const valores = c.miembros.filter((l) => /^[A-Z_]+$/.test(l));
-    const resto = c.miembros.filter((l) => !/^[A-Z_]+$/.test(l));
-    return [valores, resto.filter((l) => !esMetodo(l)), resto.filter(esMetodo)].filter((g) => g.length);
-  }
-  return [c.miembros.filter((l) => !esMetodo(l)), c.miembros.filter(esMetodo)].filter((g) => g.length);
-}
-
-function medir(c) {
-  const est = cabecera(c);
-  const grupos = compartimentos(c);
-  const textos = grupos.flat().map(limpiar);
-  const pastillas = rolesDe(c.id);
-  const anchoPast = pastillas.reduce((s, p) => s + anchoPastilla(p.texto) + 4, 0);
-  const ancho = Math.max(
-    c.id.length * NOMBRE.ancho,
-    est ? est.length * ESTEREO.ancho : 0,
-    ...textos.map((t) => t.length * MIEMBRO.ancho),
-    anchoPast,
-  ) + PAD * 2;
-  const altoCab = PAD + (pastillas.length ? 18 : 0) + (est ? ESTEREO.alto : 0) + NOMBRE.alto + PAD - 2;
-  const alto = altoCab + grupos.reduce((s, g) => s + g.length * MIEMBRO.alto + PAD, 0);
-  return { ancho: Math.ceil(ancho), alto: Math.ceil(alto), altoCab, est, grupos, pastillas };
-}
-
-const limpiar = (l) => l.replace(/\{(static|abstract)\}\s*/g, "");
-
-// ---------- tipos de relacion ----------
-const TIPOS = {
-  "<|..": { familia: "herencia", trazo: "5,4", inicio: "triangulo", fin: null, verbo: true },
-  "<|--": { familia: "herencia", trazo: null, inicio: "triangulo", fin: null, verbo: true },
-  "o-->": { familia: "estructura", trazo: null, inicio: "rombo-vacio", fin: "punta" },
-  "*-->": { familia: "estructura", trazo: null, inicio: "rombo-lleno", fin: "punta" },
-  "*--": { familia: "estructura", trazo: null, inicio: "rombo-lleno", fin: null },
-  "-->": { familia: "estructura", trazo: null, inicio: null, fin: "punta" },
-  "..>": { familia: "uso", trazo: "4,3", inicio: null, fin: "punta" },
+const modelo = leerModelo();
+const presentes = new Set([...modelo.clases.values()].flatMap((c) => [...c.capas]));
+const D = {
+  clases: [...modelo.clases.values()].map(({ definida, ...c }) => ({ ...c, capas: [...c.capas] })),
+  relaciones: modelo.relaciones,
+  patrones: Object.fromEntries(Object.entries(PATRONES).map(([n, p]) => [n, { color: p.color, capa: p.capa, roles: p.roles }])),
+  anchoCabecera: 0,
 };
+const motor = new Function("ELK", "D", MOTOR + "\nreturn motorDominio(ELK, D);")(ELK, D);
+const { C, FAMILIA, MONO, SANS, SERIF, MARGEN, TITULO, esc } = motor;
 
-// ---------- layout ----------
-async function disponer(modelo, medidas) {
-  const etiqueta = (texto, lugar) => ({
-    text: texto,
-    width: Math.ceil(texto.length * ETIQUETA.ancho) + 8,
-    height: ETIQUETA.alto,
-    layoutOptions: { "elk.edgeLabels.placement": lugar },
-  });
-  const grafo = {
-    id: "raiz",
-    layoutOptions: {
-      "elk.algorithm": "layered",
-      "elk.direction": "DOWN",
-      "elk.edgeRouting": "ORTHOGONAL",
-      "elk.hierarchyHandling": "INCLUDE_CHILDREN",
-      "elk.spacing.nodeNode": "48",
-      "elk.layered.spacing.nodeNodeBetweenLayers": "64",
-      "elk.spacing.edgeNode": "22",
-      "elk.spacing.edgeEdge": "14",
-      "elk.layered.spacing.edgeNodeBetweenLayers": "22",
-      "elk.layered.spacing.edgeEdgeBetweenLayers": "14",
-      "elk.spacing.edgeLabel": "4",
-      "elk.layered.nodePlacement.strategy": "NETWORK_SIMPLEX",
-      "elk.layered.crossingMinimization.strategy": "LAYER_SWEEP",
-      "elk.layered.thoroughness": "40",
-      "elk.layered.mergeEdges": "false",
-    },
-    children: modelo.paquetes.map((p) => ({
-      id: "pkg:" + p.id,
-      layoutOptions: { "elk.padding": "[top=40,left=24,bottom=24,right=24]" },
-      children: p.clases.map((id) => ({ id, width: medidas.get(id).ancho, height: medidas.get(id).alto })),
-    })),
-    edges: modelo.relaciones.map((r, i) => {
-      const labels = [etiqueta(r.verbo, "CENTER")];
-      if (r.multA) labels.push(etiqueta(r.multA, "TAIL"));
-      if (r.multB) labels.push(etiqueta(r.multB, "HEAD"));
-      return { id: "e" + i, sources: [r.a], targets: [r.b], labels };
-    }),
-  };
-  return new ELK().layout(grafo);
-}
-
-// ---------- dibujo ----------
-const esc = (t) => t.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-
-function caja(c, m, x, y) {
-  const col = PAQUETE[c.paquete];
-  const s = [`<g class="clase" data-id="${c.id}">`];
-  s.push(`<rect x="${x}" y="${y}" width="${m.ancho}" height="${m.alto}" rx="6" fill="${C.box}" stroke="${col}" stroke-width="1.2"/>`);
-  s.push(`<path d="M${x + 0.6},${y + m.altoCab} V${y + 6} Q${x + 0.6},${y + 0.6} ${x + 6},${y + 0.6} H${x + m.ancho - 6} Q${x + m.ancho - 0.6},${y + 0.6} ${x + m.ancho - 0.6},${y + 6} V${y + m.altoCab} Z" fill="${col}" fill-opacity="0.32"/>`);
-  let cy = y + PAD;
-  const cx = x + m.ancho / 2;
-  if (m.pastillas.length) {
-    let px = x + PAD;
-    for (const p of m.pastillas) {
-      const w = anchoPastilla(p.texto);
-      s.push(`<rect x="${px}" y="${y + 6}" width="${w}" height="15" rx="7.5" fill="${p.color}"/>`);
-      s.push(`<text x="${px + w / 2}" y="${y + 16.5}" text-anchor="middle" font-family="${MONO}" font-size="8.5" font-weight="600" fill="#ffffff" letter-spacing="0.3">${esc(p.texto)}</text>`);
-      px += w + 4;
-    }
-    cy += 18;
-  }
-  if (m.est) {
-    cy += ESTEREO.alto - 3;
-    s.push(`<text x="${cx}" y="${cy}" text-anchor="middle" font-family="${MONO}" font-size="${ESTEREO.size}" fill="${C.soft}" letter-spacing="0.4">${esc(m.est)}</text>`);
-    cy += 3;
-  }
-  cy += NOMBRE.alto - 4;
-  const italica = c.tipo === "abstract class" || c.tipo === "interface" ? ` font-style="italic"` : "";
-  s.push(`<text x="${cx}" y="${cy}" text-anchor="middle" font-family="${SANS}" font-size="${NOMBRE.size}" font-weight="600" fill="${C.ink}"${italica}>${esc(c.id)}</text>`);
-  cy = y + m.altoCab;
-  for (const g of m.grupos) {
-    s.push(`<line x1="${x}" y1="${cy}" x2="${x + m.ancho}" y2="${cy}" stroke="${C.ink}" stroke-width="0.6" stroke-opacity="0.45"/>`);
-    cy += PAD / 2;
-    for (const l of g) {
-      cy += MIEMBRO.alto;
-      const deco = [];
-      if (l.includes("{static}")) deco.push(`text-decoration="underline"`);
-      if (l.includes("{abstract}")) deco.push(`font-style="italic"`);
-      const nombre = (l.match(/(\w+)\(/) || [])[1];
-      const dm = nombre ? ` data-m="${nombre}"` : "";
-      if (nombre) s.push(`<rect class="resalte"${dm} x="${x + 2}" y="${cy - MIEMBRO.alto + 1}" width="${m.ancho - 4}" height="${MIEMBRO.alto - 1}" rx="2" style="fill:var(--patron)" opacity="0"/>`);
-      s.push(`<text class="miembro"${dm} x="${x + PAD}" y="${cy - 3.5}" font-family="${MONO}" font-size="${MIEMBRO.size}" fill="${C.ink}" ${deco.join(" ")}>${esc(limpiar(l))}</text>`);
-    }
-    cy += PAD / 2;
-  }
-  s.push("</g>");
-  return s.join("\n");
-}
-
-// Polilinea ortogonal con esquinas redondeadas
-function trazo(p, r = 7) {
-  let d = `M${p[0].x},${p[0].y}`;
-  for (let i = 1; i < p.length - 1; i++) {
-    const a = p[i - 1], b = p[i], c = p[i + 1];
-    const d1 = Math.hypot(b.x - a.x, b.y - a.y), d2 = Math.hypot(c.x - b.x, c.y - b.y);
-    const k = Math.min(r, d1 / 2, d2 / 2);
-    const p1 = { x: b.x + ((a.x - b.x) / d1) * k, y: b.y + ((a.y - b.y) / d1) * k };
-    const p2 = { x: b.x + ((c.x - b.x) / d2) * k, y: b.y + ((c.y - b.y) / d2) * k };
-    d += ` L${p1.x},${p1.y} Q${b.x},${b.y} ${p2.x},${p2.y}`;
-  }
-  const u = p[p.length - 1];
-  return d + ` L${u.x},${u.y}`;
-}
-
-// Marca en el extremo `punta`, apuntando desde `previo` hacia `punta`
-function marca(tipo, punta, previo, color) {
-  const L = Math.hypot(punta.x - previo.x, punta.y - previo.y) || 1;
-  const ux = (punta.x - previo.x) / L, uy = (punta.y - previo.y) / L;
-  const nx = -uy, ny = ux;
-  const pt = (a, b) => `${punta.x - ux * a + nx * b},${punta.y - uy * a + ny * b}`;
-  if (tipo === "triangulo") {
-    return `<polygon points="${pt(0, 0)} ${pt(13, 7)} ${pt(13, -7)}" fill="${C.box}" stroke="${color}" stroke-width="1.2" stroke-linejoin="miter"/>`;
-  }
-  if (tipo === "rombo-lleno" || tipo === "rombo-vacio") {
-    const relleno = tipo === "rombo-lleno" ? color : C.box;
-    return `<polygon points="${pt(0, 0)} ${pt(8, 5)} ${pt(16, 0)} ${pt(8, -5)}" fill="${relleno}" stroke="${color}" stroke-width="1.2"/>`;
-  }
-  if (tipo === "punta") {
-    return `<polyline points="${pt(10, 5)} ${pt(0, 0)} ${pt(10, -5)}" fill="none" stroke="${color}" stroke-width="1.3" stroke-linejoin="miter"/>`;
-  }
-  return "";
-}
-
-function dibujar(modelo, medidas, g) {
-  const abs = new Map();
-  const recorrer = (n, ox, oy) => {
-    const x = ox + (n.x || 0), y = oy + (n.y || 0);
-    abs.set(n.id, { x, y, w: n.width, h: n.height });
-    (n.children || []).forEach((h) => recorrer(h, x, y));
-  };
-  recorrer(g, 0, 0);
-
-  const MARGEN = 32, TITULO = 144;
-  const W = Math.ceil(g.width) + MARGEN * 2, H = Math.ceil(g.height) + MARGEN * 2 + TITULO;
+// Cabecera comun a todas las vistas: titulo, leyenda, toggles de capa y botones de patrones
+function cabeceraSvg() {
   const out = [];
-  out.push(`<svg xmlns="http://www.w3.org/2000/svg" data-dominio="" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" font-family="${SANS}">`);
-  out.push(`<style>@import url('https://fonts.googleapis.com/css2?family=Geist:wght@400;600&amp;family=Geist+Mono:wght@400&amp;family=Instrument+Serif:ital@0;1&amp;display=swap');</style>`);
-  out.push(`<rect width="${W}" height="${H}" fill="${C.paper}"/>`);
-  out.push(`<text x="${MARGEN}" y="${MARGEN + 22}" font-family="${SERIF}" font-size="30" fill="${C.ink}">Diagrama de clases del dominio</text>`);
-  out.push(`<text x="${MARGEN}" y="${MARGEN + 42}" font-family="${MONO}" font-size="10" fill="${C.soft}" letter-spacing="1">DASHBOARD DE PRÉSTAMOS · V4 · CADA RELACIÓN SE LEE COMO ORACIÓN, DEL ORIGEN AL DESTINO</text>`);
-  let lx = W - MARGEN - 760;
+  let derecha = 0;
+  out.push(`<text x="${MARGEN}" y="${MARGEN + 28}" font-family="${SERIF}" font-size="34" fill="${C.ink}">Diagrama de clases</text>`);
+  out.push(`<text x="${MARGEN}" y="${MARGEN + 52}" font-family="${MONO}" font-size="12" fill="${C.soft}" letter-spacing="1">DASHBOARD DE PRÉSTAMOS · V4 · CADA RELACIÓN SE LEE COMO ORACIÓN, DEL ORIGEN AL DESTINO</text>`);
+  let lx = MARGEN;
   for (const f of Object.values(FAMILIA)) {
-    out.push(`<line x1="${lx}" y1="${MARGEN + 18}" x2="${lx + 28}" y2="${MARGEN + 18}" stroke="${f.color}" stroke-width="2"${f === FAMILIA.uso ? ` stroke-dasharray="4,3"` : ""}/>`);
-    out.push(`<text x="${lx + 36}" y="${MARGEN + 22}" font-family="${MONO}" font-size="11" fill="${C.ink}">${esc(f.nombre)}</text>`);
-    lx += 64 + f.nombre.length * 6.6;
+    out.push(`<line x1="${lx}" y1="${MARGEN + 78}" x2="${lx + 28}" y2="${MARGEN + 78}" stroke="${f.color}" stroke-width="2"${f === FAMILIA.uso ? ` stroke-dasharray="4,3"` : ""}/>`);
+    out.push(`<text x="${lx + 36}" y="${MARGEN + 82.5}" font-family="${MONO}" font-size="13" fill="${C.ink}">${esc(f.nombre)}</text>`);
+    lx += 72 + f.nombre.length * 7.8;
   }
+  const fila = (y, rotulo) => {
+    out.push(`<text x="${MARGEN}" y="${y + 22}" font-family="${MONO}" font-size="13" fill="${C.soft}" letter-spacing="1">${rotulo}</text>`);
+    return MARGEN + 150;
+  };
   const boton = (bx, by, nombre, color, attrs, ficha) => {
     const w = nombre.length * 11 + 40;
     out.push(`<g class="btn-patron" data-patron="${nombre}" data-color="${color}" ${attrs} data-ficha="${esc(ficha).replace(/"/g, "&quot;")}">` +
-      `<rect x="${bx}" y="${by}" width="${w}" height="32" rx="16" fill="${color}"/>` +
-      `<text x="${bx + w / 2}" y="${by + 21.5}" text-anchor="middle" font-family="${SANS}" font-size="16" font-weight="600" fill="#ffffff">${nombre}</text></g>`);
+      `<rect x="${bx}" y="${by}" width="${w}" height="34" rx="17" fill="${color}"/>` +
+      `<text x="${bx + w / 2}" y="${by + 23}" text-anchor="middle" font-family="${SANS}" font-size="16" font-weight="600" fill="#ffffff">${nombre}</text></g>`);
+    derecha = Math.max(derecha, bx + w);
     return w + 12;
   };
   const titulo = (nombre, color, problema) =>
-    `<div style='font:600 14px Geist,sans-serif;color:${color}'>${nombre}</div><div style='margin:4px 0 6px'>${problema}</div>`;
-  let bx = MARGEN + 120;
-  out.push(`<text x="${MARGEN}" y="${MARGEN + 77}" font-family="${MONO}" font-size="12" fill="${C.soft}" letter-spacing="1">PATRONES GOF</text>`);
+    `<div style='font:600 15px Geist,sans-serif;color:${color}'>${nombre}</div><div style='margin:4px 0 6px'>${problema}</div>`;
+
+  let bx = fila(MARGEN + 100, "CAPAS");
+  for (const [capa, nombre] of [["dominio", "Dominio"], ...Object.entries(CAPAS).filter(([k]) => presentes.has(k))]) {
+    const w = nombre.length * 10 + 44;
+    const fija = capa === "dominio";
+    out.push(`<g class="btn-capa${fija ? " on fija" : ""}" data-capa="${capa}">` +
+      `<rect x="${bx}" y="${MARGEN + 100}" width="${w}" height="34" rx="6" stroke="${C.ink}" stroke-width="1.5"/>` +
+      `<text x="${bx + w / 2}" y="${MARGEN + 123}" text-anchor="middle" font-family="${SANS}" font-size="16" font-weight="600">${fija ? "" : "+ "}${nombre}</text></g>`);
+    bx += w + 12;
+  }
+  out.push(`<text class="estado" x="${bx + 8}" y="${MARGEN + 122}" font-family="${MONO}" font-size="13" fill="${C.soft}"></text>`);
+  bx = fila(MARGEN + 146, "PATRONES GOF");
   for (const [nombre, p] of Object.entries(PATRONES)) {
     const roles = {};
     for (const [clase, rol] of Object.entries(p.roles)) (roles[rol] = roles[rol] || []).push(clase);
     const ficha = titulo(nombre, p.color, p.problema) +
       Object.entries(roles).map(([rol, cs]) => `<div><b>${rol}</b>: ${cs.join(", ")}</div>`).join("");
-    bx += boton(bx, MARGEN + 56, nombre, p.color, `data-clases="${Object.keys(p.roles).join(",")}" data-rel="1"`, ficha);
+    const capa = p.capa ? ` data-capa="${p.capa}"` : "";
+    bx += boton(bx, MARGEN + 146, nombre, p.color, `data-clases="${Object.keys(p.roles).join(",")}" data-rel="1"${capa}`, ficha);
   }
-  bx = MARGEN + 120;
-  out.push(`<text x="${MARGEN}" y="${MARGEN + 119}" font-family="${MONO}" font-size="12" fill="${C.soft}" letter-spacing="1">GRASP</text>`);
+  bx = fila(MARGEN + 192, "GRASP");
   for (const [nombre, p] of Object.entries(GRASP)) {
     const metodos = Object.entries(p.metodos).flatMap(([c, ms]) => ms.map((m) => `${c}.${m}`));
     const ficha = titulo(nombre, p.color, p.problema) +
       Object.entries(p.metodos).filter(([, ms]) => ms.length).map(([c, ms]) => `<div><b>${c}</b>: ${ms.map((m) => m + "()").join(", ")}</div>`).join("");
-    bx += boton(bx, MARGEN + 98, nombre, p.color,
+    bx += boton(bx, MARGEN + 192, nombre, p.color,
       `data-clases="${Object.keys(p.metodos).join(",")}" data-metodos="${metodos.join(",")}" data-rel="${p.relaciones ? 1 : 0}"`, ficha);
   }
-  out.push(`<g transform="translate(${MARGEN},${MARGEN + TITULO})">`);
+  return { svg: out.join("\n"), ancho: derecha + MARGEN };
+}
 
-  // paquetes
-  for (const p of g.children) {
-    const a = abs.get(p.id);
-    out.push(`<rect x="${a.x}" y="${a.y}" width="${a.w}" height="${a.h}" rx="8" fill="${PAQUETE[p.id.slice(4)]}" fill-opacity="0.11" stroke="${PAQUETE[p.id.slice(4)]}" stroke-opacity="0.55" stroke-width="1.2"/>`);
-    out.push(`<text x="${a.x + 16}" y="${a.y + 24}" font-family="${MONO}" font-size="11" font-weight="600" fill="${PAQUETE[p.id.slice(4)]}" letter-spacing="1.2">${esc(p.id.slice(4).toUpperCase())}</text>`);
-  }
-
-  // relaciones (antes que las cajas)
-  const marcas = [], etiquetas = [];
-  g.edges.forEach((e, i) => {
-    const r = modelo.relaciones[i], t = TIPOS[r.flecha];
-    const o = abs.get(e.container || "raiz") || { x: 0, y: 0 };
-    const sec = e.sections[0];
-    const pts = [sec.startPoint, ...(sec.bendPoints || []), sec.endPoint].map((q) => ({ x: q.x + o.x, y: q.y + o.y }));
-    const col = FAMILIA[t.familia].color;
-    const guion = t.trazo ? ` stroke-dasharray="${t.trazo}"` : "";
-    const sujeto = r.flecha.startsWith("<|") ? r.b : r.a;
-    const attrs = `data-a="${r.a}" data-b="${r.b}" data-sujeto="${sujeto}" data-frase="${esc(frase(r))}"`;
-    out.push(`<g class="rel" ${attrs}><path d="${trazo(pts)}" fill="none" stroke="${col}" stroke-width="${t.familia === "uso" ? 1.1 : 1.4}"${guion}/></g>`);
-    marcas.push(`<g class="rel" data-a="${r.a}" data-b="${r.b}">` +
-      (t.inicio ? marca(t.inicio, pts[0], pts[1], col) : "") +
-      (t.fin ? marca(t.fin, pts[pts.length - 1], pts[pts.length - 2], col) : "") + `</g>`);
-    etiquetas.push(`<g class="rel" data-a="${r.a}" data-b="${r.b}">`);
-    for (const l of e.labels || []) {
-      const x = l.x + o.x, y = l.y + o.y;
-      const esMult = l.text !== r.verbo;
-      etiquetas.push(
-        `<rect x="${x}" y="${y}" width="${l.width}" height="${l.height}" rx="2" fill="${C.paper}" fill-opacity="0.92"/>` +
-        `<text x="${x + l.width / 2}" y="${y + l.height - 3.5}" text-anchor="middle" font-family="${MONO}" font-size="${ETIQUETA.size}" fill="${esMult ? C.ink : t.familia === "uso" ? C.soft : col}"${esMult ? ` font-weight="600"` : ` font-style="italic"`}>${esc(l.text)}</text>`,
-      );
-    }
-    etiquetas.push(`</g>`);
-  });
-
-  for (const [id, c] of modelo.clases) {
-    const a = abs.get(id);
-    out.push(caja(c, medidas.get(id), a.x, a.y));
-  }
-  out.push(...marcas, ...etiquetas);
+function dibujar(inicial, cab) {
+  const datos = JSON.stringify(D);
+  for (const t of [datos, MOTOR, ELK_JS]) if (t.includes("]]>")) throw new Error("]]> dentro de un script");
+  const out = [];
+  out.push(`<svg xmlns="http://www.w3.org/2000/svg" data-dominio="" viewBox="0 0 ${inicial.w} ${inicial.h}" width="${inicial.w}" height="${inicial.h}" font-family="${SANS}">`);
+  out.push(`<style>@import url('https://fonts.googleapis.com/css2?family=Geist:wght@400;600&amp;family=Geist+Mono:wght@400&amp;family=Instrument+Serif:ital@0;1&amp;display=swap');</style>`);
+  out.push(`<rect width="100%" height="100%" fill="${C.paper}"/>`);
+  out.push(cab.svg);
+  out.push(`<g class="lienzo" transform="translate(${MARGEN},${MARGEN + TITULO})">`);
+  out.push(inicial.html.replace('class="vista"', 'class="vista visible"'));
   out.push(`</g>`);
   out.push(`<style>${ESTILO}</style>`);
+  // ELK y el motor, una sola vez por pagina: arman en el navegador las vistas con mas capas
+  out.push(`<script><![CDATA[if (!window.ELK) {\n${ELK_JS}\n}]]></script>`);
+  out.push(`<script><![CDATA[if (!window.__dominioMotor && window.ELK) {\n${MOTOR}\nwindow.__dominioMotor = motorDominio(window.ELK, ${datos});\n}]]></script>`);
   out.push(`<script><![CDATA[${INTERACCION}]]></script>`);
   out.push(`</svg>`);
   return out.join("\n");
 }
 
-// "Credito [1] se divide en [1..*] Cuota"; implementa y extiende se leen de la hija al padre
-function frase(r) {
-  const m = (x) => (x ? ` [${x}]` : "");
-  if (r.flecha.startsWith("<|")) return `${r.b} ${r.verbo} ${r.a}`;
-  return `${r.a}${m(r.multA)} ${r.verbo}${m(r.multB)} ${r.b}`;
-}
-
 const ESTILO = `
+svg[data-dominio] .vista { display: none; }
+svg[data-dominio] .vista.visible { display: inline; }
 svg[data-dominio] .clase { cursor: pointer; }
-svg[data-dominio] .clase, svg[data-dominio] .rel { transition: opacity .15s; }
 svg[data-dominio].foco .clase:not(.activa), svg[data-dominio].foco .rel:not(.activa) { opacity: .1; }
-svg[data-dominio].foco .rel.activa path { stroke-width: 2.4; }
-svg[data-dominio] .clase.elegida > rect:first-child { stroke: #bf4520; stroke-width: 2; }
-svg[data-dominio] .btn-patron { cursor: pointer; }
+svg[data-dominio].foco .rel.activa path { stroke-width: 2.6; }
+.flujo-dominio { fill: none; stroke: ${C.paper}; stroke-width: 3.2; stroke-dasharray: 5 13; pointer-events: none; animation: flujo-dominio .8s linear infinite; }
+.flujo-dominio.inv { animation-name: flujo-dominio-inv; }
+@keyframes flujo-dominio { from { stroke-dashoffset: 18; } to { stroke-dashoffset: 0; } }
+@keyframes flujo-dominio-inv { from { stroke-dashoffset: 0; } to { stroke-dashoffset: 18; } }
+svg[data-dominio] .clase.elegida > rect:first-child { stroke: #bf4520; stroke-width: 2.4; }
+svg[data-dominio] .btn-patron, svg[data-dominio] .btn-capa:not(.fija) { cursor: pointer; }
 svg[data-dominio] .btn-patron.elegido rect { stroke: ${C.ink}; stroke-width: 2.5; }
-svg[data-dominio].patron .rel.activa path { stroke: var(--patron); stroke-width: 2.6; }
-svg[data-dominio].patron .clase.activa > rect:first-child { stroke: var(--patron); stroke-width: 2.4; }
+svg[data-dominio] .btn-capa rect { fill: #ffffff; }
+svg[data-dominio] .btn-capa text { fill: ${C.ink}; }
+svg[data-dominio] .btn-capa.on rect { fill: ${C.ink}; }
+svg[data-dominio] .btn-capa.on text { fill: #ffffff; }
+svg[data-dominio] .btn-capa.fija rect { fill: ${C.soft}; stroke: ${C.soft}; }
+svg[data-dominio].patron .rel.activa path { stroke: var(--patron); stroke-width: 2.8; }
+svg[data-dominio].patron .clase.activa > rect:first-child { stroke: var(--patron); stroke-width: 2.6; }
 svg[data-dominio].patron .resalte.marcado { opacity: .2; }
 svg[data-dominio].patron text.miembro.marcado { fill: var(--patron); font-weight: 600; }
 `;
 
-// Hover: deja a la vista la clase, sus vecinas y sus relaciones. Clic fija, Esc o clic afuera limpia.
+// Hover: deja a la vista la clase, sus vecinas y sus relaciones. Clic fija; Esc, otro clic
+// en la misma clase o un clic en el fondo la sueltan. Arrastrar (para moverse) no cuenta como clic.
 // Listeners delegados en document: sirven tambien para la copia que abre el zoom del reporte.
 const INTERACCION = `
 (function () {
   if (window.__dominio) return;
   window.__dominio = true;
-  var fijada = null, panel = null;
+  var fijada = null, panel = null, abajo = null;
   function svgDe(el) { return el && el.closest ? el.closest("svg[data-dominio]") : null; }
-  function mostrarPanel(id, rels) {
+  function vista(svg) { return svg.querySelector(".vista.visible") || svg; }
+  function nombre(svg, id) { var c = vista(svg).querySelector(".clase[data-id='" + id + "']"); return c ? c.getAttribute("data-nombre") : id; }
+  function mostrarPanel(titulo, rels, id) {
     if (!document.body) return;
     if (!panel) {
       panel = document.createElement("div");
-      panel.style.cssText = "position:fixed;right:16px;bottom:16px;max-width:420px;max-height:60vh;overflow:auto;z-index:10000;" +
-        "background:#fff;border:1px solid #bfc0c0;border-radius:6px;padding:10px 14px;font:12px/1.5 'Geist Mono',ui-monospace,Menlo,monospace;color:#2d3142";
+      panel.className = "panel-dominio";
+      panel.style.cssText = "position:fixed;right:16px;bottom:16px;max-width:460px;max-height:60vh;overflow:auto;z-index:10000;" +
+        "background:#fff;border:1px solid #bfc0c0;border-radius:6px;padding:10px 14px;font:13px/1.5 'Geist Mono',ui-monospace,Menlo,monospace;color:#2d3142";
       document.body.appendChild(panel);
     }
     var sal = [], ent = [];
     rels.forEach(function (r) { (r.getAttribute("data-sujeto") === id ? sal : ent).push(r.getAttribute("data-frase")); });
     function lista(t, xs) { return xs.length ? "<div style='margin-top:6px;color:#5a6580'>" + t + "</div>" + xs.map(function (x) { return "<div>" + x.replace(/</g, "&lt;") + "</div>"; }).join("") : ""; }
-    panel.innerHTML = "<div style='font:600 14px Geist,sans-serif'>" + id + (fijada ? " <span style='font-weight:400;color:#5a6580'>(fijada, Esc para soltar)</span>" : "") + "</div>" +
-      lista("Qué hace " + id, sal) + lista("Quién usa a " + id, ent);
+    panel.innerHTML = "<div style='font:600 15px Geist,sans-serif'>" + titulo + (fijada ? " <span style='font-weight:400;color:#5a6580'>(fijada: Esc o clic en el fondo para soltar)</span>" : "") + "</div>" +
+      lista("Qué hace " + titulo, sal) + lista("Quién usa a " + titulo, ent);
     panel.style.display = "block";
   }
   function limpiar(svg) {
     svg.classList.remove("foco", "patron");
     svg.querySelectorAll(".btn-patron.elegido").forEach(function (b) { b.classList.remove("elegido"); });
     svg.querySelectorAll(".activa, .elegida, .marcado").forEach(function (e) { e.classList.remove("activa", "elegida", "marcado"); });
+    limpiarFlujos();
     if (panel) panel.style.display = "none";
   }
+  function soltar() { fijada = null; enFoco = null; clearTimeout(espera); document.querySelectorAll("svg[data-dominio]").forEach(limpiar); }
   function enfocar(svg, id) {
     limpiar(svg);
     svg.classList.add("foco");
     var vecinas = {}; vecinas[id] = true;
-    var trazos = [];
-    svg.querySelectorAll(".rel").forEach(function (r) {
+    var trazos = [], v = vista(svg);
+    v.querySelectorAll(".rel").forEach(function (r) {
       var a = r.getAttribute("data-a"), b = r.getAttribute("data-b");
       if (a === id || b === id) {
         r.classList.add("activa"); vecinas[a] = vecinas[b] = true;
         if (r.hasAttribute("data-frase")) trazos.push(r);
       }
     });
-    svg.querySelectorAll(".clase").forEach(function (c) {
+    v.querySelectorAll(".clase").forEach(function (c) {
       if (vecinas[c.getAttribute("data-id")]) c.classList.add("activa");
       if (c.getAttribute("data-id") === id) c.classList.add("elegida");
     });
-    mostrarPanel(id, trazos);
+    flujos(svg, trazos);
+    mostrarPanel(nombre(svg, id), trazos, id);
   }
+  var sinMovimiento = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  // Los huecos que corren hacia la punta se dibujan en un SVG aparte, superpuesto al diagrama:
+  // animados dentro del diagrama obligaban a Chrome a volver a pintarlo entero en cada cuadro y,
+  // con todas las capas, trababan todo. Si el SVG se abre suelto, van dentro del diagrama.
+  var NS = "http://www.w3.org/2000/svg";
+  function limpiarFlujos() { document.querySelectorAll(".capa-flujo, .flujo-dominio").forEach(function (e) { e.remove(); }); }
+  function flujos(svg, rels) {
+    limpiarFlujos();
+    if (sinMovimiento || !rels.length) return;
+    var host = svg.parentNode, destino = vista(svg);
+    if (host && host.style && host.getBoundingClientRect) {
+      if (getComputedStyle(host).position === "static") host.style.position = "relative";
+      var r = svg.getBoundingClientRect(), h = host.getBoundingClientRect();
+      var o = document.createElementNS(NS, "svg");
+      o.setAttribute("class", "capa-flujo");
+      o.setAttribute("viewBox", svg.getAttribute("viewBox"));
+      // en porcentajes: sigue alineada si el zoom del reporte cambia el tamano con una clase fijada
+      o.style.cssText = "position:absolute;pointer-events:none;will-change:transform;overflow:visible;" +
+        "left:" + (r.left - h.left + host.scrollLeft) / host.scrollWidth * 100 + "%;top:" + (r.top - h.top + host.scrollTop) / host.scrollHeight * 100 + "%;" +
+        "width:" + r.width / host.scrollWidth * 100 + "%;height:" + r.height / host.scrollHeight * 100 + "%";
+      destino = document.createElementNS(NS, "g");
+      destino.setAttribute("transform", svg.querySelector(".lienzo").getAttribute("transform"));
+      o.appendChild(destino);
+      host.appendChild(o);
+    }
+    rels.forEach(function (rel) {
+      var f = document.createElementNS(NS, "path");
+      f.setAttribute("d", rel.querySelector("path").getAttribute("d"));
+      f.setAttribute("class", "flujo-dominio" + (rel.getAttribute("data-inv") ? " inv" : ""));
+      destino.appendChild(f);
+    });
+  }
+
+
+
+  // La vista de dominio viene dibujada; las demas combinaciones las arma el motor la primera vez
+  function capasOn(svg) {
+    var cs = [];
+    svg.querySelectorAll(".btn-capa.on:not(.fija)").forEach(function (b) { cs.push(b.getAttribute("data-capa")); });
+    return cs;
+  }
+  function activar(svg, v) {
+    svg.querySelectorAll(".vista").forEach(function (x) { x.classList.toggle("visible", x === v); });
+    var w = v.getAttribute("data-w"), h = v.getAttribute("data-h");
+    svg.setAttribute("viewBox", "0 0 " + w + " " + h);
+    if (svg.hasAttribute("width")) { svg.setAttribute("width", w); svg.setAttribute("height", h); }
+    svg.dispatchEvent(new CustomEvent("dominio-vista", { bubbles: true }));
+  }
+  function estado(svg, t) { var e = svg.querySelector(".estado"); if (e) e.textContent = t; }
+  function mostrarVista(svg) {
+    var capas = capasOn(svg), clave = ["dominio"].concat(capas).join("+");
+    var v = svg.querySelector(".vista[data-vista='" + clave + "']");
+    if (v) { activar(svg, v); return Promise.resolve(); }
+    if (!window.__dominioMotor) { estado(svg, "no se pudo cargar el motor del diagrama"); return Promise.resolve(); }
+    var cache = window.__dominioCache = window.__dominioCache || {};
+    estado(svg, "calculando la vista…");
+    if (!cache[clave]) cache[clave] = new Promise(function (r) { setTimeout(r, 30); }).then(function () { return window.__dominioMotor.vista(capas); });
+    return cache[clave].then(function (res) {
+      var v = svg.querySelector(".vista[data-vista='" + clave + "']");
+      if (!v) {
+        var doc = new DOMParser().parseFromString("<svg xmlns='http://www.w3.org/2000/svg'>" + res.html + "</svg>", "image/svg+xml");
+        v = svg.ownerDocument.importNode(doc.documentElement.firstElementChild, true);
+        svg.querySelector(".lienzo").appendChild(v);
+      }
+      if (["dominio"].concat(capasOn(svg)).join("+") === clave) { activar(svg, v); estado(svg, ""); }
+    }, function (err) { estado(svg, "error al calcular la vista: " + err); });
+  }
+  function prenderCapa(svg, capa) {
+    var b = svg.querySelector(".btn-capa[data-capa='" + capa + "']");
+    if (b && !b.classList.contains("on")) { b.classList.add("on"); return mostrarVista(svg); }
+    return Promise.resolve();
+  }
+  // El foco por hover espera a que el mouse se quede quieto: recalcularlo en cada caja que se
+  // cruza obliga a repintar todo el diagrama varias veces por segundo.
+  var espera = null, enFoco = null;
   document.addEventListener("mouseover", function (e) {
     var c = e.target.closest && e.target.closest(".clase"), svg = svgDe(c);
-    if (svg && !fijada) enfocar(svg, c.getAttribute("data-id"));
+    if (!svg || fijada || abajo) return;
+    var id = c.getAttribute("data-id");
+    clearTimeout(espera);
+    if (enFoco === id) return;
+    espera = setTimeout(function () { if (!fijada) { enFoco = id; enfocar(svg, id); } }, 90);
   });
   document.addEventListener("mouseout", function (e) {
     var c = e.target.closest && e.target.closest(".clase"), svg = svgDe(c);
-    if (svg && !fijada && !(e.relatedTarget && c.contains(e.relatedTarget))) limpiar(svg);
+    if (!svg || fijada || abajo || (e.relatedTarget && c.contains(e.relatedTarget))) return;
+    clearTimeout(espera);
+    var siguiente = e.relatedTarget && e.relatedTarget.closest && e.relatedTarget.closest(".clase");
+    if (enFoco && !siguiente) espera = setTimeout(function () { if (!fijada) { enFoco = null; limpiar(svg); } }, 90);
   });
   function enfocarPatron(svg, btn) {
     limpiar(svg);
     svg.classList.add("foco", "patron");
     svg.style.setProperty("--patron", btn.getAttribute("data-color"));
     btn.classList.add("elegido");
-    var en = {};
+    var en = {}, v = vista(svg);
     btn.getAttribute("data-clases").split(",").forEach(function (id) { en[id] = true; });
-    svg.querySelectorAll(".clase").forEach(function (c) { if (en[c.getAttribute("data-id")]) c.classList.add("activa"); });
+    v.querySelectorAll(".clase").forEach(function (c) { if (en[c.getAttribute("data-id")]) c.classList.add("activa"); });
     if (btn.getAttribute("data-rel") === "1")
-      svg.querySelectorAll(".rel").forEach(function (r) { if (en[r.getAttribute("data-a")] && en[r.getAttribute("data-b")]) r.classList.add("activa"); });
+      v.querySelectorAll(".rel").forEach(function (r) { if (en[r.getAttribute("data-a")] && en[r.getAttribute("data-b")]) r.classList.add("activa"); });
     (btn.getAttribute("data-metodos") || "").split(",").filter(Boolean).forEach(function (cm) {
       var p = cm.split(".");
-      svg.querySelectorAll(".clase[data-id='" + p[0] + "'] [data-m='" + p[1] + "']").forEach(function (e) { e.classList.add("marcado"); });
+      v.querySelectorAll(".clase[data-id='" + p[0] + "'] [data-m='" + p[1] + "']").forEach(function (e) { e.classList.add("marcado"); });
     });
     if (!document.body) return;
-    mostrarPanel("", []);
-    panel.innerHTML = btn.getAttribute("data-ficha") + "<div style='margin-top:6px;color:#5a6580'>Esc o clic afuera para salir</div>";
+    mostrarPanel("", [], "");
+    panel.innerHTML = btn.getAttribute("data-ficha") + "<div style='margin-top:6px;color:#5a6580'>Esc o clic en el fondo para salir</div>";
   }
+  document.addEventListener("mousedown", function (e) { abajo = { x: e.clientX, y: e.clientY }; }, true);
+  document.addEventListener("mouseup", function () { setTimeout(function () { abajo = null; }, 0); }, true);
   document.addEventListener("click", function (e) {
-    var b = e.target.closest && e.target.closest(".btn-patron"), sb = svgDe(b);
-    if (sb) {
+    var arrastre = abajo && Math.abs(e.clientX - abajo.x) + Math.abs(e.clientY - abajo.y) > 5;
+    if (arrastre) { e.stopPropagation(); return; }
+    var t = e.target;
+    if (t.closest && (t.closest(".panel-dominio") || (t.closest(".lb-bar") && !t.closest("#lbClose")))) return;
+    var k = t.closest && t.closest(".btn-capa"), sk = svgDe(k);
+    if (sk) {
       e.stopPropagation();
-      var nombre = "patron:" + b.getAttribute("data-patron");
-      fijada = fijada === nombre ? null : nombre;
-      if (fijada) enfocarPatron(sb, b); else limpiar(sb);
+      if (k.classList.contains("fija")) return;
+      soltar();
+      k.classList.toggle("on");
+      mostrarVista(sk);
       return;
     }
-    var c = e.target.closest && e.target.closest(".clase"), svg = svgDe(c);
+    var b = t.closest && t.closest(".btn-patron"), sb = svgDe(b);
+    if (sb) {
+      e.stopPropagation();
+      var nombreP = "patron:" + b.getAttribute("data-patron");
+      if (fijada === nombreP) { soltar(); return; }
+      soltar();
+      fijada = nombreP;
+      (b.hasAttribute("data-capa") ? prenderCapa(sb, b.getAttribute("data-capa")) : Promise.resolve()).then(function () {
+        if (fijada === nombreP) enfocarPatron(sb, b);
+      });
+      return;
+    }
+    var c = t.closest && t.closest(".clase"), svg = svgDe(c);
     if (svg) {
       e.stopPropagation();
       var id = c.getAttribute("data-id");
-      fijada = fijada === id ? null : id;
-      if (fijada) enfocar(svg, id); else limpiar(svg);
+      if (fijada === id) { soltar(); return; }
+      fijada = id;
+      enfocar(svg, id);
     } else if (fijada) {
-      fijada = null;
-      document.querySelectorAll("svg[data-dominio]").forEach(limpiar);
+      if (svgDe(t)) e.stopPropagation();
+      soltar();
     }
   }, true);
   document.addEventListener("keydown", function (e) {
-    if (e.key === "Escape" && fijada) { fijada = null; document.querySelectorAll("svg[data-dominio]").forEach(limpiar); }
+    if (e.key === "Escape" && fijada) soltar();
   });
 })();
 `;
 
-const modelo = leerModelo();
-const medidas = new Map([...modelo.clases.values()].map((c) => [c.id, medir(c)]));
-const g = await disponer(modelo, medidas);
-writeFileSync(SALIDA, dibujar(modelo, medidas, g));
-console.log(`${modelo.clases.size} clases, ${modelo.relaciones.length} relaciones -> ${SALIDA}`);
+const cab = cabeceraSvg();
+D.anchoCabecera = cab.ancho;
+const inicial = await motor.vista([]);
+writeFileSync(SALIDA, dibujar(inicial, cab));
+console.log(`dominio: ${inicial.clases} clases, ${inicial.relaciones} relaciones, ${inicial.w}x${inicial.h}`);
+console.log(`capas en el puml: ${[...presentes].join(", ")} -> ${SALIDA}`);
